@@ -14,11 +14,7 @@ A booking site for managing daily reservations of four coworking stations at **C
 - Rates, services, shared rules, and original informational PDF available from the site.
 - WhiteNoise for static assets, Gunicorn, and parameterized security settings for production.
 - Dockerfile and Docker Compose with PostgreSQL.
-
-## Important security note
-
-The PDF `New Services - MAIL.pdf` from the source material contains real access credentials. For this reason, **it is not distributed on the site or in the final package**. The old HTML prototype also contained Supabase configuration and an admin password directly in JavaScript. That logic has been completely removed: database and administration now pass through secure environment variables and Django's built-in security mechanisms.
-
+  
 ## Getting started with Docker Compose
 
 1. Copy the example environment file:
