@@ -1,35 +1,33 @@
-# Cowo d'la val - production Django booking site
+# Cowo d'la val - Coworking booking site
 
-Sito Django per la gestione delle prenotazioni giornaliere delle quattro postazioni del coworking **Cowo d'la val**.
+A booking site for managing daily reservations of four coworking stations at **Cowo d'la val**.
 
-## Cosa è stato integrato
+## What has been integrated
 
-- PostgreSQL al posto di SQLite.
-- Interfaccia e contenuti ricostruiti a partire dal materiale `spazio coworking`.
-- Quattro postazioni prenotabili per data, con controllo anti-doppia-prenotazione sia applicativo sia a livello database.
-- Registrazione, login, cancellazione prenotazioni e pannello admin Django.
-- Lingue: italiano, inglese, tedesco e francese.
-- Tema chiaro/scuro automatico tramite la preferenza del sistema operativo/browser.
-- Form di contatto verso `cowodlaval@inventati.org`, configurabile via ambiente.
-- Tariffe, servizi, regole condivise e PDF informativo originale disponibili dal sito.
-- WhiteNoise per gli asset statici, Gunicorn e impostazioni di sicurezza parametrizzate per produzione.
-- Dockerfile e Docker Compose con PostgreSQL.
+- PostgreSQL instead of SQLite.
+- Interface and content rebuilt from the "coworking space" source material.
+- Four bookable workstations by date, with double-booking prevention controls both at the application and database levels.
+- User registration, login, booking cancellation, and Django admin panel.
+- Languages: Italian, English, German, and French.
+- Automatic light/dark theme based on operating system/browser preference.
+- Contact form to `cowodlaval@inventati.org`, configurable via environment variables.
+- Rates, services, shared rules, and original informational PDF available from the site.
+- WhiteNoise for static assets, Gunicorn, and parameterized security settings for production.
+- Dockerfile and Docker Compose with PostgreSQL.
 
-## Nota di sicurezza importante
+## Important security note
 
-Il PDF `New Services - MAIL.pdf` del materiale sorgente contiene credenziali di accesso reali. Per questo motivo **non viene distribuito nel sito né nel pacchetto finale**. La password di quella casella dovrebbe essere cambiata prima della pubblicazione del sito.
+The PDF `New Services - MAIL.pdf` from the source material contains real access credentials. For this reason, **it is not distributed on the site or in the final package**. The old HTML prototype also contained Supabase configuration and an admin password directly in JavaScript. That logic has been completely removed: database and administration now pass through secure environment variables and Django's built-in security mechanisms.
 
-Anche il vecchio prototipo HTML conteneva configurazione Supabase e una password admin direttamente nel JavaScript. Quella logica è stata completamente rimossa: database e amministrazione passano ora dal backend Django.
+## Getting started with Docker Compose
 
-## Avvio con Docker Compose
-
-1. Copia il file di esempio:
+1. Copy the example environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-2. Modifica almeno:
+2. Modify at least:
 
 ```text
 DJANGO_SECRET_KEY
@@ -39,35 +37,35 @@ POSTGRES_PASSWORD
 DATABASE_URL
 ```
 
-Per Docker Compose il valore `DATABASE_URL` deve usare `db` come hostname, ad esempio:
+For Docker Compose, the `DATABASE_URL` value must use `db` as the hostname, for example:
 
 ```text
-DATABASE_URL=postgresql://coworking:UNA_PASSWORD_FORTE@db:5432/coworking
+DATABASE_URL=postgresql://coworking:A_STRONG_PASSWORD@db:5432/coworking
 ```
 
-3. Avvia:
+3. Start the containers:
 
 ```bash
 docker compose up --build -d
 ```
 
-Le migrazioni, `collectstatic` e la creazione/aggiornamento delle quattro postazioni vengono eseguite automaticamente all'avvio del container web.
+Migrations, `collectstatic`, and the creation/update of the four workstations run automatically when the web container starts.
 
-4. Crea l'amministratore Django:
+4. Create the Django administrator:
 
 ```bash
 docker compose exec web python manage.py createsuperuser
 ```
 
-5. In sviluppo locale il sito sarà disponibile su:
+5. In local development, the site will be available at:
 
 ```text
 http://127.0.0.1:8000/
 ```
 
-## Deploy senza Docker
+## Deploy without Docker
 
-Serve Python 3.12+ e un'istanza PostgreSQL raggiungibile.
+Requires Python 3.12+ and an accessible PostgreSQL instance.
 
 ```bash
 python3 -m venv .venv
@@ -81,17 +79,17 @@ python manage.py createsuperuser
 gunicorn config.wsgi:application --bind 0.0.0.0:8000
 ```
 
-In produzione Gunicorn dovrebbe stare dietro a un reverse proxy HTTPS, per esempio Nginx, Caddy o il proxy del provider.
+In production, Gunicorn should run behind an HTTPS reverse proxy, such as Nginx, Caddy, or your provider's proxy.
 
-## Configurazione email
+## Email configuration
 
-Il form **Contatti** invia le richieste all'indirizzo definito da:
+The **Contact** form sends requests to the address defined by:
 
 ```text
 CONTACT_EMAIL=cowodlaval@inventati.org
 ```
 
-Per l'invio reale devono essere compilate nel `.env` anche le impostazioni SMTP:
+For actual email delivery, SMTP settings must also be configured in `.env`:
 
 ```text
 EMAIL_HOST
@@ -103,11 +101,11 @@ EMAIL_USE_SSL
 DEFAULT_FROM_EMAIL
 ```
 
-Le credenziali SMTP non devono essere inserite nel repository.
+SMTP credentials must not be committed to the repository.
 
-## HTTPS e sicurezza
+## HTTPS and security
 
-Quando il dominio definitivo è attivo dietro HTTPS:
+When the final domain is active behind HTTPS:
 
 ```text
 DJANGO_DEBUG=False
@@ -115,48 +113,48 @@ DJANGO_SECURE_SSL_REDIRECT=True
 DJANGO_BEHIND_PROXY=True
 ```
 
-Imposta `DJANGO_CSRF_TRUSTED_ORIGINS` con schema HTTPS, ad esempio:
+Set `DJANGO_CSRF_TRUSTED_ORIGINS` with the HTTPS schema, for example:
 
 ```text
 DJANGO_CSRF_TRUSTED_ORIGINS=https://cowodlaval.example.org
 ```
 
-`DJANGO_SECURE_HSTS_SECONDS` è lasciato a `0` nel file di esempio. Dopo aver verificato che il sito funzioni esclusivamente in HTTPS può essere aumentato progressivamente.
+`DJANGO_SECURE_HSTS_SECONDS` is left at `0` in the example file. After verifying that the site functions exclusively over HTTPS, it can be increased gradually.
 
-Prima del deploy definitivo eseguire:
+Before final deployment, run:
 
 ```bash
 python manage.py check --deploy
 ```
 
-Prima dell'apertura al pubblico conviene inoltre verificare backup, recupero password, indirizzo SMTP, dominio definitivo e l'informativa privacy applicabile al servizio. Il sito non include analytics o cookie di profilazione: usa solo le funzionalità necessarie a sessione, autenticazione e protezione CSRF.
+Before opening to the public, it's also recommended to verify backups, password recovery, SMTP address, final domain, and applicable privacy policy for the service. The site does not include analytics or third-party tracking by default.
 
-## Test
+## Tests
 
-I test usano impostazioni separate con SQLite in memoria, esclusivamente per rendere la suite automatica indipendente dal database di produzione:
+Tests use separate settings with SQLite in memory, to keep the automated test suite independent of the production database:
 
 ```bash
 DJANGO_SETTINGS_MODULE=config.settings_test python manage.py test
 ```
 
-L'applicazione normale non usa SQLite.
+The normal application does not use SQLite.
 
-## Struttura principale
+## Main structure
 
 ```text
-accounts/                 registrazione utenti
-bookings/                 prenotazioni, vincoli e logica transazionale
-config/                   settings, home e form contatti
-locale/                   traduzioni IT/DE/FR; inglese come testo sorgente
-spaces/                   quattro postazioni coworking
-templates/                interfaccia HTML
-static/css/               tema responsive chiaro/scuro
-static/img/               loghi forniti
-static/docs/              PDF tariffe/regole fornito
-Dockerfile                immagine web
-docker-compose.yml          stack web + PostgreSQL
+accounts/                 user registration
+bookings/                 reservations, constraints, and transaction logic
+config/                   settings, home, and contact form
+locale/                   translations for IT/DE/FR; English as source language
+spaces/                   four coworking workstations
+templates/                HTML interface
+static/css/               responsive light/dark theme
+static/img/               provided logos
+static/docs/              provided rates/rules PDF
+Dockerfile                web image
+docker-compose.yml        web stack + PostgreSQL
 ```
 
 ## Backup
 
-Il volume PostgreSQL contiene i dati delle prenotazioni. In produzione è consigliato usare PostgreSQL gestito oppure predisporre backup periodici con `pg_dump`, conservati fuori dal server applicativo e protetti adeguatamente.
+The PostgreSQL volume contains reservation data. In production, it is recommended to use managed PostgreSQL or set up periodic backups with `pg_dump`, stored outside the application server.
