@@ -1,0 +1,353 @@
+msgid ""
+msgstr "Project-Id-Version: Cowo d'la val\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "A bookable desk in the shared coworking room."
+msgstr "Un poste réservable dans l'espace de coworking partagé."
+
+msgid "A booking must start and end on the same day."
+msgstr "Une réservation doit commencer et se terminer le même jour."
+
+msgid "A shared coworking space in a rural village: four desks, internet access, coffee area, heating, printer, projector, storage and a WC with shower."
+msgstr "Un espace de coworking partagé dans un village rural : quatre postes, accès Internet, coin café, chauffage, imprimante, vidéoprojecteur, rangement et WC avec douche."
+
+msgid "Access from 06:00 to 21:00, with other arrangements possible"
+msgstr "Accès de 06:00 à 21:00, avec d'autres arrangements possibles"
+
+msgid "Account created successfully."
+msgstr "Compte créé avec succès."
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "An account lets you confirm and manage your desk bookings."
+msgstr "Un compte vous permet de confirmer et de gérer vos réservations de poste."
+
+msgid "An administrator must create the coworking desks before bookings can be accepted."
+msgstr "Un administrateur doit créer les postes avant que les réservations puissent être acceptées."
+
+msgid "Ask for information"
+msgstr "Demander des informations"
+
+msgid "Ask us for information"
+msgstr "Nous demander des informations"
+
+msgid "Available"
+msgstr "Disponible"
+
+msgid "Avoid excessive noise and be respectful of other people."
+msgstr "Évitez le bruit excessif et respectez les autres personnes."
+
+msgid "Book"
+msgstr "Réserver"
+
+msgid "Book a desk"
+msgstr "Réserver un poste"
+
+msgid "Book. Create. Discover. Explore. Engage. Work."
+msgstr "Réserver. Créer. Découvrir. Explorer. Participer. Travailler."
+
+msgid "Booked by"
+msgstr "Réservé par"
+
+msgid "Booking cancelled."
+msgstr "Réservation annulée."
+
+msgid "Booking confirmed."
+msgstr "Réservation confirmée."
+
+msgid "Bookings"
+msgstr "Réservations"
+
+msgid "Bring an activity to the village"
+msgstr "Proposez une activité au village"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Cancellation and complete information"
+msgstr "Annulation et informations complètes"
+
+msgid "Cancelled"
+msgstr "Annulée"
+
+msgid "Check availability"
+msgstr "Vérifier la disponibilité"
+
+msgid "Choose a date and a desk"
+msgstr "Choisissez une date et un poste"
+
+msgid "Coffee area"
+msgstr "Coin café"
+
+msgid "Community proposal"
+msgstr "Proposition pour la communauté"
+
+msgid "Confirm booking"
+msgstr "Confirmer la réservation"
+
+msgid "Confirm your desk"
+msgstr "Confirmer votre poste"
+
+msgid "Confirmed"
+msgstr "Confirmée"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Cowo d'la val - Coworking Space"
+msgstr "Cowo d'la val - Espace de coworking"
+
+msgid "Cowo d'la val - information request"
+msgstr "Cowo d'la val - demande d'informations"
+
+msgid "Coworking Space"
+msgstr "Espace de coworking"
+
+msgid "Coworking desks"
+msgstr "Postes de coworking"
+
+msgid "Create account"
+msgstr "Créer le compte"
+
+msgid "Create an account"
+msgstr "Créer un compte"
+
+msgid "Daily"
+msgstr "Journée"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Desk"
+msgstr "Poste"
+
+msgid "Desk %(number)s"
+msgstr "Poste %(number)s"
+
+msgid "Desk availability"
+msgstr "Disponibilité des postes"
+
+msgid "Desks"
+msgstr "Postes"
+
+msgid "Details"
+msgstr "Détails"
+
+msgid "Details and services"
+msgstr "Détails et services"
+
+msgid "Do not enter with dirty shoes; wipe them down or take them off."
+msgstr "N'entrez pas avec des chaussures sales ; essuyez-les ou retirez-les."
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "European Union emblem"
+msgstr "Emblème de l'Union européenne"
+
+msgid "Everything you need to work"
+msgstr "Tout ce qu'il faut pour travailler"
+
+msgid "Expense reimbursement rates"
+msgstr "Tarifs de remboursement des frais"
+
+msgid "Follow the wood-stove instructions and ask for help if you are unsure."
+msgstr "Suivez les instructions du poêle à bois et demandez de l'aide en cas de doute."
+
+msgid "For cancellations less than 12 hours before the booking, a 50% expense reimbursement is requested."
+msgstr "Pour une annulation moins de 12 heures avant la réservation, un remboursement de 50 % des frais est demandé."
+
+msgid "For example: extra monitor, projector, wood stove assistance..."
+msgstr "Par exemple : écran supplémentaire, vidéoprojecteur, aide avec le poêle à bois..."
+
+msgid "Funded by the European Union"
+msgstr "Financé par l'Union européenne"
+
+msgid "Heating with wood stove"
+msgstr "Chauffage au poêle à bois"
+
+msgid "If something is damaged, let us know so we can work out how to fix it together."
+msgstr "Si quelque chose est endommagé, prévenez-nous afin que nous trouvions ensemble comment le réparer."
+
+msgid "Included services"
+msgstr "Services inclus"
+
+msgid "Information request from %(name)s (%(email)s):\n\n%(message)s"
+msgstr "Demande d'informations de %(name)s (%(email)s) :\n\n%(message)s"
+
+msgid "Internet access"
+msgstr "Accès Internet"
+
+msgid "Keep the desk, coffee table and floor clean; there is no cleaning service."
+msgstr "Gardez le poste, la table basse et le sol propres ; il n'y a pas de service de nettoyage."
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Let's talk"
+msgstr "Parlons-en"
+
+msgid "Log in"
+msgstr "Se connecter"
+
+msgid "Log in to confirm a booking or manage your reservations."
+msgstr "Connectez-vous pour confirmer une réservation ou gérer vos réservations."
+
+msgid "Log out"
+msgstr "Se déconnecter"
+
+msgid "Main navigation"
+msgstr "Navigation principale"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Monthly"
+msgstr "Mensuel"
+
+msgid "My bookings"
+msgstr "Mes réservations"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "New booking"
+msgstr "Nouvelle réservation"
+
+msgid "No bookings yet."
+msgstr "Aucune réservation pour le moment."
+
+msgid "No desks are configured yet"
+msgstr "Aucun poste n'est encore configuré"
+
+msgid "No desks are configured yet."
+msgstr "Aucun poste n'est encore configuré."
+
+msgid "No smoking inside."
+msgstr "Il est interdit de fumer à l'intérieur."
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "Occupied"
+msgstr "Occupé"
+
+msgid "Online booking"
+msgstr "Réservation en ligne"
+
+msgid "Open the full rates and shared-practices PDF"
+msgstr "Ouvrir le PDF complet des tarifs et règles partagées"
+
+msgid "Opening hours"
+msgstr "Horaires d'ouverture"
+
+msgid "Please take care of the space"
+msgstr "Merci de prendre soin de l'espace"
+
+msgid "Policy"
+msgstr "Règles"
+
+msgid "Printer and projector"
+msgstr "Imprimante et vidéoprojecteur"
+
+msgid "Questions about access, half-day use, activities, equipment or special arrangements? Send us a message."
+msgstr "Des questions sur l'accès, l'utilisation à la demi-journée, les activités, l'équipement ou des arrangements particuliers ? Envoyez-nous un message."
+
+msgid "Register"
+msgstr "S'inscrire"
+
+msgid "Requests or notes"
+msgstr "Demandes ou notes"
+
+msgid "Reservation"
+msgstr "Réservation"
+
+msgid "Reservations cover the selected day during the coworking opening hours."
+msgstr "Les réservations couvrent la journée sélectionnée pendant les heures d'ouverture du coworking."
+
+msgid "Select a date"
+msgstr "Sélectionner une date"
+
+msgid "Send request"
+msgstr "Envoyer la demande"
+
+msgid "Shared practices"
+msgstr "Règles partagées"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Storage"
+msgstr "Rangement"
+
+msgid "Student / resident"
+msgstr "Étudiant / résident"
+
+msgid "The booking covers the selected desk from 06:00 to 21:00 on that day."
+msgstr "La réservation couvre le poste sélectionné de 06:00 à 21:00 ce jour-là."
+
+msgid "The booking exceeds the maximum allowed duration."
+msgstr "La réservation dépasse la durée maximale autorisée."
+
+msgid "The booking is shorter than the minimum allowed duration."
+msgstr "La réservation est plus courte que la durée minimale autorisée."
+
+msgid "The booking must be within the opening hours."
+msgstr "La réservation doit être comprise dans les horaires d'ouverture."
+
+msgid "The end must be after the start."
+msgstr "La fin doit être postérieure au début."
+
+msgid "The rates are calculated to cover the minimum use costs, including electricity, Wi-Fi, cleaning products and firewood. Printing and food/drink consumption are handled separately."
+msgstr "Les tarifs sont calculés pour couvrir les coûts minimums d'utilisation, notamment l'électricité, le Wi-Fi, les produits de nettoyage et le bois de chauffage. Les frais d'impression ainsi que les consommations de nourriture et de boissons sont traités séparément."
+
+msgid "The space was made possible in part by European co-funding for the restoration of rural architecture. If you organise an event, meeting or activity related to your work, research or passion and open to the community, coworking costs can be considered covered. Contact us and we can discuss it together."
+msgstr "Cet espace a été rendu possible en partie grâce à un cofinancement européen pour la restauration de l'architecture rurale. Si vous organisez un événement, une rencontre ou une activité liée à votre travail, vos recherches ou votre passion et ouverte à la communauté, les coûts du coworking peuvent être considérés comme couverts. Contactez-nous pour en discuter ensemble."
+
+msgid "This desk is already booked for the selected date."
+msgstr "Ce poste est déjà réservé à la date sélectionnée."
+
+msgid "Up to half day"
+msgstr "Jusqu'à une demi-journée"
+
+msgid "Use the space as booked and respect other people's reservations."
+msgstr "Utilisez l'espace conformément à votre réservation et respectez les réservations des autres."
+
+msgid "User"
+msgstr "Utilisateur"
+
+msgid "Ventilate the room and do not leave lights on unnecessarily."
+msgstr "Aérez la pièce et ne laissez pas les lumières allumées inutilement."
+
+msgid "WC with shower"
+msgstr "WC avec douche"
+
+msgid "We could not send your message. Please try again later or contact us by email."
+msgstr "Nous n'avons pas pu envoyer votre message. Réessayez plus tard ou contactez-nous par e-mail."
+
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+msgid "When you are the last to leave, close all windows and external door flaps."
+msgstr "Lorsque vous êtes la dernière personne à partir, fermez toutes les fenêtres et les battants extérieurs de la porte."
+
+msgid "You can check availability without an account. Log in or register when you are ready to confirm a booking."
+msgstr "Vous pouvez vérifier les disponibilités sans compte. Connectez-vous ou inscrivez-vous lorsque vous souhaitez confirmer une réservation."
+
+msgid "You cannot book a past date."
+msgstr "Vous ne pouvez pas réserver une date passée."
+
+msgid "You cannot book in the past."
+msgstr "Vous ne pouvez pas réserver dans le passé."
+
+msgid "You do not have permission to cancel this booking."
+msgstr "Vous n'avez pas l'autorisation d'annuler cette réservation."
+
+msgid "Your message has been sent. We will reply as soon as possible."
+msgstr "Votre message a été envoyé. Nous vous répondrons dès que possible."

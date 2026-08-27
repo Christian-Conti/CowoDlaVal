@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "New booking" %} - Cowo d'la val{% endblock %}
+{% block content %}
+<section class="page-section shell narrow-shell">
+    <div class="section-heading">
+        <p class="eyebrow">{% translate "Reservation" %}</p>
+        <h1>{% translate "Confirm your desk" %}</h1>
+        <p>{% translate "The booking covers the selected desk from 06:00 to 21:00 on that day." %}</p>
+    </div>
+    <section class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="button" type="submit">{% translate "Confirm booking" %}</button>
+        </form>
+    </section>
+</section>
+{% endblock %}

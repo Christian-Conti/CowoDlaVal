@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Desks" %} - Cowo d'la val{% endblock %}
+{% block content %}
+<section class="page-section shell">
+    <div class="section-heading">
+        <p class="eyebrow">COWO D'LA VAL</p>
+        <h1>{% translate "Coworking desks" %}</h1>
+    </div>
+    <div class="space-grid">
+        {% for space in spaces %}
+            <article class="info-card">
+                <h2>{{ space }}</h2>
+                <p>{% translate "A bookable desk in the shared coworking room." %}</p>
+                <dl>
+                    <dt>{% translate "Opening hours" %}</dt><dd>{{ space.opening_time|time:"H:i" }}–{{ space.closing_time|time:"H:i" }}</dd>
+                </dl>
+                <a class="button" href="{% url 'home' %}#booking">{% translate "Check availability" %}</a>
+            </article>
+        {% empty %}
+            <div class="empty-state card-panel"><p>{% translate "No desks are configured yet." %}</p></div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

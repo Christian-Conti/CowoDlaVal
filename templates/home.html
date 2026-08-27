@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load i18n static %}
+{% block title %}{% translate "Cowo d'la val - Coworking Space" %}{% endblock %}
+{% block content %}
+<section class="hero-section">
+    <div class="dot-field dot-field-left" aria-hidden="true"></div>
+    <div class="dot-field dot-field-right" aria-hidden="true"></div>
+    <div class="shell hero-grid">
+        <div class="hero-copy">
+            <p class="eyebrow">COWO D'LA VAL</p>
+            <h1>{% translate "Coworking Space" %}</h1>
+            <p class="hero-manifesto">{% translate "Book. Create. Discover. Explore. Engage. Work." %}</p>
+            <p class="hero-text">{% translate "A shared coworking space in a rural village: four desks, internet access, coffee area, heating, printer, projector, storage and a WC with shower." %}</p>
+            <div class="hero-actions">
+                <a class="button" href="#booking">{% translate "Book a desk" %}</a>
+                <a class="button secondary" href="{% url 'contact' %}">{% translate "Ask for information" %}</a>
+            </div>
+        </div>
+        <div class="hero-art hero-image-wrap">
+            <img class="hero-image" src="{% static 'img/hero-coworking.png' %}" alt="{% translate 'Coworking illustration' %}">
+        </div>
+    </div>
+</section>
+
+<section id="booking" class="section booking-section">
+    <div class="shell narrow-shell">
+        <div class="section-heading centered">
+            <p class="eyebrow">{% translate "Online booking" %}</p>
+            <h2>{% translate "Choose a date and a desk" %}</h2>
+            <p>{% translate "Reservations cover the selected day during the coworking opening hours." %}</p>
+        </div>
+
+        <form method="get" action="#booking" class="date-filter card-panel">
+            <label for="booking-date">{% translate "Select a date" %}</label>
+            <div class="date-row">
+                <input id="booking-date" type="date" name="date" min="{{ today|date:'Y-m-d' }}" value="{{ selected_date|date:'Y-m-d' }}">
+                <button type="submit" class="button compact">{% translate "Check availability" %}</button>
+            </div>
+        </form>
+
+        {% if spaces %}
+            <div class="desk-grid" aria-label="{% translate 'Desk availability' %}">
+                {% for space in spaces %}
+                    {% if space.id in occupied_space_ids %}
+                        <article class="desk-card occupied" aria-disabled="true">
+                            <span class="desk-number">{{ space }}</span>
+                            <span class="desk-state">{% translate "Occupied" %}</span>
+                            <span class="desk-booked-by">{% translate "Booked by" %}: <strong>{{ space.booked_by_name }}</strong></span>
+                        </article>
+                    {% else %}
+                        <a class="desk-card available" href="{% url 'booking_create' %}?space={{ space.id }}&date={{ selected_date|date:'Y-m-d' }}">
+                            <span class="desk-number">{{ space }}</span>
+                            <span class="desk-state">{% translate "Available" %}</span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="legend">
+                <span><i class="legend-dot available-dot"></i>{% translate "Available" %}</span>
+                <span><i class="legend-dot occupied-dot"></i>{% translate "Occupied" %}</span>
+            </div>
+            {% if not user.is_authenticated %}
+                <p class="booking-note">{% translate "You can check availability without an account. Log in or register when you are ready to confirm a booking." %}</p>
+            {% endif %}
+        {% else %}
+            <div class="empty-state card-panel">
+                <h3>{% translate "No desks are configured yet" %}</h3>
+                <p>{% translate "An administrator must create the coworking desks before bookings can be accepted." %}</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section id="details" class="section info-section">
+    <div class="shell">
+        <div class="section-heading">
+            <p class="eyebrow">{% translate "Details and services" %}</p>
+            <h2>{% translate "Everything you need to work" %}</h2>
+        </div>
+        <div class="info-grid">
+            <article class="info-card rates-card">
+                <h3>{% translate "Expense reimbursement rates" %}</h3>
+                <table class="rates-table">
+                    <thead>
+                        <tr><th>{% translate "Standard" %}</th><th>{% translate "Student / resident" %}</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>{% translate "Up to half day" %} <strong>5€</strong></td><td>{% translate "Up to half day" %} <strong>3€</strong></td></tr>
+                        <tr><td>{% translate "Daily" %} <strong>8€</strong></td><td>{% translate "Daily" %} <strong>5€</strong></td></tr>
+                        <tr><td>{% translate "Weekly" %} <strong>35€</strong></td><td>{% translate "Weekly" %} <strong>20€</strong></td></tr>
+                        <tr><td>{% translate "Monthly" %} <strong>100€</strong></td><td>{% translate "Monthly" %} <strong>50€</strong></td></tr>
+                    </tbody>
+                </table>
+                <p class="fine-print">{% translate "The rates are calculated to cover the minimum use costs, including electricity, Wi-Fi, cleaning products and firewood. Printing and food/drink consumption are handled separately." %}</p>
+            </article>
+
+            <article class="info-card">
+                <h3>{% translate "Included services" %}</h3>
+                <ul class="check-list">
+                    <li>{% translate "Internet access" %}</li>
+                    <li>{% translate "Coffee area" %}</li>
+                    <li>{% translate "Heating with wood stove" %}</li>
+                    <li>{% translate "Printer and projector" %}</li>
+                    <li>{% translate "Storage" %}</li>
+                    <li>{% translate "WC with shower" %}</li>
+                    <li>{% translate "Access from 06:00 to 21:00, with other arrangements possible" %}</li>
+                </ul>
+            </article>
+        </div>
+
+        <div class="community-feature">
+            <figure class="village-photo-wrap">
+                <img class="village-photo" src="{% static 'img/veglio.jpg' %}" alt="Veglio" loading="lazy">
+            </figure>
+            <div class="community-banner">
+                <div>
+                    <p class="eyebrow">{% translate "Community proposal" %}</p>
+                    <h3>{% translate "Bring an activity to the village" %}</h3>
+                    <p>{% translate "The space was made possible in part by European co-funding for the restoration of rural architecture. If you organise an event, meeting or activity related to your work, research or passion and open to the community, coworking costs can be considered covered. Contact us and we can discuss it together." %}</p>
+                </div>
+                <a class="button light" href="{% url 'contact' %}">{% translate "Let's talk" %}</a>
+            </div>
+        </div>
+
+        <div class="rules-grid">
+            <article class="rules-card">
+                <p class="eyebrow">{% translate "Shared practices" %}</p>
+                <h3>{% translate "Please take care of the space" %}</h3>
+                <ul>
+                    <li>{% translate "No smoking inside." %}</li>
+                    <li>{% translate "Do not enter with dirty shoes; wipe them down or take them off." %}</li>
+                    <li>{% translate "Ventilate the room and do not leave lights on unnecessarily." %}</li>
+                    <li>{% translate "Use the space as booked and respect other people's reservations." %}</li>
+                    <li>{% translate "Keep the desk, coffee table and floor clean; there is no cleaning service." %}</li>
+                    <li>{% translate "Avoid excessive noise and be respectful of other people." %}</li>
+                    <li>{% translate "When you are the last to leave, close all windows and external door flaps." %}</li>
+                    <li>{% translate "Follow the wood-stove instructions and ask for help if you are unsure." %}</li>
+                    <li>{% translate "If something is damaged, let us know so we can work out how to fix it together." %}</li>
+                </ul>
+            </article>
+            <article class="policy-card">
+                <p class="eyebrow">{% translate "Policy" %}</p>
+                <h3>{% translate "Cancellation and complete information" %}</h3>
+                {% get_current_language as current_language %}
+                {% if current_language == "it" %}
+                    <p>Per cancellazioni effettuate meno di 12 ore prima della prenotazione è richiesto il 50% del rimborso spese.</p>
+                {% elif current_language == "de" %}
+                    <p>Bei Stornierungen weniger als 12 Stunden vor der Buchung werden 50 % des Kostenbeitrags erbeten.</p>
+                {% elif current_language == "fr" %}
+                    <p>Pour une annulation moins de 12 heures avant la réservation, un remboursement de 50 % des frais est demandé.</p>
+                {% else %}
+                    <p>For cancellations less than 12 hours before the booking, a 50% expense reimbursement is requested.</p>
+                {% endif %}
+                <a class="text-link" href="{% static 'docs/cowo-rules-and-rates.pdf' %}" target="_blank" rel="noopener">{% translate "Open the full rates and shared-practices PDF" %} →</a>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Log in" %} - Cowo d'la val{% endblock %}
+{% block content %}
+<section class="page-section shell narrow-shell">
+    <div class="section-heading">
+        <p class="eyebrow">COWO D'LA VAL</p>
+        <h1>{% translate "Log in" %}</h1>
+        <p>{% translate "Log in to confirm a booking or manage your reservations." %}</p>
+    </div>
+    <section class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            <button class="button" type="submit">{% translate "Log in" %}</button>
+        </form>
+    </section>
+</section>
+{% endblock %}

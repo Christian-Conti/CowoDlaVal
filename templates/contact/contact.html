@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Contact" %} - Cowo d'la val{% endblock %}
+{% block content %}
+<section class="page-section shell contact-layout">
+    <div class="contact-copy">
+        <p class="eyebrow">{% translate "Contact" %}</p>
+        <h1>{% translate "Ask us for information" %}</h1>
+        <p>{% translate "Questions about access, half-day use, activities, equipment or special arrangements? Send us a message." %}</p>
+        <div class="contact-email">
+            <span>{% translate "Email" %}</span>
+            <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+        </div>
+    </div>
+    <section class="form-card contact-form-card">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="button" type="submit">{% translate "Send request" %}</button>
+        </form>
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Bookings" %} - Cowo d'la val{% endblock %}
+{% block content %}
+<section class="page-section shell">
+    <div class="heading-row">
+        <div>
+            <p class="eyebrow">COWO D'LA VAL</p>
+            <h1>{% translate "Bookings" %}</h1>
+        </div>
+        <a class="button" href="{% url 'home' %}#booking">{% translate "New booking" %}</a>
+    </div>
+    <div class="table-card">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% translate "Desk" %}</th>
+                        {% if user.is_staff %}<th>{% translate "User" %}</th>{% endif %}
+                        <th>{% translate "Date" %}</th>
+                        <th>{% translate "Status" %}</th>
+                        <th>{% translate "Notes" %}</th>
+                        <th>{% translate "Action" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.space }}</td>
+                            {% if user.is_staff %}<td>{{ booking.user.username }}</td>{% endif %}
+                            <td>{{ booking.date|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td><span class="status {{ booking.status }}">{{ booking.get_status_display }}</span></td>
+                            <td>{{ booking.notes|default:"—" }}</td>
+                            <td>
+                                {% if booking.status == "confirmed" %}
+                                    <form method="post" action="{% url 'booking_cancel' booking.id %}">
+                                        {% csrf_token %}
+                                        <button class="danger-button" type="submit">{% translate "Cancel" %}</button>
+                                    </form>
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6">{% translate "No bookings yet." %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
