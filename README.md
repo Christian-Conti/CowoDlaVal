@@ -5,12 +5,11 @@ A booking site for managing daily reservations of four coworking stations at **C
 ## What has been integrated
 
 - PostgreSQL instead of SQLite.
-- Interface and content rebuilt from the "coworking space" source material.
-- Four bookable workstations by date, with double-booking prevention controls both at the application and database levels.
+- Bookable workstations by date, with double-booking prevention controls both at the application and database levels.
 - User registration, login, booking cancellation, and Django admin panel.
 - Languages: Italian, English, German, and French.
 - Automatic light/dark theme based on operating system/browser preference.
-- Contact form to `cowodlaval@inventati.org`, configurable via environment variables.
+- Contact form to `xxxxxxxxxx@xxxxx.xxx`, configurable via environment variables.
 - Rates, services, shared rules, and original informational PDF available from the site.
 - WhiteNoise for static assets, Gunicorn, and parameterized security settings for production.
 - Dockerfile and Docker Compose with PostgreSQL.
