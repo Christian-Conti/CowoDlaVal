@@ -35,6 +35,28 @@
                 <a class="nav-cta" href="{% url 'signup' %}">{% translate "Register" %}</a>
             {% endif %}
         </div>
+        <details class="mobile-menu">
+            <summary>
+                <span aria-hidden="true">☰</span>
+                <span>{% translate "Menu" %}</span>
+            </summary>
+            <div class="mobile-menu-panel">
+                <a href="{% url 'home' %}#booking">{% translate "Book" %}</a>
+                <a href="{% url 'home' %}#details">{% translate "Details" %}</a>
+                <a href="{% url 'contact' %}">{% translate "Contact" %}</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'booking_list' %}">{% translate "My bookings" %}</a>
+                    {% if user.is_staff %}<a href="{% url 'admin:index' %}">{% translate "Admin" %}</a>{% endif %}
+                    <form action="{% url 'logout' %}" method="post" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-button">{% translate "Log out" %}</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}">{% translate "Log in" %}</a>
+                    <a class="nav-cta" href="{% url 'signup' %}">{% translate "Register" %}</a>
+                {% endif %}
+            </div>
+        </details>
         <form action="{% url 'set_language' %}" method="post" class="language-form">
             {% csrf_token %}
             <input name="next" type="hidden" value="{{ request.get_full_path }}">

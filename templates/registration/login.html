@@ -13,7 +13,12 @@
             {% csrf_token %}
             {{ form.as_p }}
             {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
-            <button class="button" type="submit">{% translate "Log in" %}</button>
+            <div class="login-actions">
+                <button class="button" type="submit">{% translate "Log in" %}</button>
+                {% if form.errors %}
+                    <a class="button secondary login-register" href="{% url 'signup' %}">{% translate "Register" %}</a>
+                {% endif %}
+            </div>
         </form>
     </section>
 </section>

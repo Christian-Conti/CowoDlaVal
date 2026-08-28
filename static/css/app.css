@@ -152,6 +152,70 @@ img {
     color: var(--blue) !important;
 }
 
+.mobile-menu {
+    display: none;
+    position: relative;
+    margin-left: auto;
+}
+
+.mobile-menu summary {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface-soft);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 750;
+    list-style: none;
+}
+
+.mobile-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.mobile-menu summary:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--blue) 28%, transparent);
+    outline-offset: 2px;
+}
+
+.mobile-menu-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(280px, calc(100vw - 26px));
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.mobile-menu-panel a,
+.mobile-menu-panel .nav-button {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.mobile-menu-panel a:hover,
+.mobile-menu-panel .nav-button:hover {
+    background: var(--surface-soft);
+    color: var(--blue);
+}
+
+.mobile-menu-panel .nav-cta {
+    border: 0;
+    background: var(--blue);
+    color: #ffffff !important;
+}
+
 .inline-form {
     margin: 0;
 }
@@ -759,6 +823,12 @@ textarea {
     margin: 5px 0;
 }
 
+.login-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 .table-card {
     overflow: hidden;
 }
@@ -921,12 +991,11 @@ dt {
 
 @media (max-width: 900px) {
     .nav-links {
-        gap: 12px;
+        display: none;
     }
 
-    .nav-links > a:not(.nav-cta),
-    .nav-links .inline-form {
-        display: none;
+    .mobile-menu {
+        display: block;
     }
 
     .hero-grid {
@@ -960,10 +1029,6 @@ dt {
     .nav {
         min-height: 68px;
         gap: 12px;
-    }
-
-    .nav-cta {
-        display: none;
     }
 
     .hero-grid,
