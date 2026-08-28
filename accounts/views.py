@@ -1,10 +1,17 @@
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
-from .forms import SignUpForm
+from .forms import EmailAuthenticationForm, SignUpForm
+
+
+class EmailLoginView(LoginView):
+    authentication_form = EmailAuthenticationForm
+    template_name = "registration/login.html"
+    redirect_authenticated_user = True
 
 
 @require_http_methods(["GET", "POST"])
