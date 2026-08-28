@@ -11,10 +11,12 @@ from spaces.models import Space
 def get_booking_date_range(start_date, duration):
     """
     Return the inclusive start/end date range for a booking duration.
+
+    The booking UI historically used multiple names for a one-day booking.
+    Normalize them here so old links/forms and the current UI remain compatible.
     """
     duration = str(duration).strip().lower()
 
-    # Normalize values used by current and previous booking forms.
     aliases = {
         "full_day": "daily",
         "full-day": "daily",
@@ -42,6 +44,7 @@ def get_booking_date_range(start_date, duration):
         _("Select a valid duration: %(duration)s"),
         params={"duration": duration},
     )
+
 
 
 def get_overlapping_bookings(
@@ -156,13 +159,27 @@ def _get_available_ranges(start_date, end_date, booked_dates: set) -> List[Tuple
     return ranges
 
 
-def suggest_split_booking(start_date, end_date, requested_desk_id: int) -> dict | None:
+def suggest_split_booking(
+    start_date,
+    end_date,
+    requested_desk_id: int,
+) -> dict | None:
     """
-    Suggest free date ranges when the requested desk is not available for
-    the complete period.
+    Suggest contiguous free ranges when the requested desk is unavailable.
 
-    The returned structure keeps the keys used by the booking confirmation
-    flow and includes ranges for every active desk.
+    The returned structure intentionally exposes both the current "space"
+    terminology and the older "desk" terminology. The web booking flow has
+    used both names over time, so keeping the aliases here gives callers one
+    stable compatibility contract.
+
+    Every split option contains:
+      - space / desk: the Space instance
+      - space_id / desk_id: the Space primary key
+      - start_date / end_date: inclusive available interval
+      - days: inclusive number of calendar days in the interval
+
+    At the top level both "options" and "split_options" reference the same
+    option list.
     """
     requested_space = Space.objects.filter(
         pk=requested_desk_id,
@@ -197,6 +214,8 @@ def suggest_split_booking(start_date, end_date, requested_desk_id: int) -> dict 
         )
 
         for available_start, available_end in available_ranges:
+            days = (available_end - available_start).days + 1
+
             options.append(
                 {
                     "space": space,
@@ -205,6 +224,7 @@ def suggest_split_booking(start_date, end_date, requested_desk_id: int) -> dict 
                     "desk_id": space.pk,
                     "start_date": available_start,
                     "end_date": available_end,
+                    "days": days,
                 }
             )
 
@@ -213,7 +233,7 @@ def suggest_split_booking(start_date, end_date, requested_desk_id: int) -> dict 
 
     options.sort(
         key=lambda option: (
-            -(option["end_date"] - option["start_date"]).days,
+            -option["days"],
             option["space"].name,
             option["start_date"],
         )
@@ -226,3 +246,4 @@ def suggest_split_booking(start_date, end_date, requested_desk_id: int) -> dict 
         "options": options,
         "split_options": options,
     }
+
