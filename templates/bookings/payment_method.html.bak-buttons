@@ -55,11 +55,11 @@
                     {% endfor %}
                 </ul>
             </fieldset>
-            <button class="button payment-submit action-button action-button--positive" type="submit">{% translate "Continue" %}</button>
+            <button class="button payment-submit" type="submit">{% translate "Continue" %}</button>
         
         <button
             type="submit"
-            class="button danger abandon-booking-button action-button action-button--danger"
+            class="button danger abandon-booking-button"
             formaction="{% url 'abandon' booking.booking_code %}"
             formmethod="post"
             formnovalidate

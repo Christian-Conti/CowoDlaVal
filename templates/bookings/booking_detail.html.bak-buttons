@@ -32,12 +32,12 @@
 
         <div class="detail-actions">
             {% if booking.can_user_modify %}
-                <a class="button secondary action-button action-button--secondary" href="{% url 'booking_modify' booking.id %}">{% translate "Modify booking" %}</a>
+                <a class="button secondary" href="{% url 'booking_modify' booking.id %}">{% translate "Modify booking" %}</a>
             {% endif %}
             {% if booking.can_user_cancel %}
                 <form method="post" action="{% url 'booking_cancel' booking.id %}">
                     {% csrf_token %}
-                    <button class="danger-button action-button action-button--danger" type="submit">{% translate "Cancel booking" %}</button>
+                    <button class="danger-button" type="submit">{% translate "Cancel booking" %}</button>
                 </form>
             {% endif %}
         </div>

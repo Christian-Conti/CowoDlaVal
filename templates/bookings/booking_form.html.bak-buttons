@@ -13,12 +13,7 @@
             {% csrf_token %}
             {{ form.as_p }}
             <p class="policy-notice">{% translate "Only bookings with payment in person can be cancelled autonomously. Online-paid bookings require assistance from the coworking staff." %}</p>
-            
-{# cowodlaval-normal-payment-action #}
-{% if not alternative_choice_required %}
-<button class="button action-button action-button--positive" type="submit">{% if is_update %}{% translate "Save changes" %}{% else %}{% translate "Continue to payment" %}{% endif %}</button>
-{% endif %}
-
+            <button class="button" type="submit">{% if is_update %}{% translate "Save changes" %}{% else %}{% translate "Continue to payment" %}{% endif %}</button>
         
 {% if alternative_choice_required and alternative_suggestion %}
 
@@ -56,7 +51,7 @@
                 </label>
             {% endfor %}
         </div>
-        <button type="submit" class="button action-button action-button--positive">{% translate "Continue to payment" %}</button>
+        <button type="submit" class="button">{% translate "Continue with selected alternative" %}</button>
     {% else %}
         <h2 id="alternative-choice-title">{% translate "No solutions available" %}</h2>
         <div class="cowodlaval-alternative-choice__empty">
