@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
@@ -200,13 +201,38 @@ class PaymentAndEmailTests(TestCase):
         self.assertIn(self.booking.booking_code, output.getvalue())
         self.assertIn(str(self.space), output.getvalue())
 
+    def test_dashboard_manages_onsite_payment_and_booking_state(self):
+        select_onsite_payment(booking=self.booking, user=self.user)
+        call_command("bookings_dashboard", mark_paid=self.booking.booking_code, stdout=StringIO())
+        call_command("bookings_dashboard", cancel_booking=self.booking.booking_code, stdout=StringIO())
+        self.booking.refresh_from_db()
+
+        self.assertEqual(self.booking.payment_status, Booking.PaymentStatus.PAID)
+        self.assertIsNotNone(self.booking.paid_at)
+        self.assertEqual(self.booking.status, Booking.Status.CANCELLED)
+
+    def test_dashboard_prevents_conflicting_confirmation(self):
+        call_command("bookings_dashboard", cancel_booking=self.booking.booking_code, stdout=StringIO())
+        create_booking(
+            user=self.user,
+            space_id=self.space.pk,
+            booking_date=self.booking.date,
+        )
+
+        with self.assertRaises(CommandError):
+            call_command("bookings_dashboard", confirm_booking=self.booking.booking_code)
+
     def test_booking_detail_and_payment_pages_render(self):
         self.client.force_login(self.user)
         detail = self.client.get(reverse("booking_detail", kwargs={"pk": self.booking.pk}))
         payment = self.client.get(reverse("booking_payment", kwargs={"pk": self.booking.pk}))
+        booking_list = self.client.get(reverse("booking_list"))
 
         self.assertContains(detail, self.booking.booking_code)
         self.assertContains(payment, self.booking.booking_code)
+        self.assertContains(payment, "payment-option-paypal")
+        self.assertContains(payment, "payment-option-stripe")
+        self.assertContains(booking_list, 'data-label="')
 
     def test_booking_admin_changelist_loads(self):
         admin_user = User.objects.create_superuser(username="admin", email="admin@example.org")

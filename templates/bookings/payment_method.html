@@ -15,9 +15,43 @@
             {{ form.non_field_errors }}
             <fieldset class="payment-options">
                 <legend>{{ form.payment_method.label }}</legend>
-                {{ form.payment_method }}
+                {{ form.payment_method.errors }}
+                <ul class="payment-option-list">
+                    {% for radio in form.payment_method %}
+                        <li class="payment-option payment-option-{{ radio.data.value }}">
+                            <label for="{{ radio.id_for_label }}">
+                                {{ radio.tag }}
+                                <span class="payment-icon" aria-hidden="true">
+                                    {% if radio.data.value == "onsite" %}
+                                        <svg viewBox="0 0 24 24"><path d="M3 7h18v12H3zM7 7V5h10v2M7 13h4"/></svg>
+                                    {% elif radio.data.value == "satispay" %}
+                                        <span class="payment-monogram">S</span>
+                                    {% elif radio.data.value == "paypal" %}
+                                        <span class="payment-monogram">P</span>
+                                    {% else %}
+                                        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>
+                                    {% endif %}
+                                </span>
+                                <span class="payment-option-copy">
+                                    <strong>{{ radio.choice_label }}</strong>
+                                    <small>
+                                        {% if radio.data.value == "onsite" %}
+                                            {% translate "Pay when you arrive at the coworking space." %}
+                                        {% elif radio.data.value == "satispay" %}
+                                            {% translate "Continue securely with Satispay." %}
+                                        {% elif radio.data.value == "paypal" %}
+                                            {% translate "Continue securely with PayPal." %}
+                                        {% else %}
+                                            {% translate "Pay by card through Stripe Checkout." %}
+                                        {% endif %}
+                                    </small>
+                                </span>
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
             </fieldset>
-            <button class="button" type="submit">{% translate "Continue" %}</button>
+            <button class="button payment-submit" type="submit">{% translate "Continue" %}</button>
         </form>
         <p class="fine-print">{% translate "Card payments use Stripe Checkout. Cowo d'la val never receives or stores card details." %}</p>
     </section>

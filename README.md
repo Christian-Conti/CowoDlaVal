@@ -6,17 +6,18 @@ A multilingual Django website for viewing availability, booking one of four cowo
 
 ## Overview
 
-The application keeps the existing Cowo d'la val public site and adds authenticated booking management, human-readable booking codes, frozen daily prices, confirmation email, payment tracking, Django Admin tools, and an SSH-friendly terminal dashboard. Italian is the default language; English, German, and French are also available. The responsive light/dark theme follows the device preference.
+The application keeps the existing Cowo d'la val public site and adds authenticated booking management, human-readable booking codes, frozen daily prices, confirmation email, payment tracking, password recovery, Django Admin tools, and a server booking manager with terminal and desktop interfaces. Italian is the default language; English, German, and French are also available. The responsive light/dark theme follows the device preference.
 
 ## Features
 
 - Four desk availability and database-level double-booking protection.
 - Booking codes such as `COWO-2026-A1B2C3D4`.
 - Standard daily rate (€8) and student/resident daily rate (€5), frozen on each booking.
-- Payment on site, Satispay Web Redirect, PayPal Orders v2, and Stripe Checkout.
+- Responsive payment cards with icons for payment on site, Satispay Web Redirect, PayPal Orders v2, and Stripe Checkout.
 - Verified, idempotent payment state updates; no card data enters Django or PostgreSQL.
 - Localised confirmation email and authenticated manage link.
-- Booking history, payment/status badges, admin filters, and terminal dashboard.
+- Booking history, mobile booking cards, payment/status badges, admin filters, and terminal/desktop dashboard.
+- Account registration, password change, and email-based password reset.
 - PostgreSQL, Docker Compose, persistent database volume, Gunicorn, WhiteNoise, and automatic migrations.
 
 ## Architecture
@@ -168,13 +169,33 @@ Plain HTTP is for trusted local testing only. Re-enable HTTPS redirect before pu
 
 Open `/admin/` as a superuser. The booking list shows code, date, desk, account/name, status, frozen amount, payment method/status, and creation time. Filters cover date, desk, booking status, payment method, and payment status. Search supports booking code and Django user identity fields. Payment records expose only non-sensitive provider/order references and metadata.
 
-## Terminal booking dashboard
+## Server booking manager
 
-Interactive navigation:
+Launch the manager from the server:
 
 ```sh
 docker compose exec web python manage.py bookings_dashboard
 ```
+
+Over SSH it opens the interactive terminal interface. In a desktop session it opens a native window automatically; use `--cli` or `--gui` to force one mode. The desktop interface needs Tkinter (`python3-tk` on Debian/Ubuntu) and direct access to the project environment, so it is normally launched outside the Docker container:
+
+```sh
+python manage.py bookings_dashboard --gui
+```
+
+Both interfaces show booking and payment states and allow staff to confirm or cancel bookings, edit notes, and record payments made on site. Online payment states remain controlled by verified provider callbacks.
+
+### Desktop icon
+
+On the server's graphical desktop, install a menu entry and desktop shortcut once:
+
+```sh
+./scripts/bookings_dashboard_gui.sh --install
+```
+
+The installer creates `~/.local/bin/cowodlaval-bookings`, registers “Cowo d'la val - Prenotazioni” in the application menu, and links the same launcher on the desktop when that directory is available. Double-clicking it opens the GUI directly with no terminal window. Re-run the installer if the repository is moved.
+
+The launcher uses `.venv/bin/python`, `venv/bin/python`, or the system `python3`, in that order. Set `COWO_PYTHON=/absolute/path/to/python` before installation when the deployment uses a different virtual environment. Startup errors are written to `~/.local/state/cowodlaval/bookings-dashboard.log` and shown with Zenity, KDialog, or XMessage when available.
 
 Non-interactive SSH/automation examples:
 
@@ -182,6 +203,10 @@ Non-interactive SSH/automation examples:
 docker compose exec web python manage.py bookings_dashboard --today
 docker compose exec web python manage.py bookings_dashboard --date 2026-08-28
 docker compose exec web python manage.py bookings_dashboard --from-date 2026-08-28 --to-date 2026-08-31
+docker compose exec web python manage.py bookings_dashboard --cancel-booking COWO-2026-ABC123DEF456
+docker compose exec web python manage.py bookings_dashboard --confirm-booking COWO-2026-ABC123DEF456
+docker compose exec web python manage.py bookings_dashboard --mark-paid COWO-2026-ABC123DEF456
+docker compose exec web python manage.py bookings_dashboard --set-notes COWO-2026-ABC123DEF456 "Needs a monitor"
 ```
 
 When attached to a terminal it uses ANSI colours; add `--no-color` for plain output.
@@ -202,6 +227,8 @@ EMAIL_USE_SSL=False
 ```
 
 TLS and SSL cannot both be enabled. With `DJANGO_DEBUG=True` and an empty `EMAIL_HOST`, Django uses the console backend. Onsite confirmations are sent after selecting payment on site. Online confirmations/receipts are sent only after verified payment success.
+
+Password reset uses the same SMTP settings. Users can request a reset from the “Forgot your password?” link on `/accounts/login/`; Django sends a time-limited link to the email stored on the account. Logged-in users can change their password from the main menu. In production, `PUBLIC_BASE_URL`, proxy HTTPS settings, and the public hostname must be consistent so reset links point to the correct site.
 
 ## Payment providers
 

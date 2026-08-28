@@ -29,15 +29,15 @@
                 <tbody>
                     {% for booking in bookings %}
                         <tr>
-                            <td><strong>{{ booking.booking_code }}</strong></td>
-                            <td>{{ booking.space }}</td>
-                            {% if user.is_staff %}<td>{{ booking.user.username }}</td>{% endif %}
-                            <td>{{ booking.date|date:"SHORT_DATE_FORMAT" }}</td>
-                            <td><span class="status {{ booking.status }}">{{ booking.get_status_display }}</span></td>
-                            <td>€{{ booking.amount }}</td>
-                            <td>{{ booking.get_payment_method_display }}</td>
-                            <td><span class="status {{ booking.payment_status }}">{{ booking.get_payment_status_display }}</span></td>
-                            <td>
+                            <td data-label="{% translate 'Booking code' %}"><strong>{{ booking.booking_code }}</strong></td>
+                            <td data-label="{% translate 'Desk' %}">{{ booking.space }}</td>
+                            {% if user.is_staff %}<td data-label="{% translate 'User' %}">{{ booking.user.username }}</td>{% endif %}
+                            <td data-label="{% translate 'Date' %}">{{ booking.date|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td data-label="{% translate 'Status' %}"><span class="status {{ booking.status }}">{{ booking.get_status_display }}</span></td>
+                            <td data-label="{% translate 'Price' %}">€{{ booking.amount }}</td>
+                            <td data-label="{% translate 'Payment method' %}">{{ booking.get_payment_method_display }}</td>
+                            <td data-label="{% translate 'Payment status' %}"><span class="status {{ booking.payment_status }}">{{ booking.get_payment_status_display }}</span></td>
+                            <td data-label="{% translate 'Action' %}">
                                 <div class="table-actions">
                                     <a class="button secondary compact" href="{% url 'booking_detail' booking.id %}">{% translate "Manage" %}</a>
                                 {% if booking.can_user_cancel %}
@@ -50,7 +50,7 @@
                             </td>
                         </tr>
                     {% empty %}
-                        <tr><td colspan="{% if user.is_staff %}10{% else %}9{% endif %}">{% translate "No bookings yet." %}</td></tr>
+                        <tr><td class="mobile-table-empty" colspan="{% if user.is_staff %}10{% else %}9{% endif %}">{% translate "No bookings yet." %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

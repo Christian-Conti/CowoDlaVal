@@ -6,8 +6,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#173fc8" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0d1530" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#586dc4" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#171923" media="(prefers-color-scheme: dark)">
     <title>{% block title %}Cowo d'la val{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <script defer src="{% static 'js/app.js' %}"></script>
@@ -25,6 +25,7 @@
             <a href="{% url 'contact' %}">{% translate "Contact" %}</a>
             {% if user.is_authenticated %}
                 <a href="{% url 'booking_list' %}">{% translate "My bookings" %}</a>
+                <a href="{% url 'password_change' %}">{% translate "Change password" %}</a>
                 {% if user.is_staff %}<a href="{% url 'admin:index' %}">{% translate "Admin" %}</a>{% endif %}
                 <form action="{% url 'logout' %}" method="post" class="inline-form">
                     {% csrf_token %}
@@ -46,6 +47,7 @@
                 <a href="{% url 'contact' %}">{% translate "Contact" %}</a>
                 {% if user.is_authenticated %}
                     <a href="{% url 'booking_list' %}">{% translate "My bookings" %}</a>
+                    <a href="{% url 'password_change' %}">{% translate "Change password" %}</a>
                     {% if user.is_staff %}<a href="{% url 'admin:index' %}">{% translate "Admin" %}</a>{% endif %}
                     <form action="{% url 'logout' %}" method="post" class="inline-form">
                         {% csrf_token %}

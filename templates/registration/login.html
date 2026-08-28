@@ -19,6 +19,7 @@
                     <a class="button secondary login-register" href="{% url 'signup' %}">{% translate "Register" %}</a>
                 {% endif %}
             </div>
+            <p class="account-help"><a class="text-link" href="{% url 'password_reset' %}">{% translate "Forgot your password?" %}</a></p>
         </form>
     </section>
 </section>

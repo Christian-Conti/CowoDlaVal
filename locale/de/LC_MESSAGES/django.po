@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cowo d'la val\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 12:44+0200\n"
+"POT-Creation-Date: 2026-08-28 13:06+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -13,14 +13,12 @@ msgstr "E-Mail"
 msgid "Account created successfully."
 msgstr "Konto erfolgreich erstellt."
 
-#| msgid "User"
 msgid "Username"
 msgstr "Benutzername"
 
 msgid "Name"
 msgstr "Name"
 
-#| msgid "Payment method"
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -53,8 +51,77 @@ msgstr "Ein vergangenes Datum kann nicht gebucht werden."
 msgid "Payment method"
 msgstr "Zahlungsart"
 
-msgid "View bookings and payment status by date."
-msgstr "Buchungen und Zahlungsstatus nach Datum anzeigen."
+msgid "Cowo d'la val - Bookings"
+msgstr "Cowo d'la val - Buchungen"
+
+msgid "Previous day"
+msgstr "Vorheriger Tag"
+
+msgid "Apply date"
+msgstr "Datum anwenden"
+
+msgid "Next day"
+msgstr "Nächster Tag"
+
+msgid "Booking code"
+msgstr "Buchungscode"
+
+msgid "Customer"
+msgstr "Kunde"
+
+msgid "Booking"
+msgstr "Buchung"
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "Selected booking notes"
+msgstr "Notizen zur ausgewählten Buchung"
+
+msgid "Confirm"
+msgstr "Bestätigen"
+
+msgid "Cancel booking"
+msgstr "Buchung stornieren"
+
+msgid "Mark paid on site"
+msgstr "Als vor Ort bezahlt markieren"
+
+msgid "Save notes"
+msgstr "Notizen speichern"
+
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Bookings"
+msgstr "Buchungen"
+
+msgid "Select a booking first."
+msgstr "Wähle zuerst eine Buchung aus."
+
+#, python-format
+msgid "%(count)s bookings · %(available)s desks available"
+msgstr "%(count)s Buchungen · %(available)s Arbeitsplätze verfügbar"
+
+#, python-format
+msgid "Set %(code)s to %(status)s?"
+msgstr "%(code)s auf %(status)s setzen?"
+
+#, python-format
+msgid "Record the on-site payment for %(code)s?"
+msgstr "Zahlung vor Ort für %(code)s erfassen?"
+
+msgid "View and manage bookings and payment status."
+msgstr "Buchungen und Zahlungsstatus anzeigen und verwalten."
+
+msgid "Force the terminal interface."
+msgstr "Terminal-Oberfläche erzwingen."
+
+msgid "Force the desktop interface."
+msgstr "Desktop-Oberfläche erzwingen."
 
 msgid "Show YYYY-MM-DD and exit."
 msgstr "JJJJ-MM-TT anzeigen und beenden."
@@ -68,14 +135,41 @@ msgstr "Erstes Datum eines nicht interaktiven Zeitraums."
 msgid "Last date in a non-interactive range."
 msgstr "Letztes Datum eines nicht interaktiven Zeitraums."
 
+msgid "Cancel a booking and exit."
+msgstr "Eine Buchung stornieren und beenden."
+
+msgid "Confirm a booking and exit."
+msgstr "Eine Buchung bestätigen und beenden."
+
+msgid "Record an on-site payment and exit."
+msgstr "Eine Zahlung vor Ort erfassen und beenden."
+
+msgid "Replace notes and exit."
+msgstr "Notizen ersetzen und beenden."
+
+msgid "Date ranges are only available in the terminal interface."
+msgstr "Datumsbereiche sind nur in der Terminal-Oberfläche verfügbar."
+
 msgid "--from-date and --to-date must be used together."
 msgstr "--from-date und --to-date müssen zusammen verwendet werden."
 
 msgid "--to-date cannot be earlier than --from-date."
 msgstr "--to-date darf nicht vor --from-date liegen."
 
-msgid "[p]revious [n]ext [j]ump [r]ange [q]uit: "
-msgstr "[p] vorher [n] weiter [j] Datum wählen [r] Zeitraum [q] beenden: "
+#, python-format
+msgid "Updated %(code)s."
+msgstr "%(code)s wurde aktualisiert."
+
+#, python-format
+msgid "The desktop interface could not start: %(error)s"
+msgstr "Die Desktop-Oberfläche konnte nicht gestartet werden: %(error)s"
+
+msgid ""
+"[p]revious [n]ext [j]ump [r]ange [c]ancel con[f]irm [m]ark paid [e]dit notes "
+"[q]uit: "
+msgstr ""
+"[p] vorher [n] weiter [j] Datum [r] Zeitraum [c] stornieren [f] bestätigen "
+"[m] bezahlt [e] Notizen [q] beenden: "
 
 msgid "Date (YYYY-MM-DD): "
 msgstr "Datum (JJJJ-MM-TT): "
@@ -86,12 +180,17 @@ msgstr "Von (JJJJ-MM-TT): "
 msgid "To (YYYY-MM-DD): "
 msgstr "Bis (JJJJ-MM-TT): "
 
-#| msgid "The end must be after the start."
 msgid "End date must not be earlier than start date."
 msgstr "Das Enddatum darf nicht vor dem Startdatum liegen."
 
 msgid "Press Enter to continue..."
 msgstr "Eingabetaste drücken, um fortzufahren..."
+
+msgid "Booking code: "
+msgstr "Buchungscode: "
+
+msgid "New notes (empty clears them): "
+msgstr "Neue Notizen (leer löscht sie): "
 
 msgid "Dates must use YYYY-MM-DD."
 msgstr "Datumsangaben müssen JJJJ-MM-TT verwenden."
@@ -106,8 +205,28 @@ msgstr "Datum: %(date)s"
 msgid "AVAILABLE"
 msgstr "VERFÜGBAR"
 
-msgid "PAID"
-msgstr "BEZAHLT"
+msgid "Cancelled bookings"
+msgstr "Stornierte Buchungen"
+
+msgid "Notes"
+msgstr "Notizen"
+
+#, python-format
+msgid "%(space)s already has a confirmed booking on %(date)s."
+msgstr "Für %(space)s gibt es am %(date)s bereits eine bestätigte Buchung."
+
+msgid "The booking conflicts with another confirmed booking."
+msgstr "Die Buchung steht im Konflikt mit einer anderen bestätigten Buchung."
+
+msgid "Only confirmed bookings can be marked paid."
+msgstr "Nur bestätigte Buchungen können als bezahlt markiert werden."
+
+msgid "Only payments made on site can be recorded manually."
+msgstr "Nur Zahlungen vor Ort können manuell erfasst werden."
+
+#, python-format
+msgid "Booking %(code)s does not exist."
+msgstr "Die Buchung %(code)s existiert nicht."
 
 msgid "Confirmed"
 msgstr "Bestätigt"
@@ -281,6 +400,9 @@ msgstr "Kontakt"
 msgid "My bookings"
 msgstr "Meine Buchungen"
 
+msgid "Change password"
+msgstr "Passwort ändern"
+
 msgid "Admin"
 msgstr "Admin"
 
@@ -305,9 +427,6 @@ msgstr "Emblem der Europäischen Union"
 msgid "Funded by the European Union"
 msgstr "Finanziert von der Europäischen Union"
 
-msgid "Booking"
-msgstr "Buchung"
-
 msgid "All bookings"
 msgstr "Alle Buchungen"
 
@@ -326,9 +445,6 @@ msgstr "Zahlungsstatus"
 msgid "Payment reference"
 msgstr "Zahlungsreferenz"
 
-msgid "Notes"
-msgstr "Notizen"
-
 msgid "Payment is due on site."
 msgstr "Die Zahlung ist vor Ort fällig."
 
@@ -337,9 +453,6 @@ msgstr "Zahlungsart wählen"
 
 msgid "Modify booking"
 msgstr "Buchung ändern"
-
-msgid "Cancel booking"
-msgstr "Buchung stornieren"
 
 #, python-format
 msgid ""
@@ -385,12 +498,6 @@ msgstr "Änderungen speichern"
 msgid "Continue to payment"
 msgstr "Weiter zur Zahlung"
 
-msgid "Bookings"
-msgstr "Buchungen"
-
-msgid "Booking code"
-msgstr "Buchungscode"
-
 msgid "User"
 msgstr "Benutzer"
 
@@ -411,9 +518,6 @@ msgstr "Noch keine Buchungen."
 
 msgid "Your Cowo d'la val booking is confirmed."
 msgstr "Deine Cowo d'la val Buchung ist bestätigt."
-
-msgid "Amount"
-msgstr "Betrag"
 
 msgid "Manage booking"
 msgstr "Buchung verwalten"
@@ -447,6 +551,18 @@ msgid ""
 msgstr ""
 "Online bezahlte Buchungen können nicht selbstständig storniert oder geändert "
 "werden; kontaktiere das Coworking-Team, wenn du Hilfe benötigst."
+
+msgid "Pay when you arrive at the coworking space."
+msgstr "Bezahle bei deiner Ankunft im Coworking Space."
+
+msgid "Continue securely with Satispay."
+msgstr "Sicher mit Satispay fortfahren."
+
+msgid "Continue securely with PayPal."
+msgstr "Sicher mit PayPal fortfahren."
+
+msgid "Pay by card through Stripe Checkout."
+msgstr "Mit Karte über Stripe Checkout bezahlen."
 
 msgid "Continue"
 msgstr "Weiter"
@@ -674,6 +790,68 @@ msgstr ""
 "Melde dich an, um eine Buchung zu bestätigen oder deine Buchungen zu "
 "verwalten."
 
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
+
+msgid "Password changed"
+msgstr "Passwort geändert"
+
+msgid "Your password has been updated successfully."
+msgstr "Dein Passwort wurde erfolgreich aktualisiert."
+
+msgid "Enter your current password, then choose a new one."
+msgstr "Gib dein aktuelles Passwort ein und wähle dann ein neues."
+
+msgid "Save password"
+msgstr "Passwort speichern"
+
+msgid "Password reset complete"
+msgstr "Passwort erfolgreich zurückgesetzt"
+
+msgid "Your new password is active. You can now log in."
+msgstr "Dein neues Passwort ist aktiv. Du kannst dich jetzt anmelden."
+
+msgid "Choose a new password"
+msgstr "Neues Passwort wählen"
+
+msgid "This reset link is invalid or has expired. Request a new one."
+msgstr "Dieser Link ist ungültig oder abgelaufen. Fordere einen neuen an."
+
+msgid "Request another link"
+msgstr "Neuen Link anfordern"
+
+msgid "Check your email"
+msgstr "Prüfe deine E-Mails"
+
+msgid ""
+"If an account exists for that address, a password reset link has been sent."
+msgstr ""
+"Wenn für diese Adresse ein Konto existiert, wurde ein Link zum Zurücksetzen "
+"des Passworts gesendet."
+
+msgid "You requested a password reset for Cowo d'la val."
+msgstr "Du hast das Zurücksetzen deines Passworts für Cowo d'la val angefordert."
+
+msgid "Open this link to choose a new password:"
+msgstr "Öffne diesen Link, um ein neues Passwort zu wählen:"
+
+msgid "If you did not request this change, you can ignore this email."
+msgstr "Wenn du diese Änderung nicht angefordert hast, kannst du diese E-Mail ignorieren."
+
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
+msgid "Enter your account email address and we will send you a reset link."
+msgstr ""
+"Gib die E-Mail-Adresse deines Kontos ein. Wir senden dir einen Link zum "
+"Zurücksetzen."
+
+msgid "Send reset link"
+msgstr "Link zum Zurücksetzen senden"
+
+msgid "Reset your Cowo d'la val password"
+msgstr "Setze dein Cowo d'la val Passwort zurück"
+
 msgid "Desks"
 msgstr "Arbeitsplätze"
 
@@ -689,11 +867,11 @@ msgstr "Öffnungszeiten"
 msgid "No desks are configured yet."
 msgstr "Es sind noch keine Arbeitsplätze eingerichtet."
 
+#~ msgid "PAID"
+#~ msgstr "BEZAHLT"
+
 #~ msgid "A booking must start and end on the same day."
 #~ msgstr "Eine Buchung muss am selben Tag beginnen und enden."
-
-#~ msgid "Confirm booking"
-#~ msgstr "Buchung bestätigen"
 
 #~ msgid "The booking exceeds the maximum allowed duration."
 #~ msgstr "Die Buchung überschreitet die maximal zulässige Dauer."
