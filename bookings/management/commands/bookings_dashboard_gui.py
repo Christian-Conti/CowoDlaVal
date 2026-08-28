@@ -468,7 +468,7 @@ class DashboardWindow:
 
         self.root.title("Cowo d'la val - Prenotazioni")
         self.root.geometry("1280x760")
-        self.root.minsize(760, 560)
+        self.root.minsize(620, 520)
 
         self.style = ttk.Style(self.root)
         try:
@@ -702,19 +702,31 @@ class DashboardWindow:
 
     def _handle_resize(self) -> None:
         self._resize_job = None
-        width = max(self.root.winfo_width(), 760)
-        height = max(self.root.winfo_height(), 560)
 
-        scale = min(max(min(width / 1280, height / 760), 0.90), 1.14)
-        font_size = max(10, min(13, round(11 * scale)))
+        root_width = max(self.root.winfo_width(), 620)
+        root_height = max(self.root.winfo_height(), 520)
+
+        content_width = self.content.winfo_width()
+        if content_width <= 1:
+            content_width = max(root_width - 36, 1)
+
+        scale = min(max(min(root_width / 1280, root_height / 760), 0.86), 1.12)
+        font_size = max(9, min(13, round(11 * scale)))
         self._configure_fonts(font_size)
 
-        self._layout_header(compact=width < 1050)
-        self._layout_toolbar(compact=width < 1050)
+        if content_width >= 1280:
+            chrome_layout = "wide"
+        elif content_width >= 760:
+            chrome_layout = "medium"
+        else:
+            chrome_layout = "narrow"
 
-        if width >= 1480:
+        self._layout_header(chrome_layout)
+        self._layout_toolbar(chrome_layout)
+
+        if content_width >= 1420:
             action_layout = "wide"
-        elif width >= 900:
+        elif content_width >= 760:
             action_layout = "medium"
         else:
             action_layout = "narrow"
@@ -722,6 +734,7 @@ class DashboardWindow:
 
         if self._auto_fit_columns and self._columns_initialized:
             self.fit_columns(keep_auto=True)
+
 
     def _on_tree_button_press(self, event) -> None:
         self._column_drag_active = self.tree.identify_region(event.x, event.y) == "separator"
@@ -750,8 +763,7 @@ class DashboardWindow:
         if not keep_auto:
             self._auto_fit_columns = True
 
-    def _layout_header(self, compact: bool) -> None:
-        layout = "compact" if compact else "wide"
+    def _layout_header(self, layout: str) -> None:
         if self._header_layout == layout:
             return
         self._header_layout = layout
@@ -765,24 +777,97 @@ class DashboardWindow:
             widget.grid_forget()
 
         for column in range(4):
-            self.header.grid_columnconfigure(column, weight=0)
+            self.header.grid_columnconfigure(column, weight=0, minsize=0)
 
-        if compact:
+        if layout == "wide":
             self.header.grid_columnconfigure(0, weight=1)
-            self.title_label.grid(row=0, column=0, columnspan=4, sticky="w")
-            self.summary_label.grid(row=1, column=0, sticky="w", pady=(8, 0))
-            self.fit_columns_button.grid(row=1, column=2, padx=(8, 4), pady=(8, 0))
-            self.theme_button.grid(row=1, column=3, padx=(4, 0), pady=(8, 0))
+
+            self.title_label.grid(row=0, column=0, sticky="w")
+            self.summary_label.grid(
+                row=0,
+                column=1,
+                padx=(16, 10),
+                sticky="e",
+            )
+            self.fit_columns_button.grid(
+                row=0,
+                column=2,
+                padx=4,
+                sticky="e",
+            )
+            self.theme_button.grid(
+                row=0,
+                column=3,
+                padx=(4, 0),
+                sticky="e",
+            )
             return
 
-        self.header.grid_columnconfigure(0, weight=1)
-        self.title_label.grid(row=0, column=0, sticky="w")
-        self.summary_label.grid(row=0, column=1, padx=(16, 10), sticky="e")
-        self.fit_columns_button.grid(row=0, column=2, padx=4, sticky="e")
-        self.theme_button.grid(row=0, column=3, padx=(4, 0), sticky="e")
+        if layout == "medium":
+            self.header.grid_columnconfigure(0, weight=1)
 
-    def _layout_toolbar(self, compact: bool) -> None:
-        layout = "compact" if compact else "wide"
+            self.title_label.grid(
+                row=0,
+                column=0,
+                columnspan=4,
+                sticky="w",
+            )
+            self.summary_label.grid(
+                row=1,
+                column=0,
+                columnspan=2,
+                sticky="w",
+                pady=(8, 0),
+            )
+            self.fit_columns_button.grid(
+                row=1,
+                column=2,
+                padx=(8, 4),
+                pady=(8, 0),
+                sticky="e",
+            )
+            self.theme_button.grid(
+                row=1,
+                column=3,
+                padx=(4, 0),
+                pady=(8, 0),
+                sticky="e",
+            )
+            return
+
+        for column in range(2):
+            self.header.grid_columnconfigure(column, weight=1)
+
+        self.title_label.grid(
+            row=0,
+            column=0,
+            columnspan=2,
+            sticky="w",
+        )
+        self.summary_label.grid(
+            row=1,
+            column=0,
+            columnspan=2,
+            sticky="w",
+            pady=(8, 0),
+        )
+        self.fit_columns_button.grid(
+            row=2,
+            column=0,
+            sticky="ew",
+            padx=(0, 4),
+            pady=(8, 0),
+        )
+        self.theme_button.grid(
+            row=2,
+            column=1,
+            sticky="ew",
+            padx=(4, 0),
+            pady=(8, 0),
+        )
+
+
+    def _layout_toolbar(self, layout: str) -> None:
         if self._toolbar_layout == layout:
             return
         self._toolbar_layout = layout
@@ -798,25 +883,133 @@ class DashboardWindow:
             widget.grid_forget()
 
         for column in range(5):
-            self.toolbar.grid_columnconfigure(column, weight=0)
+            self.toolbar.grid_columnconfigure(column, weight=0, minsize=0)
 
-        if compact:
+        if layout in {"wide", "medium"}:
+            self.previous_button.configure(text="‹ Giorno precedente")
+            self.next_button.configure(text="Giorno successivo ›")
+        else:
+            self.previous_button.configure(text="‹ Precedente")
+            self.next_button.configure(text="Successivo ›")
+
+        if layout == "wide":
+            weights = (2, 1, 1, 1, 2)
+            for column, weight in enumerate(weights):
+                self.toolbar.grid_columnconfigure(column, weight=weight)
+
+            self.previous_button.grid(
+                row=0,
+                column=0,
+                sticky="ew",
+                padx=(0, 4),
+            )
+            self.date_entry.grid(
+                row=0,
+                column=1,
+                sticky="ew",
+                padx=4,
+            )
+            self.apply_date_button.grid(
+                row=0,
+                column=2,
+                sticky="ew",
+                padx=4,
+            )
+            self.today_button.grid(
+                row=0,
+                column=3,
+                sticky="ew",
+                padx=4,
+            )
+            self.next_button.grid(
+                row=0,
+                column=4,
+                sticky="ew",
+                padx=(4, 0),
+            )
+            return
+
+        if layout == "medium":
             for column in range(3):
                 self.toolbar.grid_columnconfigure(column, weight=1)
 
-            self.previous_button.grid(row=0, column=0, sticky="ew", padx=(0, 4), pady=(0, 6))
-            self.date_entry.grid(row=0, column=1, sticky="ew", padx=4, pady=(0, 6))
-            self.apply_date_button.grid(row=0, column=2, sticky="ew", padx=(4, 0), pady=(0, 6))
-            self.today_button.grid(row=1, column=0, sticky="ew", padx=(0, 4))
-            self.next_button.grid(row=1, column=1, columnspan=2, sticky="ew", padx=(4, 0))
+            self.previous_button.grid(
+                row=0,
+                column=0,
+                sticky="ew",
+                padx=(0, 4),
+                pady=(0, 6),
+            )
+            self.date_entry.grid(
+                row=0,
+                column=1,
+                sticky="ew",
+                padx=4,
+                pady=(0, 6),
+            )
+            self.apply_date_button.grid(
+                row=0,
+                column=2,
+                sticky="ew",
+                padx=(4, 0),
+                pady=(0, 6),
+            )
+
+            self.today_button.grid(
+                row=1,
+                column=0,
+                sticky="ew",
+                padx=(0, 4),
+            )
+            self.next_button.grid(
+                row=1,
+                column=1,
+                columnspan=2,
+                sticky="ew",
+                padx=(4, 0),
+            )
             return
 
-        self.toolbar.grid_columnconfigure(4, weight=1)
-        self.previous_button.grid(row=0, column=0, padx=(0, 8))
-        self.date_entry.grid(row=0, column=1, padx=4)
-        self.apply_date_button.grid(row=0, column=2, padx=4)
-        self.today_button.grid(row=0, column=3, padx=4)
-        self.next_button.grid(row=0, column=4, padx=(8, 0), sticky="e")
+        for column in range(2):
+            self.toolbar.grid_columnconfigure(column, weight=1)
+
+        self.date_entry.grid(
+            row=0,
+            column=0,
+            sticky="ew",
+            padx=(0, 4),
+            pady=(0, 6),
+        )
+        self.apply_date_button.grid(
+            row=0,
+            column=1,
+            sticky="ew",
+            padx=(4, 0),
+            pady=(0, 6),
+        )
+
+        self.previous_button.grid(
+            row=1,
+            column=0,
+            sticky="ew",
+            padx=(0, 4),
+            pady=(0, 6),
+        )
+        self.next_button.grid(
+            row=1,
+            column=1,
+            sticky="ew",
+            padx=(4, 0),
+            pady=(0, 6),
+        )
+
+        self.today_button.grid(
+            row=2,
+            column=0,
+            columnspan=2,
+            sticky="ew",
+        )
+
 
     def _configure_fonts(self, font_size: int) -> None:
         if self._last_font_size == font_size:
