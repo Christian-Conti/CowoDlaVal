@@ -1,0 +1,17 @@
+{% load i18n %}{% blocktranslate %}Your Cowo d'la val booking is confirmed.{% endblocktranslate %}
+
+{% translate "Booking code" %}: {{ booking.booking_code }}
+{% translate "Name" %}: {{ booking.user.get_full_name|default:booking.user.username }}
+{% translate "Desk" %}: {{ booking.space }}
+{% translate "Date" %}: {{ booking.date|date:"SHORT_DATE_FORMAT" }}
+{% translate "Access hours" %}: {{ booking.space.opening_time|time:"H:i" }}–{{ booking.space.closing_time|time:"H:i" }}
+{% translate "Amount" %}: €{{ booking.amount }} {{ booking.currency }}
+{% translate "Payment method" %}: {{ booking.get_payment_method_display }}
+{% translate "Payment status" %}: {{ booking.get_payment_status_display }}
+{% if booking.payment_reference %}{% translate "Payment reference" %}: {{ booking.payment_reference }}
+{% endif %}
+{% translate "Manage booking" %}: {{ manage_url }}
+
+{% blocktranslate %}If you chose payment in person, you can cancel the booking from your account. Bookings paid online cannot be cancelled automatically; contact the coworking staff if you need assistance.{% endblocktranslate %}
+
+{% blocktranslate %}For cancellations less than 12 hours before the booking, a 50% expense reimbursement is requested. This self-service option is available only for bookings paid in person.{% endblocktranslate %}

@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 
 from spaces.models import Space
 
+from .models import Booking
+
 
 class BookingForm(forms.Form):
     space = forms.ModelChoiceField(
@@ -14,6 +16,10 @@ class BookingForm(forms.Form):
     date = forms.DateField(
         label=_("Date"),
         widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    tariff_category = forms.ChoiceField(
+        label=_("Rate"),
+        choices=Booking.TariffCategory.choices,
     )
     notes = forms.CharField(
         label=_("Requests or notes"),
@@ -31,3 +37,11 @@ class BookingForm(forms.Form):
         if booking_date < timezone.localdate():
             raise ValidationError(_("You cannot book a past date."))
         return booking_date
+
+
+class PaymentMethodForm(forms.Form):
+    payment_method = forms.ChoiceField(
+        label=_("Payment method"),
+        choices=[choice for choice in Booking.PaymentMethod.choices if choice[0]],
+        widget=forms.RadioSelect,
+    )

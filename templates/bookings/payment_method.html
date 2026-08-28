@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Choose payment" %} - Cowo d'la val{% endblock %}
+{% block content %}
+<section class="page-section shell narrow-shell">
+    <div class="section-heading">
+        <p class="eyebrow">{{ booking.booking_code }}</p>
+        <h1>{% translate "Choose payment" %}</h1>
+        <p>{{ booking.space }} · {{ booking.date|date:"SHORT_DATE_FORMAT" }} · <strong>€{{ booking.amount }}</strong></p>
+    </div>
+    <section class="form-card">
+        <p class="policy-notice"><strong>{% translate "Only bookings with payment in person can be cancelled autonomously." %}</strong> {% translate "Bookings paid online cannot be cancelled or modified automatically; contact the coworking staff if you need assistance." %}</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <fieldset class="payment-options">
+                <legend>{{ form.payment_method.label }}</legend>
+                {{ form.payment_method }}
+            </fieldset>
+            <button class="button" type="submit">{% translate "Continue" %}</button>
+        </form>
+        <p class="fine-print">{% translate "Card payments use Stripe Checkout. Cowo d'la val never receives or stores card details." %}</p>
+    </section>
+</section>
+{% endblock %}

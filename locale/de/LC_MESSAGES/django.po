@@ -1,152 +1,544 @@
 msgid ""
-msgstr "Project-Id-Version: Cowo d'la val\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
-
-msgid "A bookable desk in the shared coworking room."
-msgstr "Ein buchbarer Arbeitsplatz im gemeinsam genutzten Coworking-Raum."
-
-msgid "A booking must start and end on the same day."
-msgstr "Eine Buchung muss am selben Tag beginnen und enden."
-
-msgid "A shared coworking space in a rural village: four desks, internet access, coffee area, heating, printer, projector, storage and a WC with shower."
-msgstr "Ein gemeinsamer Coworking-Space in einem ländlichen Dorf: vier Arbeitsplätze, Internetzugang, Kaffeebereich, Heizung, Drucker, Projektor, Stauraum sowie WC mit Dusche."
-
-msgid "Access from 06:00 to 21:00, with other arrangements possible"
-msgstr "Zugang von 06:00 bis 21:00 Uhr; andere Vereinbarungen sind möglich"
-
-msgid "Account created successfully."
-msgstr "Konto erfolgreich erstellt."
-
-msgid "Action"
-msgstr "Aktion"
-
-msgid "Admin"
-msgstr "Admin"
-
-msgid "An account lets you confirm and manage your desk bookings."
-msgstr "Mit einem Konto kannst du Arbeitsplatzbuchungen bestätigen und verwalten."
-
-msgid "An administrator must create the coworking desks before bookings can be accepted."
-msgstr "Ein Administrator muss die Arbeitsplätze anlegen, bevor Buchungen möglich sind."
-
-msgid "Ask for information"
-msgstr "Informationen anfragen"
-
-msgid "Ask us for information"
-msgstr "Informationen anfragen"
-
-msgid "Available"
-msgstr "Verfügbar"
-
-msgid "Avoid excessive noise and be respectful of other people."
-msgstr "Vermeide übermäßigen Lärm und nimm Rücksicht auf andere."
-
-msgid "Book"
-msgstr "Buchen"
-
-msgid "Book a desk"
-msgstr "Arbeitsplatz buchen"
-
-msgid "Book. Create. Discover. Explore. Engage. Work."
-msgstr "Buchen. Gestalten. Entdecken. Erkunden. Mitmachen. Arbeiten."
-
-msgid "Booked by"
-msgstr "Gebucht von"
-
-msgid "Booking cancelled."
-msgstr "Buchung storniert."
-
-msgid "Booking confirmed."
-msgstr "Buchung bestätigt."
-
-msgid "Bookings"
-msgstr "Buchungen"
-
-msgid "Bring an activity to the village"
-msgstr "Bring eine Aktivität ins Dorf"
-
-msgid "Cancel"
-msgstr "Stornieren"
-
-msgid "Cancellation and complete information"
-msgstr "Stornierung und vollständige Informationen"
-
-msgid "Cancelled"
-msgstr "Storniert"
-
-msgid "Check availability"
-msgstr "Verfügbarkeit prüfen"
-
-msgid "Choose a date and a desk"
-msgstr "Datum und Arbeitsplatz wählen"
-
-msgid "Coffee area"
-msgstr "Kaffeebereich"
-
-msgid "Community proposal"
-msgstr "Angebot für die Gemeinschaft"
-
-msgid "Confirm booking"
-msgstr "Buchung bestätigen"
-
-msgid "Confirm your desk"
-msgstr "Arbeitsplatz bestätigen"
-
-msgid "Confirmed"
-msgstr "Bestätigt"
-
-msgid "Contact"
-msgstr "Kontakt"
-
-msgid "Cowo d'la val - Coworking Space"
-msgstr "Cowo d'la val - Coworking Space"
-
-msgid "Cowo d'la val - information request"
-msgstr "Cowo d'la val - Informationsanfrage"
-
-msgid "Coworking Space"
-msgstr "Coworking Space"
-
-msgid "Coworking desks"
-msgstr "Coworking-Arbeitsplätze"
-
-msgid "Create account"
-msgstr "Konto erstellen"
-
-msgid "Create an account"
-msgstr "Konto erstellen"
-
-msgid "Daily"
-msgstr "Täglich"
-
-msgid "Date"
-msgstr "Datum"
-
-msgid "Desk"
-msgstr "Arbeitsplatz"
-
-msgid "Desk %(number)s"
-msgstr "Arbeitsplatz %(number)s"
-
-msgid "Desk availability"
-msgstr "Verfügbarkeit der Arbeitsplätze"
-
-msgid "Desks"
-msgstr "Arbeitsplätze"
-
-msgid "Details"
-msgstr "Details"
-
-msgid "Details and services"
-msgstr "Details und Leistungen"
-
-msgid "Do not enter with dirty shoes; wipe them down or take them off."
-msgstr "Nicht mit schmutzigen Schuhen eintreten; bitte abwischen oder ausziehen."
+msgstr ""
+"Project-Id-Version: Cowo d'la val\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-28 11:34+0200\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Email"
 msgstr "E-Mail"
 
+msgid "Account created successfully."
+msgstr "Konto erfolgreich erstellt."
+
+#| msgid "User"
+msgid "Username"
+msgstr "Benutzername"
+
+msgid "Name"
+msgstr "Name"
+
+#| msgid "Payment method"
+msgid "Payment"
+msgstr "Zahlung"
+
+msgid "PAYMENT DUE"
+msgstr "ZAHLUNG FÄLLIG"
+
+#, python-format
+msgid "Cowo d'la val booking %(code)s"
+msgstr "Cowo d'la val Buchung %(code)s"
+
+msgid "Desk"
+msgstr "Arbeitsplatz"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Rate"
+msgstr "Tarif"
+
+msgid "Requests or notes"
+msgstr "Wünsche oder Notizen"
+
+msgid "For example: extra monitor, projector, wood stove assistance..."
+msgstr ""
+"Zum Beispiel: zusätzlicher Monitor, Projektor, Hilfe mit dem Holzofen ..."
+
+msgid "You cannot book a past date."
+msgstr "Ein vergangenes Datum kann nicht gebucht werden."
+
+msgid "Payment method"
+msgstr "Zahlungsart"
+
+msgid "View bookings and payment status by date."
+msgstr "Buchungen und Zahlungsstatus nach Datum anzeigen."
+
+msgid "Show YYYY-MM-DD and exit."
+msgstr "JJJJ-MM-TT anzeigen und beenden."
+
+msgid "Show today and exit."
+msgstr "Heute anzeigen und beenden."
+
+msgid "First date in a non-interactive range."
+msgstr "Erstes Datum eines nicht interaktiven Zeitraums."
+
+msgid "Last date in a non-interactive range."
+msgstr "Letztes Datum eines nicht interaktiven Zeitraums."
+
+msgid "--from-date and --to-date must be used together."
+msgstr "--from-date und --to-date müssen zusammen verwendet werden."
+
+msgid "--to-date cannot be earlier than --from-date."
+msgstr "--to-date darf nicht vor --from-date liegen."
+
+msgid "[p]revious [n]ext [j]ump [r]ange [q]uit: "
+msgstr "[p] vorher [n] weiter [j] Datum wählen [r] Zeitraum [q] beenden: "
+
+msgid "Date (YYYY-MM-DD): "
+msgstr "Datum (JJJJ-MM-TT): "
+
+msgid "From (YYYY-MM-DD): "
+msgstr "Von (JJJJ-MM-TT): "
+
+msgid "To (YYYY-MM-DD): "
+msgstr "Bis (JJJJ-MM-TT): "
+
+#| msgid "The end must be after the start."
+msgid "End date must not be earlier than start date."
+msgstr "Das Enddatum darf nicht vor dem Startdatum liegen."
+
+msgid "Press Enter to continue..."
+msgstr "Eingabetaste drücken, um fortzufahren..."
+
+msgid "Dates must use YYYY-MM-DD."
+msgstr "Datumsangaben müssen JJJJ-MM-TT verwenden."
+
+msgid "Invalid date; keeping the current date."
+msgstr "Ungültiges Datum; das aktuelle Datum bleibt bestehen."
+
+#, python-format
+msgid "Date: %(date)s"
+msgstr "Datum: %(date)s"
+
+msgid "AVAILABLE"
+msgstr "VERFÜGBAR"
+
+msgid "PAID"
+msgstr "BEZAHLT"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "Cancelled"
+msgstr "Storniert"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Student / resident"
+msgstr "Studierende / Einwohner"
+
+msgid "Not selected"
+msgstr "Nicht ausgewählt"
+
+msgid "Pay in person"
+msgstr "Vor Ort bezahlen"
+
+msgid "Satispay"
+msgstr "Satispay"
+
+msgid "PayPal"
+msgstr "PayPal"
+
+msgid "Credit/debit card"
+msgstr "Kredit-/Debitkarte"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+msgid "Pending"
+msgstr "Ausstehend"
+
+msgid "Paid"
+msgstr "Bezahlt"
+
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+msgid "Refunded"
+msgstr "Erstattet"
+
+msgid "This desk is already booked for the selected date."
+msgstr "Dieser Arbeitsplatz ist am ausgewählten Datum bereits gebucht."
+
+msgid "Select a valid rate."
+msgstr "Wähle einen gültigen Tarif."
+
+msgid "You do not have permission to manage this booking."
+msgstr "Du hast keine Berechtigung, diese Buchung zu verwalten."
+
+msgid "This booking is no longer active."
+msgstr "Diese Buchung ist nicht mehr aktiv."
+
+msgid "This booking has already been paid."
+msgstr "Diese Buchung wurde bereits bezahlt."
+
+msgid "The payment method cannot be changed after online checkout starts."
+msgstr ""
+"Die Zahlungsart kann nach Beginn der Online-Zahlung nicht mehr geändert "
+"werden."
+
+msgid "Select a valid payment method."
+msgstr "Wähle eine gültige Zahlungsart."
+
+msgid "The verified payment amount does not match the booking."
+msgstr "Der bestätigte Zahlungsbetrag stimmt nicht mit der Buchung überein."
+
+msgid "The verified payment provider does not match the booking."
+msgstr "Der bestätigte Zahlungsanbieter stimmt nicht mit der Buchung überein."
+
+msgid "You do not have permission to cancel this booking."
+msgstr "Du hast keine Berechtigung, diese Buchung zu stornieren."
+
+msgid ""
+"Only bookings with payment in person can be cancelled online. Contact the "
+"coworking staff."
+msgstr ""
+"Nur Buchungen mit Zahlung vor Ort können online storniert werden. "
+"Kontaktiere das Coworking-Team."
+
+msgid ""
+"Online-paid bookings cannot be modified automatically. Contact the coworking "
+"staff."
+msgstr ""
+"Online bezahlte Buchungen können nicht selbstständig geändert werden. "
+"Kontaktiere das Coworking-Team."
+
+msgid "Booking created. Choose how you want to pay."
+msgstr "Buchung erstellt. Wähle die Zahlungsart."
+
+msgid "Booking confirmed. Payment is due on site."
+msgstr "Buchung bestätigt. Die Zahlung ist vor Ort fällig."
+
+msgid "This payment method is temporarily unavailable. Please try again later."
+msgstr ""
+"Diese Zahlungsart ist vorübergehend nicht verfügbar. Versuche es später "
+"erneut."
+
+msgid "Booking updated."
+msgstr "Buchung aktualisiert."
+
+msgid "Booking cancelled."
+msgstr "Buchung storniert."
+
+msgid "Payment is still being verified. Refresh this page shortly."
+msgstr "Die Zahlung wird noch geprüft. Aktualisiere diese Seite in Kürze."
+
+msgid "Payment confirmed."
+msgstr "Zahlung bestätigt."
+
+msgid "Payment status updated."
+msgstr "Zahlungsstatus aktualisiert."
+
+msgid "Message"
+msgstr "Nachricht"
+
+#, python-format
+msgid ""
+"Information request from %(name)s (%(email)s):\n"
+"\n"
+"%(message)s"
+msgstr ""
+"Informationsanfrage von %(name)s (%(email)s):\n"
+"\n"
+"%(message)s"
+
+msgid "Cowo d'la val - information request"
+msgstr "Cowo d'la val - Informationsanfrage"
+
+msgid "Your message has been sent. We will reply as soon as possible."
+msgstr "Deine Nachricht wurde gesendet. Wir antworten so bald wie möglich."
+
+msgid ""
+"We could not send your message. Please try again later or contact us by "
+"email."
+msgstr ""
+"Deine Nachricht konnte nicht gesendet werden. Versuche es später erneut oder "
+"kontaktiere uns per E-Mail."
+
+#, python-format
+msgid "Desk %(number)s"
+msgstr "Arbeitsplatz %(number)s"
+
+msgid "Register"
+msgstr "Registrieren"
+
+msgid "Create an account"
+msgstr "Konto erstellen"
+
+msgid "An account lets you confirm and manage your desk bookings."
+msgstr ""
+"Mit einem Konto kannst du Arbeitsplatzbuchungen bestätigen und verwalten."
+
+msgid "Create account"
+msgstr "Konto erstellen"
+
+msgid "Main navigation"
+msgstr "Hauptnavigation"
+
+msgid "Book"
+msgstr "Buchen"
+
+msgid "Details"
+msgstr "Details"
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "My bookings"
+msgstr "Meine Buchungen"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Log out"
+msgstr "Abmelden"
+
+msgid "Log in"
+msgstr "Anmelden"
+
+msgid "Language"
+msgstr "Sprache"
+
+msgid "Book. Create. Discover. Explore. Engage. Work."
+msgstr "Buchen. Gestalten. Entdecken. Erkunden. Mitmachen. Arbeiten."
+
 msgid "European Union emblem"
 msgstr "Emblem der Europäischen Union"
+
+msgid "Funded by the European Union"
+msgstr "Finanziert von der Europäischen Union"
+
+msgid "Booking"
+msgstr "Buchung"
+
+msgid "All bookings"
+msgstr "Alle Buchungen"
+
+msgid "Access hours"
+msgstr "Zugangszeiten"
+
+msgid "Booking status"
+msgstr "Buchungsstatus"
+
+msgid "Price"
+msgstr "Preis"
+
+msgid "Payment status"
+msgstr "Zahlungsstatus"
+
+msgid "Payment reference"
+msgstr "Zahlungsreferenz"
+
+msgid "Notes"
+msgstr "Notizen"
+
+msgid "Payment is due on site."
+msgstr "Die Zahlung ist vor Ort fällig."
+
+msgid "Choose payment"
+msgstr "Zahlungsart wählen"
+
+msgid "Modify booking"
+msgstr "Buchung ändern"
+
+msgid "Cancel booking"
+msgstr "Buchung stornieren"
+
+#, python-format
+msgid ""
+"Only bookings with payment in person can be cancelled autonomously. For "
+"cancellations less than 12 hours before the booking, a 50%% expense "
+"reimbursement is requested."
+msgstr ""
+"Nur Buchungen mit Zahlung vor Ort können selbstständig storniert werden. Bei "
+"Stornierungen weniger als 12 Stunden vor der Buchung werden 50 %% des "
+"Kostenbeitrags erbeten."
+
+msgid ""
+"Online-paid bookings cannot be cancelled or modified automatically. Contact "
+"the coworking staff if you need a change or refund."
+msgstr ""
+"Online bezahlte Buchungen können nicht selbstständig storniert oder geändert "
+"werden. Kontaktiere das Coworking-Team für Änderungen oder Erstattungen."
+
+msgid "New booking"
+msgstr "Neue Buchung"
+
+msgid "Reservation"
+msgstr "Buchung"
+
+msgid "Confirm your desk"
+msgstr "Arbeitsplatz bestätigen"
+
+msgid "The booking covers the selected desk from 06:00 to 21:00 on that day."
+msgstr ""
+"Die Buchung gilt an diesem Tag für den ausgewählten Arbeitsplatz von 06:00 "
+"bis 21:00 Uhr."
+
+msgid ""
+"Only bookings with payment in person can be cancelled autonomously. Online-"
+"paid bookings require assistance from the coworking staff."
+msgstr ""
+"Nur Buchungen mit Zahlung vor Ort können selbstständig storniert werden. "
+"Online bezahlte Buchungen erfordern die Hilfe des Coworking-Teams."
+
+msgid "Save changes"
+msgstr "Änderungen speichern"
+
+msgid "Continue to payment"
+msgstr "Weiter zur Zahlung"
+
+msgid "Bookings"
+msgstr "Buchungen"
+
+msgid "Booking code"
+msgstr "Buchungscode"
+
+msgid "User"
+msgstr "Benutzer"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Action"
+msgstr "Aktion"
+
+msgid "Manage"
+msgstr "Verwalten"
+
+msgid "Cancel"
+msgstr "Stornieren"
+
+msgid "No bookings yet."
+msgstr "Noch keine Buchungen."
+
+msgid "Your Cowo d'la val booking is confirmed."
+msgstr "Deine Cowo d'la val Buchung ist bestätigt."
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "Manage booking"
+msgstr "Buchung verwalten"
+
+msgid ""
+"If you chose payment in person, you can cancel the booking from your "
+"account. Bookings paid online cannot be cancelled automatically; contact the "
+"coworking staff if you need assistance."
+msgstr ""
+"Wenn du Zahlung vor Ort gewählt hast, kannst du die Buchung in deinem Konto "
+"stornieren. Online bezahlte Buchungen können nicht selbstständig storniert "
+"werden; kontaktiere das Coworking-Team, wenn du Hilfe benötigst."
+
+#, python-format
+msgid ""
+"For cancellations less than 12 hours before the booking, a 50%% expense "
+"reimbursement is requested. This self-service option is available only for "
+"bookings paid in person."
+msgstr ""
+"Bei Stornierungen weniger als 12 Stunden vor der Buchung werden 50 %% des "
+"Kostenbeitrags erbeten. Diese Selbstbedienungsoption gilt nur für Buchungen "
+"mit Zahlung vor Ort."
+
+msgid "Only bookings with payment in person can be cancelled autonomously."
+msgstr ""
+"Nur Buchungen mit Zahlung vor Ort können selbstständig storniert werden."
+
+msgid ""
+"Bookings paid online cannot be cancelled or modified automatically; contact "
+"the coworking staff if you need assistance."
+msgstr ""
+"Online bezahlte Buchungen können nicht selbstständig storniert oder geändert "
+"werden; kontaktiere das Coworking-Team, wenn du Hilfe benötigst."
+
+msgid "Continue"
+msgstr "Weiter"
+
+msgid ""
+"Card payments use Stripe Checkout. Cowo d'la val never receives or stores "
+"card details."
+msgstr ""
+"Kartenzahlungen verwenden Stripe Checkout. Cowo d'la val empfängt oder "
+"speichert niemals Kartendaten."
+
+msgid "Ask us for information"
+msgstr "Informationen anfragen"
+
+msgid ""
+"Questions about access, half-day use, activities, equipment or special "
+"arrangements? Send us a message."
+msgstr ""
+"Fragen zu Zugang, Halbtagesnutzung, Aktivitäten, Ausstattung oder besonderen "
+"Vereinbarungen? Schreib uns."
+
+msgid "Send request"
+msgstr "Anfrage senden"
+
+msgid "Cowo d'la val - Coworking Space"
+msgstr "Cowo d'la val - Coworking Space"
+
+msgid "Coworking Space"
+msgstr "Coworking Space"
+
+msgid ""
+"A shared coworking space in a rural village: four desks, internet access, "
+"coffee area, heating, printer, projector, storage and a WC with shower."
+msgstr ""
+"Ein gemeinsamer Coworking-Space in einem ländlichen Dorf: vier "
+"Arbeitsplätze, Internetzugang, Kaffeebereich, Heizung, Drucker, Projektor, "
+"Stauraum sowie WC mit Dusche."
+
+msgid "Book a desk"
+msgstr "Arbeitsplatz buchen"
+
+msgid "Ask for information"
+msgstr "Informationen anfragen"
+
+msgid "Coworking illustration"
+msgstr "Coworking-Illustration"
+
+msgid "Online booking"
+msgstr "Online-Buchung"
+
+msgid "Choose a date and a desk"
+msgstr "Datum und Arbeitsplatz wählen"
+
+msgid "Reservations cover the selected day during the coworking opening hours."
+msgstr ""
+"Buchungen gelten für den ausgewählten Tag während der Öffnungszeiten des "
+"Coworking-Spaces."
+
+msgid "Select a date"
+msgstr "Datum auswählen"
+
+msgid "Check availability"
+msgstr "Verfügbarkeit prüfen"
+
+msgid "Desk availability"
+msgstr "Verfügbarkeit der Arbeitsplätze"
+
+msgid "Occupied"
+msgstr "Belegt"
+
+msgid "Booked by"
+msgstr "Gebucht von"
+
+msgid "Available"
+msgstr "Verfügbar"
+
+msgid ""
+"You can check availability without an account. Log in or register when you "
+"are ready to confirm a booking."
+msgstr ""
+"Du kannst die Verfügbarkeit ohne Konto prüfen. Melde dich an oder "
+"registriere dich, wenn du eine Buchung bestätigen möchtest."
+
+msgid "No desks are configured yet"
+msgstr "Noch keine Arbeitsplätze eingerichtet"
+
+msgid ""
+"An administrator must create the coworking desks before bookings can be "
+"accepted."
+msgstr ""
+"Ein Administrator muss die Arbeitsplätze anlegen, bevor Buchungen möglich "
+"sind."
+
+msgid "Details and services"
+msgstr "Details und Leistungen"
 
 msgid "Everything you need to work"
 msgstr "Alles, was du zum Arbeiten brauchst"
@@ -154,200 +546,160 @@ msgstr "Alles, was du zum Arbeiten brauchst"
 msgid "Expense reimbursement rates"
 msgstr "Kostenbeiträge"
 
-msgid "Follow the wood-stove instructions and ask for help if you are unsure."
-msgstr "Befolge die Hinweise für den Holzofen und frage bei Unsicherheit nach Hilfe."
-
-msgid "For cancellations less than 12 hours before the booking, a 50% expense reimbursement is requested."
-msgstr "Bei Stornierungen weniger als 12 Stunden vor der Buchung werden 50 % des Kostenbeitrags erbeten."
-
-msgid "For example: extra monitor, projector, wood stove assistance..."
-msgstr "Zum Beispiel: zusätzlicher Monitor, Projektor, Hilfe mit dem Holzofen ..."
-
-msgid "Funded by the European Union"
-msgstr "Finanziert von der Europäischen Union"
-
-msgid "Heating with wood stove"
-msgstr "Heizung mit Holzofen"
-
-msgid "If something is damaged, let us know so we can work out how to fix it together."
-msgstr "Wenn etwas beschädigt wird, sag uns bitte Bescheid, damit wir gemeinsam eine Lösung finden."
-
-msgid "Included services"
-msgstr "Enthaltene Leistungen"
-
-msgid "Information request from %(name)s (%(email)s):\n\n%(message)s"
-msgstr "Informationsanfrage von %(name)s (%(email)s):\n\n%(message)s"
-
-msgid "Internet access"
-msgstr "Internetzugang"
-
-msgid "Keep the desk, coffee table and floor clean; there is no cleaning service."
-msgstr "Halte Arbeitsplatz, Kaffeetisch und Boden sauber; es gibt keinen Reinigungsdienst."
-
-msgid "Language"
-msgstr "Sprache"
-
-msgid "Let's talk"
-msgstr "Sprich mit uns"
-
-msgid "Log in"
-msgstr "Anmelden"
-
-msgid "Log in to confirm a booking or manage your reservations."
-msgstr "Melde dich an, um eine Buchung zu bestätigen oder deine Buchungen zu verwalten."
-
-msgid "Log out"
-msgstr "Abmelden"
-
-msgid "Main navigation"
-msgstr "Hauptnavigation"
-
-msgid "Message"
-msgstr "Nachricht"
-
-msgid "Monthly"
-msgstr "Monatlich"
-
-msgid "My bookings"
-msgstr "Meine Buchungen"
-
-msgid "Name"
-msgstr "Name"
-
-msgid "New booking"
-msgstr "Neue Buchung"
-
-msgid "No bookings yet."
-msgstr "Noch keine Buchungen."
-
-msgid "No desks are configured yet"
-msgstr "Noch keine Arbeitsplätze eingerichtet"
-
-msgid "No desks are configured yet."
-msgstr "Es sind noch keine Arbeitsplätze eingerichtet."
-
-msgid "No smoking inside."
-msgstr "Rauchen im Innenbereich ist nicht erlaubt."
-
-msgid "Notes"
-msgstr "Notizen"
-
-msgid "Occupied"
-msgstr "Belegt"
-
-msgid "Online booking"
-msgstr "Online-Buchung"
-
-msgid "Open the full rates and shared-practices PDF"
-msgstr "PDF mit allen Tarifen und gemeinsamen Regeln öffnen"
-
-msgid "Opening hours"
-msgstr "Öffnungszeiten"
-
-msgid "Please take care of the space"
-msgstr "Bitte gehe sorgsam mit dem Raum um"
-
-msgid "Policy"
-msgstr "Regeln"
-
-msgid "Printer and projector"
-msgstr "Drucker und Projektor"
-
-msgid "Questions about access, half-day use, activities, equipment or special arrangements? Send us a message."
-msgstr "Fragen zu Zugang, Halbtagesnutzung, Aktivitäten, Ausstattung oder besonderen Vereinbarungen? Schreib uns."
-
-msgid "Register"
-msgstr "Registrieren"
-
-msgid "Requests or notes"
-msgstr "Wünsche oder Notizen"
-
-msgid "Reservation"
-msgstr "Buchung"
-
-msgid "Reservations cover the selected day during the coworking opening hours."
-msgstr "Buchungen gelten für den ausgewählten Tag während der Öffnungszeiten des Coworking-Spaces."
-
-msgid "Select a date"
-msgstr "Datum auswählen"
-
-msgid "Send request"
-msgstr "Anfrage senden"
-
-msgid "Shared practices"
-msgstr "Gemeinsame Regeln"
-
-msgid "Standard"
-msgstr "Standard"
-
-msgid "Status"
-msgstr "Status"
-
-msgid "Storage"
-msgstr "Stauraum"
-
-msgid "Student / resident"
-msgstr "Studierende / Einwohner"
-
-msgid "The booking covers the selected desk from 06:00 to 21:00 on that day."
-msgstr "Die Buchung gilt an diesem Tag für den ausgewählten Arbeitsplatz von 06:00 bis 21:00 Uhr."
-
-msgid "The booking exceeds the maximum allowed duration."
-msgstr "Die Buchung überschreitet die maximal zulässige Dauer."
-
-msgid "The booking is shorter than the minimum allowed duration."
-msgstr "Die Buchung ist kürzer als die zulässige Mindestdauer."
-
-msgid "The booking must be within the opening hours."
-msgstr "Die Buchung muss innerhalb der Öffnungszeiten liegen."
-
-msgid "The end must be after the start."
-msgstr "Das Ende muss nach dem Beginn liegen."
-
-msgid "The rates are calculated to cover the minimum use costs, including electricity, Wi-Fi, cleaning products and firewood. Printing and food/drink consumption are handled separately."
-msgstr "Die Beiträge decken die Mindestkosten der Nutzung, einschließlich Strom, WLAN, Reinigungsmittel und Brennholz. Druckkosten sowie Speisen und Getränke werden separat abgerechnet."
-
-msgid "The space was made possible in part by European co-funding for the restoration of rural architecture. If you organise an event, meeting or activity related to your work, research or passion and open to the community, coworking costs can be considered covered. Contact us and we can discuss it together."
-msgstr "Der Raum wurde teilweise durch europäische Kofinanzierung zur Restaurierung ländlicher Architektur ermöglicht. Wenn du eine Veranstaltung, ein Treffen oder eine Aktivität zu Arbeit, Forschung oder Leidenschaft organisierst und sie für die Gemeinschaft öffnest, können die Coworking-Kosten als gedeckt gelten. Kontaktiere uns, damit wir es gemeinsam besprechen können."
-
-msgid "This desk is already booked for the selected date."
-msgstr "Dieser Arbeitsplatz ist am ausgewählten Datum bereits gebucht."
-
 msgid "Up to half day"
 msgstr "Bis zu einem halben Tag"
 
-msgid "Use the space as booked and respect other people's reservations."
-msgstr "Nutze den Raum wie gebucht und respektiere die Buchungen anderer."
-
-msgid "User"
-msgstr "Benutzer"
-
-msgid "Ventilate the room and do not leave lights on unnecessarily."
-msgstr "Lüfte den Raum und lass das Licht nicht unnötig eingeschaltet."
-
-msgid "WC with shower"
-msgstr "WC mit Dusche"
-
-msgid "We could not send your message. Please try again later or contact us by email."
-msgstr "Deine Nachricht konnte nicht gesendet werden. Versuche es später erneut oder kontaktiere uns per E-Mail."
+msgid "Daily"
+msgstr "Täglich"
 
 msgid "Weekly"
 msgstr "Wöchentlich"
 
-msgid "When you are the last to leave, close all windows and external door flaps."
-msgstr "Wenn du als Letztes gehst, schließe alle Fenster und äußeren Türflügel."
+msgid "Monthly"
+msgstr "Monatlich"
 
-msgid "You can check availability without an account. Log in or register when you are ready to confirm a booking."
-msgstr "Du kannst die Verfügbarkeit ohne Konto prüfen. Melde dich an oder registriere dich, wenn du eine Buchung bestätigen möchtest."
+msgid ""
+"The rates are calculated to cover the minimum use costs, including "
+"electricity, Wi-Fi, cleaning products and firewood. Printing and food/drink "
+"consumption are handled separately."
+msgstr ""
+"Die Beiträge decken die Mindestkosten der Nutzung, einschließlich Strom, "
+"WLAN, Reinigungsmittel und Brennholz. Druckkosten sowie Speisen und Getränke "
+"werden separat abgerechnet."
 
-msgid "You cannot book a past date."
-msgstr "Ein vergangenes Datum kann nicht gebucht werden."
+msgid "Included services"
+msgstr "Enthaltene Leistungen"
 
-msgid "You cannot book in the past."
-msgstr "Buchungen in der Vergangenheit sind nicht möglich."
+msgid "Internet access"
+msgstr "Internetzugang"
 
-msgid "You do not have permission to cancel this booking."
-msgstr "Du hast keine Berechtigung, diese Buchung zu stornieren."
+msgid "Coffee area"
+msgstr "Kaffeebereich"
 
-msgid "Your message has been sent. We will reply as soon as possible."
-msgstr "Deine Nachricht wurde gesendet. Wir antworten so bald wie möglich."
+msgid "Heating with wood stove"
+msgstr "Heizung mit Holzofen"
+
+msgid "Printer and projector"
+msgstr "Drucker und Projektor"
+
+msgid "Storage"
+msgstr "Stauraum"
+
+msgid "WC with shower"
+msgstr "WC mit Dusche"
+
+msgid "Access from 06:00 to 21:00, with other arrangements possible"
+msgstr "Zugang von 06:00 bis 21:00 Uhr; andere Vereinbarungen sind möglich"
+
+msgid "Community proposal"
+msgstr "Angebot für die Gemeinschaft"
+
+msgid "Bring an activity to the village"
+msgstr "Bring eine Aktivität ins Dorf"
+
+msgid ""
+"The space was made possible in part by European co-funding for the "
+"restoration of rural architecture. If you organise an event, meeting or "
+"activity related to your work, research or passion and open to the "
+"community, coworking costs can be considered covered. Contact us and we can "
+"discuss it together."
+msgstr ""
+"Der Raum wurde teilweise durch europäische Kofinanzierung zur Restaurierung "
+"ländlicher Architektur ermöglicht. Wenn du eine Veranstaltung, ein Treffen "
+"oder eine Aktivität zu Arbeit, Forschung oder Leidenschaft organisierst und "
+"sie für die Gemeinschaft öffnest, können die Coworking-Kosten als gedeckt "
+"gelten. Kontaktiere uns, damit wir es gemeinsam besprechen können."
+
+msgid "Let's talk"
+msgstr "Sprich mit uns"
+
+msgid "Shared practices"
+msgstr "Gemeinsame Regeln"
+
+msgid "Please take care of the space"
+msgstr "Bitte gehe sorgsam mit dem Raum um"
+
+msgid "No smoking inside."
+msgstr "Rauchen im Innenbereich ist nicht erlaubt."
+
+msgid "Do not enter with dirty shoes; wipe them down or take them off."
+msgstr ""
+"Nicht mit schmutzigen Schuhen eintreten; bitte abwischen oder ausziehen."
+
+msgid "Ventilate the room and do not leave lights on unnecessarily."
+msgstr "Lüfte den Raum und lass das Licht nicht unnötig eingeschaltet."
+
+msgid "Use the space as booked and respect other people's reservations."
+msgstr "Nutze den Raum wie gebucht und respektiere die Buchungen anderer."
+
+msgid ""
+"Keep the desk, coffee table and floor clean; there is no cleaning service."
+msgstr ""
+"Halte Arbeitsplatz, Kaffeetisch und Boden sauber; es gibt keinen "
+"Reinigungsdienst."
+
+msgid "Avoid excessive noise and be respectful of other people."
+msgstr "Vermeide übermäßigen Lärm und nimm Rücksicht auf andere."
+
+msgid ""
+"When you are the last to leave, close all windows and external door flaps."
+msgstr ""
+"Wenn du als Letztes gehst, schließe alle Fenster und äußeren Türflügel."
+
+msgid "Follow the wood-stove instructions and ask for help if you are unsure."
+msgstr ""
+"Befolge die Hinweise für den Holzofen und frage bei Unsicherheit nach Hilfe."
+
+msgid ""
+"If something is damaged, let us know so we can work out how to fix it "
+"together."
+msgstr ""
+"Wenn etwas beschädigt wird, sag uns bitte Bescheid, damit wir gemeinsam eine "
+"Lösung finden."
+
+msgid "Policy"
+msgstr "Regeln"
+
+msgid "Cancellation and complete information"
+msgstr "Stornierung und vollständige Informationen"
+
+msgid "Open the full rates and shared-practices PDF"
+msgstr "PDF mit allen Tarifen und gemeinsamen Regeln öffnen"
+
+msgid "Log in to confirm a booking or manage your reservations."
+msgstr ""
+"Melde dich an, um eine Buchung zu bestätigen oder deine Buchungen zu "
+"verwalten."
+
+msgid "Desks"
+msgstr "Arbeitsplätze"
+
+msgid "Coworking desks"
+msgstr "Coworking-Arbeitsplätze"
+
+msgid "A bookable desk in the shared coworking room."
+msgstr "Ein buchbarer Arbeitsplatz im gemeinsam genutzten Coworking-Raum."
+
+msgid "Opening hours"
+msgstr "Öffnungszeiten"
+
+msgid "No desks are configured yet."
+msgstr "Es sind noch keine Arbeitsplätze eingerichtet."
+
+#~ msgid "A booking must start and end on the same day."
+#~ msgstr "Eine Buchung muss am selben Tag beginnen und enden."
+
+#~ msgid "Confirm booking"
+#~ msgstr "Buchung bestätigen"
+
+#~ msgid "The booking exceeds the maximum allowed duration."
+#~ msgstr "Die Buchung überschreitet die maximal zulässige Dauer."
+
+#~ msgid "The booking is shorter than the minimum allowed duration."
+#~ msgstr "Die Buchung ist kürzer als die zulässige Mindestdauer."
+
+#~ msgid "The booking must be within the opening hours."
+#~ msgstr "Die Buchung muss innerhalb der Öffnungszeiten liegen."
+
+#~ msgid "You cannot book in the past."
+#~ msgstr "Buchungen in der Vergangenheit sind nicht möglich."
