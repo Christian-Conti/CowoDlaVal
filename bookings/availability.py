@@ -12,6 +12,23 @@ def get_booking_date_range(start_date, duration):
     """
     Return the inclusive start/end date range for a booking duration.
     """
+    duration = str(duration).strip().lower()
+
+    # Normalize values used by current and previous booking forms.
+    aliases = {
+        "full_day": "daily",
+        "full-day": "daily",
+        "full day": "daily",
+        "day": "daily",
+        "1_day": "daily",
+        "half-day": "half_day",
+        "half day": "half_day",
+        "week": "weekly",
+        "month": "monthly",
+    }
+
+    duration = aliases.get(duration, duration)
+
     if duration in {"half_day", "daily"}:
         return start_date, start_date
 
@@ -21,7 +38,10 @@ def get_booking_date_range(start_date, duration):
     if duration == "monthly":
         return start_date, start_date + timedelta(days=29)
 
-    raise ValidationError(_("Select a valid duration."))
+    raise ValidationError(
+        _("Select a valid duration: %(duration)s"),
+        params={"duration": duration},
+    )
 
 
 def get_overlapping_bookings(

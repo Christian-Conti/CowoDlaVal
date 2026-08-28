@@ -10,8 +10,11 @@ from django.utils.translation import gettext as _
 from spaces.models import Space
 
 from .models import Booking, Payment
-from .availability import get_booking_date_range, get_available_desks_for_period, suggest_split_booking
-from bookings.availability import get_overlapping_bookings
+from .availability import (
+    get_booking_date_range,
+    get_overlapping_bookings,
+    suggest_split_booking,
+)
 
 
 def _send_confirmation_after_commit(booking_id: int) -> None:
