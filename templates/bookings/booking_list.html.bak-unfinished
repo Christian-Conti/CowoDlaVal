@@ -28,9 +28,6 @@
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
-            {# cowodlaval-hide-unfinished-bookings #}
-            {% if booking.payment_method != 'unselected' %}
-
                         <tr>
                             <td data-label="{% translate 'Booking code' %}"><strong>{{ booking.booking_code }}</strong></td>
                             <td data-label="{% translate 'Desk' %}">{{ booking.space }}</td>
@@ -52,12 +49,9 @@
                                 </div>
                             </td>
                         </tr>
-                                {% endif %}
-{% empty %}
-                        <tr><td class="mobile-table-empty" colspan="{% if user.is_staff %}10{% else %}9">{% translate "No bookings yet." %}</td></tr>
-                    
-            {% endif %}
-{% endfor %}
+                    {% empty %}
+                        <tr><td class="mobile-table-empty" colspan="{% if user.is_staff %}10{% else %}9{% endif %}">{% translate "No bookings yet." %}</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

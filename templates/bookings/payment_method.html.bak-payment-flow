@@ -60,7 +60,7 @@
         <button
             type="submit"
             class="button danger abandon-booking-button"
-            formaction="{% url 'abandon' booking.booking_code %}"
+            formaction="{% url 'bookings:abandon' booking.booking_code %}"
             formmethod="post"
             formnovalidate
             data-confirm="{% translate 'Discard this unfinished booking? It will be permanently removed.' %}"

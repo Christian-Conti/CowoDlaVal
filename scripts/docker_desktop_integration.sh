@@ -7,17 +7,15 @@ ACTION="${1:-}"
 HOST_HOME="${COWODLAVAL_HOST_HOME:-/host-home}"
 HOST_HOME_PATH="${COWODLAVAL_HOST_HOME_PATH:-}"
 HOST_PROJECT_DIR="${COWODLAVAL_HOST_PROJECT_DIR:-}"
+HOST_BIN="${COWODLAVAL_HOST_BIN:-/host-usr-local-bin}"
 
 APP_NAME="Cowo d'la val - Prenotazioni"
-
 DESKTOP_FILE_NAME="cowodlaval-bookings.desktop"
 COMMAND_NAME="cowodlaval-bookings"
 
-LOCAL_DIR="$HOST_HOME/.local"
-BIN_DIR="$LOCAL_DIR/bin"
-APPLICATIONS_DIR="$LOCAL_DIR/share/applications"
+APPLICATIONS_DIR="$HOST_HOME/.local/share/applications"
 
-COMMAND_PATH="$BIN_DIR/$COMMAND_NAME"
+COMMAND_PATH="$HOST_BIN/$COMMAND_NAME"
 APPLICATION_PATH="$APPLICATIONS_DIR/$DESKTOP_FILE_NAME"
 
 
@@ -29,6 +27,12 @@ fi
 
 if [ ! -d "$HOST_HOME" ]; then
     echo "Host home directory not mounted: $HOST_HOME" >&2
+    exit 1
+fi
+
+
+if [ ! -d "$HOST_BIN" ]; then
+    echo "Host /usr/local/bin directory not mounted: $HOST_BIN" >&2
     exit 1
 fi
 
@@ -80,8 +84,12 @@ find_desktop_dir() {
 
 
 remove_legacy_files() {
+    # Remove old launcher previously installed under ~/.local/bin.
     rm -f \
-        "$HOST_HOME/.local/bin/cowodlaval-db-controller" \
+        "$HOST_HOME/.local/bin/cowodlaval-bookings" \
+        "$HOST_HOME/.local/bin/cowodlaval-db-controller"
+
+    rm -f \
         "$APPLICATIONS_DIR/cowodlaval-db-controller.desktop" \
         "$APPLICATIONS_DIR/cowodlaval-bookings-gui.desktop"
 
@@ -104,13 +112,11 @@ install_integration() {
 
     remove_legacy_files
 
-    mkdir -p \
-        "$BIN_DIR" \
-        "$APPLICATIONS_DIR"
+    mkdir -p "$APPLICATIONS_DIR"
 
-    # --------------------------------------------------------
-    # CLI / GUI host command
-    # --------------------------------------------------------
+    # ========================================================
+    # CLI / GUI launcher
+    # ========================================================
 
     rm -f "$COMMAND_PATH"
 
@@ -118,11 +124,16 @@ install_integration() {
         "$HOST_PROJECT_DIR/scripts/bookings_dashboard.sh" \
         "$COMMAND_PATH"
 
-    chown -h "$OWNER" "$COMMAND_PATH" 2>/dev/null || true
+    chmod +x "$HOST_HOME/CowoDlaVal/scripts/bookings_dashboard.sh" \
+        2>/dev/null || true
 
-    # --------------------------------------------------------
-    # Application menu entry
-    # --------------------------------------------------------
+    echo "Launcher installed:"
+    echo "  /usr/local/bin/$COMMAND_NAME"
+
+
+    # ========================================================
+    # Main application menu
+    # ========================================================
 
     cat > "$APPLICATION_PATH" <<DESKTOP
 [Desktop Entry]
@@ -130,7 +141,7 @@ Version=1.0
 Type=Application
 Name=$APP_NAME
 Comment=Open the Cowo d'la val bookings manager
-Exec=$HOST_HOME_PATH/.local/bin/$COMMAND_NAME --gui
+Exec=/usr/local/bin/$COMMAND_NAME --gui
 Icon=utilities-system-monitor
 Terminal=false
 Categories=Office;Utility;
@@ -140,9 +151,12 @@ DESKTOP
     chmod 755 "$APPLICATION_PATH"
     chown "$OWNER" "$APPLICATION_PATH"
 
-    # --------------------------------------------------------
-    # Desktop shortcut, if a desktop directory exists
-    # --------------------------------------------------------
+    echo "Application menu entry installed."
+
+
+    # ========================================================
+    # Desktop shortcut
+    # ========================================================
 
     desktop_dir="$(find_desktop_dir || true)"
 
@@ -159,12 +173,6 @@ DESKTOP
 
         echo "Desktop shortcut installed."
     fi
-
-    echo "Host command installed:"
-    echo "  $HOST_HOME_PATH/.local/bin/$COMMAND_NAME"
-
-    echo "Application menu entry installed:"
-    echo "  $HOST_HOME_PATH/.local/share/applications/$DESKTOP_FILE_NAME"
 }
 
 

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if is_update %}{% translate "Modify booking" %}{% else %}{% translate "New booking" %}{% endif %} - Cowo d'la val{% endblock %}
+{% block content %}
+<section class="page-section shell narrow-shell">
+    <div class="section-heading">
+        <p class="eyebrow">{% translate "Reservation" %}</p>
+        <h1>{% if is_update %}{% translate "Modify booking" %}{% else %}{% translate "Confirm your desk" %}{% endif %}</h1>
+        <p>{% translate "The booking covers the selected desk from 06:00 to 21:00 on that day." %}</p>
+    </div>
+    <section class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <p class="policy-notice">{% translate "Only bookings with payment in person can be cancelled autonomously. Online-paid bookings require assistance from the coworking staff." %}</p>
+            <button class="button" type="submit">{% if is_update %}{% translate "Save changes" %}{% else %}{% translate "Continue to payment" %}{% endif %}</button>
+        
+{% if alternative_choice_required and alternative_suggestion %}
+
+
+
+{% endif %}
+
+
+{% if alternative_choice_required and alternative_suggestion %}
+
+
+{% endif %}
+
+
+{% if alternative_choice_required and alternative_suggestion %}
+
+
+{% endif %}
+
+
+{% if alternative_choice_required and alternative_suggestion %}
+<section class="cowodlaval-alternative-choice" aria-labelledby="alternative-choice-title">
+    {% if alternative_suggestion.alternatives %}
+        <h2 id="alternative-choice-title">{% translate "Choose an available alternative" %}</h2>
+        <p>
+            {% translate "The requested desk is not available for the complete requested period. Select one alternative below." %}
+            {% translate "Only the selected alternative will be booked." %}
+        </p>
+        <div class="cowodlaval-alternative-choice__grid">
+            {% for alternative in alternative_suggestion.alternatives %}
+                <label class="cowodlaval-alternative-choice__card">
+                    <input type="radio" name="alternative" value="{{ alternative.alternative_id }}" required>
+                    <span class="cowodlaval-alternative-choice__title">{{ alternative.space.name }}</span>
+                    <span>{{ alternative.start_date|date:"SHORT_DATE_FORMAT" }} → {{ alternative.end_date|date:"SHORT_DATE_FORMAT" }}</span>
+                </label>
+            {% endfor %}
+        </div>
+        <button type="submit" class="button">{% translate "Continue with selected alternative" %}</button>
+    {% else %}
+        <h2 id="alternative-choice-title">{% translate "No solutions available" %}</h2>
+        <div class="cowodlaval-alternative-choice__empty">
+            <strong>{% translate "No alternative desk is available for the complete requested period." %}</strong>
+            <p>{% translate "Please choose a different date or duration." %}</p>
+        </div>
+    {% endif %}
+</section>
+<style>
+.cowodlaval-alternative-choice { margin-top: 1.25rem; padding: 1.25rem; border: 1px solid rgba(148,163,184,.35); border-radius: 1rem; background: rgba(124,131,255,.06); }
+.cowodlaval-alternative-choice__grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: .8rem; margin: 1rem 0; }
+.cowodlaval-alternative-choice__card { display: grid; grid-template-columns: auto 1fr; gap: .35rem .65rem; align-items: start; padding: 1rem; border: 1px solid rgba(148,163,184,.45); border-radius: .85rem; cursor: pointer; }
+.cowodlaval-alternative-choice__card:hover, .cowodlaval-alternative-choice__card:has(input:checked) { border-color: #7c83ff; }
+.cowodlaval-alternative-choice__card:has(input:checked) { box-shadow: 0 0 0 2px rgba(124,131,255,.25); }
+.cowodlaval-alternative-choice__card span { grid-column: 2; }
+.cowodlaval-alternative-choice__title { font-weight: 700; }
+</style>
+{% endif %}
+
+</form>
+    </section>
+</section>
+{% endblock %}
