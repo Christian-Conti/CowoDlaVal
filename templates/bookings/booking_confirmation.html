@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Booking confirmation" %} - Cowo d'la val{% endblock %}
+{% block content %}
+<section class="page-section shell narrow-shell">
+    <div class="section-heading">
+        <p class="eyebrow">{% translate "Reservation" %}</p>
+        <h1>{% translate "Confirm your split booking" %}</h1>
+        <p>{% translate "The desk you selected is not available for the entire period you requested." %}</p>
+    </div>
+    <section class="form-card">
+        {% if suggestion %}
+            <div class="booking-info">
+                <h2>{% translate "Original booking request" %}</h2>
+                <dl class="booking-facts">
+                    <div>
+                        <dt>{% translate "Desk" %}</dt>
+                        <dd>{{ suggestion.original_desk }}</dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Period" %}</dt>
+                        <dd>{{ suggestion.original_period.0|date:"SHORT_DATE_FORMAT" }} - {{ suggestion.original_period.1|date:"SHORT_DATE_FORMAT" }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            {% if suggestion.split_options %}
+                <div class="split-booking-suggestion">
+                    <h2>{% translate "Available alternative" %}</h2>
+                    <p>{% translate "We can split your booking across different desks for different periods:" %}</p>
+                    
+                    <div class="split-options">
+                        {% for option in suggestion.split_options %}
+                            <div class="split-option-card">
+                                <h3>{{ option.desk_name }}</h3>
+                                <dl>
+                                    <div>
+                                        <dt>{% translate "Dates" %}</dt>
+                                        <dd>
+                                            {{ option.start_date|date:"SHORT_DATE_FORMAT" }} - {{ option.end_date|date:"SHORT_DATE_FORMAT" }}
+                                            <span class="duration-badge">({{ option.days }} {% blocktranslate count counter=option.days %}day{% plural %}days{% endblocktranslate %}))</span>
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <form method="post" class="booking-actions">
+                    {% csrf_token %}
+                    <div class="button-group">
+                        <button type="submit" name="action" value="confirm" class="button">
+                            {% translate "Accept and continue" %}
+                        </button>
+                        <button type="submit" name="action" value="cancel" class="button secondary">
+                            {% translate "Cancel" %}
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="empty-state card-panel">
+                    <h3>{% translate "No alternative available" %}</h3>
+                    <p>{% translate "Unfortunately, we cannot offer a suitable split booking for your requested period. Please try different dates or contact us directly." %}</p>
+                    <a href="{% url 'home' %}#booking" class="button">{% translate "Try different dates" %}</a>
+                </div>
+            {% endif %}
+        {% else %}
+            <p>{% translate "No booking information available." %}</p>
+            <a href="{% url 'home' %}#booking" class="button">{% translate "Back to booking" %}</a>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}
