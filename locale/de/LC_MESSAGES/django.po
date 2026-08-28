@@ -884,3 +884,39 @@ msgstr "Es sind noch keine Arbeitsplätze eingerichtet."
 
 #~ msgid "You cannot book in the past."
 #~ msgstr "Buchungen in der Vergangenheit sind nicht möglich."
+
+
+msgid "Choose an available alternative"
+msgstr "Wähle eine verfügbare Alternative"
+
+
+msgid "The requested desk is not available for the complete requested period. Select one alternative below."
+msgstr "Der gewünschte Arbeitsplatz ist für den gesamten angefragten Zeitraum nicht verfügbar. Wähle unten eine verfügbare Alternative aus."
+
+
+msgid "Only the selected alternative will be booked."
+msgstr "Nur die ausgewählte Alternative wird gebucht."
+
+
+msgid "Choose one option and submit again to confirm it."
+msgstr "Wähle eine Option aus und sende das Formular erneut, um sie zu bestätigen."
+
+
+msgid "No solutions available"
+msgstr "Keine Lösung verfügbar"
+
+
+msgid "No complete-period alternatives are available."
+msgstr "Für den gesamten angefragten Zeitraum sind keine alternativen Arbeitsplätze verfügbar."
+
+
+msgid "Please choose a different date or duration."
+msgstr "Bitte wähle ein anderes Datum oder eine andere Dauer."
+
+
+msgid "day"
+msgstr "Tag"
+
+
+msgid "days"
+msgstr "Tage"

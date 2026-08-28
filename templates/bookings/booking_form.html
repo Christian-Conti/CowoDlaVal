@@ -16,40 +16,74 @@
             <button class="button" type="submit">{% if is_update %}{% translate "Save changes" %}{% else %}{% translate "Continue to payment" %}{% endif %}</button>
         
 {% if split_choice_required and split_suggestion %}
-<section class="cowodlaval-split-choice" aria-labelledby="split-choice-title">
-    <h2 id="split-choice-title">Choose an available alternative</h2>
-    <p>
-        The requested desk cannot cover the complete period. Select one
-        alternative below. Only the selected alternative will be booked.
-    </p>
+<section
+    class="cowodlaval-split-choice"
+    aria-labelledby="split-choice-title"
+>
+    {% if split_suggestion.split_options %}
 
-    <div class="cowodlaval-split-choice__grid">
-        {% for option in split_suggestion.split_options %}
-        <label class="cowodlaval-split-choice__card">
-            <input
-                type="radio"
-                name="split_option"
-                value="{{ option.option_id }}"
-                required
-            >
-            <span class="cowodlaval-split-choice__title">
-                {{ option.space.name }}
-            </span>
-            <span>
-                {{ option.start_date|date:"Y-m-d" }}
-                →
-                {{ option.end_date|date:"Y-m-d" }}
-            </span>
-            <span>
-                {{ option.days }} day{{ option.days|pluralize }}
-            </span>
-        </label>
-        {% endfor %}
-    </div>
+        <h2 id="split-choice-title">
+            {% trans "Choose an available alternative" %}
+        </h2>
 
-    <p class="cowodlaval-split-choice__hint">
-        Choose one option and submit again to confirm it.
-    </p>
+        <p>
+            {% trans "The requested desk is not available for the complete requested period. Select one alternative below." %}
+            {% trans "Only the selected alternative will be booked." %}
+        </p>
+
+        <div class="cowodlaval-split-choice__grid">
+            {% for option in split_suggestion.split_options %}
+                <label class="cowodlaval-split-choice__card">
+                    <input
+                        type="radio"
+                        name="split_option"
+                        value="{{ option.option_id }}"
+                        required
+                    >
+
+                    <span class="cowodlaval-split-choice__title">
+                        {{ option.space.name }}
+                    </span>
+
+                    <span>
+                        {{ option.start_date|date:"Y-m-d" }}
+                        →
+                        {{ option.end_date|date:"Y-m-d" }}
+                    </span>
+
+                    <span>
+                        {{ option.days }}
+                        {% blocktranslate count counter=option.days %}
+                            day
+                        {% plural %}
+                            days
+                        {% endblocktranslate %}
+                    </span>
+                </label>
+            {% endfor %}
+        </div>
+
+        <p class="cowodlaval-split-choice__hint">
+            {% trans "Choose one option and submit again to confirm it." %}
+        </p>
+
+    {% else %}
+
+        <h2 id="split-choice-title">
+            {% trans "No solutions available" %}
+        </h2>
+
+        <div class="cowodlaval-split-choice__empty">
+            <strong>
+                {% trans "No complete-period alternatives are available." %}
+            </strong>
+
+            <p>
+                {% trans "Please choose a different date or duration." %}
+            </p>
+        </div>
+
+    {% endif %}
 </section>
 
 <style>

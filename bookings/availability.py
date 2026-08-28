@@ -156,8 +156,13 @@ def suggest_split_booking(
     requested_desk_id: int,
 ) -> dict | None:
     """
-    Return selectable alternatives when the requested desk cannot cover the
-    complete period. This function only computes options; it never books them.
+    Suggest alternative desks for the complete requested period.
+
+    Partial ranges are intentionally not proposed.
+
+    If the requested desk is unavailable but no complete-period alternative
+    exists, return a valid suggestion object with an empty options list. This
+    allows the booking page to explicitly report that no solution is available.
     """
     requested_space = Space.objects.filter(
         pk=requested_desk_id,
@@ -167,64 +172,68 @@ def suggest_split_booking(
     if requested_space is None:
         return None
 
-    if not get_overlapping_bookings(
+    requested_conflicts = get_overlapping_bookings(
         start_date=start_date,
         end_date=end_date,
         space_id=requested_desk_id,
-    ).exists():
+    )
+
+    # No alternative is needed if the requested desk is already available.
+    if not requested_conflicts.exists():
         return None
 
+    days = (end_date - start_date).days + 1
     options = []
 
-    for space in Space.objects.filter(is_active=True).order_by("name"):
-        booked_dates = get_booked_dates(
+    for space in Space.objects.filter(
+        is_active=True,
+    ).order_by("name"):
+
+        if space.pk == requested_space.pk:
+            continue
+
+        conflicts = get_overlapping_bookings(
             start_date=start_date,
             end_date=end_date,
             space_id=space.pk,
         )
 
-        for available_start, available_end in _get_available_ranges(
-            start_date,
-            end_date,
-            booked_dates,
-        ):
-            days = (available_end - available_start).days + 1
-            option_id = (
-                f"{space.pk}:"
-                f"{available_start.isoformat()}:"
-                f"{available_end.isoformat()}"
-            )
+        if conflicts.exists():
+            continue
 
-            options.append(
-                {
-                    "option_id": option_id,
-                    "space": space,
-                    "space_id": space.pk,
-                    "desk": space,
-                    "desk_id": space.pk,
-                    "start_date": available_start,
-                    "end_date": available_end,
-                    "days": days,
-                }
-            )
-
-    if not options:
-        return None
-
-    options.sort(
-        key=lambda option: (
-            -option["days"],
-            option["space"].name,
-            option["start_date"],
+        option_id = (
+            f"{space.pk}:"
+            f"{start_date.isoformat()}:"
+            f"{end_date.isoformat()}"
         )
-    )
+
+        options.append(
+            {
+                "option_id": option_id,
+
+                "space": space,
+                "space_id": space.pk,
+
+                # Compatibility with the existing booking flow.
+                "desk": space,
+                "desk_id": space.pk,
+
+                "start_date": start_date,
+                "end_date": end_date,
+                "days": days,
+            }
+        )
 
     return {
-        "original_period": (start_date, end_date),
+        "original_period": (
+            start_date,
+            end_date,
+        ),
         "requested_space": requested_space,
         "requested_desk": requested_space,
         "options": options,
         "split_options": options,
     }
+
 
 

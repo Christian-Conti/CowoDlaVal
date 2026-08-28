@@ -889,3 +889,39 @@ msgstr "Nessuna postazione è ancora configurata."
 
 #~ msgid "You cannot book in the past."
 #~ msgstr "Non puoi prenotare nel passato."
+
+
+msgid "Choose an available alternative"
+msgstr "Scegli un'alternativa disponibile"
+
+
+msgid "The requested desk is not available for the complete requested period. Select one alternative below."
+msgstr "La postazione richiesta non è disponibile per l'intero periodo richiesto. Seleziona una delle alternative disponibili qui sotto."
+
+
+msgid "Only the selected alternative will be booked."
+msgstr "Verrà prenotata soltanto l'alternativa selezionata."
+
+
+msgid "Choose one option and submit again to confirm it."
+msgstr "Seleziona un'opzione e invia nuovamente il modulo per confermarla."
+
+
+msgid "No solutions available"
+msgstr "Nessuna soluzione disponibile"
+
+
+msgid "No complete-period alternatives are available."
+msgstr "Non ci sono postazioni alternative disponibili per l'intero periodo richiesto."
+
+
+msgid "Please choose a different date or duration."
+msgstr "Scegli un'altra data o una durata diversa."
+
+
+msgid "day"
+msgstr "giorno"
+
+
+msgid "days"
+msgstr "giorni"
