@@ -1,142 +1,205 @@
 from datetime import timedelta
 from typing import List, Tuple
 
-from django.utils import timezone
-from django.utils.translation import gettext as _
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
+from bookings.models import Booking
 from spaces.models import Space
-from .models import Booking
 
 
-def get_booking_date_range(start_date, duration: str) -> Tuple[timezone.datetime.date, timezone.datetime.date]:
+def get_booking_date_range(start_date, duration):
     """
-    Calculate the end date based on the start date and duration.
-    Returns (start_date, end_date)
+    Return the inclusive start/end date range for a booking duration.
     """
-    if duration == "half_day":
+    if duration in {"half_day", "daily"}:
         return start_date, start_date
-    elif duration == "full_day":
-        return start_date, start_date
-    elif duration == "week":
-        return start_date, start_date + timedelta(days=6)  # 7 days total
-    elif duration == "month":
-        return start_date, start_date + timedelta(days=29)  # 30 days total
-    else:
-        raise ValueError(f"Invalid duration: {duration}")
+
+    if duration == "weekly":
+        return start_date, start_date + timedelta(days=6)
+
+    if duration == "monthly":
+        return start_date, start_date + timedelta(days=29)
+
+    raise ValidationError(_("Select a valid duration."))
 
 
-def get_available_desks_for_period(
+def get_overlapping_bookings(
     start_date,
     end_date,
-    exclude_booking_id: int | None = None,
-) -> dict:
+    space_id=None,
+    confirmed_only=True,
+    exclude_booking_id=None,
+):
     """
-    Check availability of all desks for a given period.
-    Returns a dict with:
-    - fully_available: list of desks available for the entire period
-    - partially_available: dict of desks with their available date ranges
-    """
-    desks = Space.objects.filter(is_active=True)
-    fully_available = []
-    partially_available = {}
+    Return bookings whose occupied interval intersects the requested interval.
 
-    for desk in desks:
-        bookings = Booking.objects.filter(
-            space=desk,
-            date__range=[start_date, end_date],
-            status=Booking.Status.CONFIRMED,
+    A booking with no end_date is treated as a one-day booking.
+    """
+    from django.db.models import Q
+
+    bookings = Booking.objects.filter(date__lte=end_date).filter(
+        Q(end_date__gte=start_date)
+        | Q(
+            end_date__isnull=True,
+            date__gte=start_date,
         )
-        if exclude_booking_id:
-            bookings = bookings.exclude(pk=exclude_booking_id)
+    )
 
-        if not bookings.exists():
-            # Desk is fully available for the entire period
-            fully_available.append(desk)
-        else:
-            # Check for partial availability
-            booked_dates = set(b.date for b in bookings)
-            available_ranges = _get_available_ranges(start_date, end_date, booked_dates)
-            if available_ranges:
-                partially_available[desk.id] = {
-                    "desk": desk,
-                    "available_ranges": available_ranges,
-                }
+    if space_id is not None:
+        bookings = bookings.filter(space_id=space_id)
 
-    return {
-        "fully_available": fully_available,
-        "partially_available": partially_available,
-    }
+    if confirmed_only:
+        bookings = bookings.filter(status=Booking.Status.CONFIRMED)
+
+    if exclude_booking_id is not None:
+        bookings = bookings.exclude(pk=exclude_booking_id)
+
+    return bookings
+
+
+def get_booked_dates(start_date, end_date, space_id):
+    """
+    Return every calendar day occupied by confirmed bookings for one space.
+    """
+    booked_dates = set()
+
+    bookings = get_overlapping_bookings(
+        start_date=start_date,
+        end_date=end_date,
+        space_id=space_id,
+    )
+
+    for booking in bookings:
+        occupied_start = max(booking.date, start_date)
+        occupied_end = min(booking.end_date or booking.date, end_date)
+
+        current = occupied_start
+        while current <= occupied_end:
+            booked_dates.add(current)
+            current += timedelta(days=1)
+
+    return booked_dates
+
+
+def get_available_spaces(start_date, end_date):
+    """
+    Return active spaces that are free for the complete requested interval.
+    """
+    available = []
+
+    for space in Space.objects.filter(is_active=True).order_by("name"):
+        if not get_overlapping_bookings(
+            start_date=start_date,
+            end_date=end_date,
+            space_id=space.pk,
+        ).exists():
+            available.append(space)
+
+    return available
+
+
+def get_available_desks(start_date, end_date):
+    """
+    Backwards-compatible alias for callers that use desk terminology.
+    """
+    return get_available_spaces(start_date, end_date)
+
+
+def find_available_desks(start_date, end_date):
+    """
+    Backwards-compatible alias for callers that use find_available_desks().
+    """
+    return get_available_spaces(start_date, end_date)
 
 
 def _get_available_ranges(start_date, end_date, booked_dates: set) -> List[Tuple]:
     """
-    Get list of available date ranges within the period, excluding booked dates.
+    Return contiguous free ranges inside an inclusive date interval.
     """
     ranges = []
     current = start_date
 
     while current <= end_date:
-        if current not in booked_dates:
-            range_start = current
-            while current <= end_date and current not in booked_dates:
-                current += timedelta(days=1)
-            ranges.append((range_start, current - timedelta(days=1)))
-        else:
+        if current in booked_dates:
             current += timedelta(days=1)
+            continue
+
+        available_start = current
+
+        while current <= end_date and current not in booked_dates:
+            current += timedelta(days=1)
+
+        available_end = current - timedelta(days=1)
+        ranges.append((available_start, available_end))
 
     return ranges
 
 
 def suggest_split_booking(start_date, end_date, requested_desk_id: int) -> dict | None:
     """
-    If the requested desk is not fully available, suggest splitting the booking
-    across multiple desks for different periods.
+    Suggest free date ranges when the requested desk is not available for
+    the complete period.
 
-    Returns a dict with suggested split booking or None if fully available.
+    The returned structure keeps the keys used by the booking confirmation
+    flow and includes ranges for every active desk.
     """
-    requested_desk = Space.objects.get(pk=requested_desk_id)
-    bookings = Booking.objects.filter(
-        space=requested_desk,
-        date__range=[start_date, end_date],
-        status=Booking.Status.CONFIRMED,
-    )
+    requested_space = Space.objects.filter(
+        pk=requested_desk_id,
+        is_active=True,
+    ).first()
 
-    if not bookings.exists():
-        return None  # Desk is fully available
-
-    booked_dates = set(b.date for b in bookings)
-    available_ranges = _get_available_ranges(start_date, end_date, booked_dates)
-
-    if not available_ranges:
-        # No availability at all
+    if requested_space is None:
         return None
 
-    suggestion = {
-        "original_desk": requested_desk,
-        "original_period": (start_date, end_date),
-        "split_options": [],
-    }
+    requested_conflicts = get_overlapping_bookings(
+        start_date=start_date,
+        end_date=end_date,
+        space_id=requested_desk_id,
+    )
 
-    # Get all available desks for the periods
-    current_period_start = start_date
-    used_desks = {}
+    if not requested_conflicts.exists():
+        return None
 
-    for available_start, available_end in available_ranges:
-        # For this available period, find a desk
-        alternative_desks = Space.objects.filter(is_active=True).exclude(pk=requested_desk_id)
-        for desk in alternative_desks:
-            desk_bookings = Booking.objects.filter(
-                space=desk,
-                date__range=[available_start, available_end],
-                status=Booking.Status.CONFIRMED,
-            )
-            if not desk_bookings.exists():
-                suggestion["split_options"].append({
-                    "desk": desk,
+    options = []
+
+    for space in Space.objects.filter(is_active=True).order_by("name"):
+        booked_dates = get_booked_dates(
+            start_date=start_date,
+            end_date=end_date,
+            space_id=space.pk,
+        )
+
+        available_ranges = _get_available_ranges(
+            start_date,
+            end_date,
+            booked_dates,
+        )
+
+        for available_start, available_end in available_ranges:
+            options.append(
+                {
+                    "space": space,
+                    "space_id": space.pk,
                     "start_date": available_start,
                     "end_date": available_end,
-                    "days": (available_end - available_start).days + 1,
-                })
-                break
+                }
+            )
 
-    return suggestion if suggestion["split_options"] else None
+    if not options:
+        return None
+
+    options.sort(
+        key=lambda option: (
+            -(option["end_date"] - option["start_date"]).days,
+            option["space"].name,
+            option["start_date"],
+        )
+    )
+
+    return {
+        "original_period": (start_date, end_date),
+        "requested_space": requested_space,
+        "requested_desk": requested_space,
+        "options": options,
+    }

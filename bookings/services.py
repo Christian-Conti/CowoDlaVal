@@ -11,6 +11,7 @@ from spaces.models import Space
 
 from .models import Booking, Payment
 from .availability import get_booking_date_range, get_available_desks_for_period, suggest_split_booking
+from bookings.availability import get_overlapping_bookings
 
 
 def _send_confirmation_after_commit(booking_id: int) -> None:
@@ -35,11 +36,11 @@ def create_booking(
     num_days = (end_date - start_date).days + 1
 
     # Check if the desk is available for the entire period
-    bookings = Booking.objects.filter(
-        space=space,
-        date__range=[start_date, end_date],
-        status=Booking.Status.CONFIRMED,
-    )
+    bookings = get_overlapping_bookings(
+            start_date=start_date,
+            end_date=end_date,
+            space_id=space.pk,
+        )
     if bookings.exists():
         raise ValidationError(
             _("This desk is not available for the entire requested period. Please check availability or try a different desk.")
@@ -218,11 +219,11 @@ def modify_booking(
     start_date, end_date = get_booking_date_range(booking_date, duration)
     num_days = (end_date - start_date).days + 1
 
-    bookings = Booking.objects.filter(
-        space=space,
-        date__range=[start_date, end_date],
-        status=Booking.Status.CONFIRMED,
-    ).exclude(pk=booking.pk)
+    bookings = get_overlapping_bookings(
+            start_date=start_date,
+            end_date=end_date,
+            space_id=space.pk,
+        ).exclude(pk=booking.pk)
     if bookings.exists():
         raise ValidationError(_("This desk is already booked for the selected dates."))
 
