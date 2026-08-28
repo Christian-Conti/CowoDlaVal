@@ -19,6 +19,8 @@ COPY . .
 RUN chmod +x /app/entrypoint.sh /app/scripts/bookings_dashboard_gui.sh && \
     chown -R django:django /app && \
     /app/scripts/bookings_dashboard_gui.sh --install
+    
+RUN chmod +x scripts/bookings_dashboard_docker_gui.sh
 
 USER django
 
