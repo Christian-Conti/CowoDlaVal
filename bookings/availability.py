@@ -10,9 +10,9 @@ from spaces.models import Space
 
 def get_booking_date_range(start_date, duration):
     """
-    Return the inclusive start/end date range for a booking duration.
+    Return the inclusive start/end range for a canonical booking duration.
 
-    Canonical duration values:
+    Accepted internal values:
         half_day
         daily
         weekly
@@ -30,8 +30,10 @@ def get_booking_date_range(start_date, duration):
         return start_date, start_date + timedelta(days=29)
 
     raise ValidationError(
-        _("Select a valid duration."),
+        _("Select a valid duration: %(duration)s"),
+        params={"duration": duration},
     )
+
 
 
 

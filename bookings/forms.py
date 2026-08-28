@@ -12,8 +12,8 @@ class BookingForm(forms.Form):
     DURATION_CHOICES = [
         ("half_day", _("Half day")),
         ("daily", _("Full day")),
-        ("week", _("Week (7 days)")),
-        ("month", _("Month (30 days)")),
+        ("weekly", _("Week (7 days)")),
+        ("monthly", _("Month (30 days)")),
     ]
 
     space = forms.ModelChoiceField(
