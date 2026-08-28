@@ -11,7 +11,7 @@ from .models import Booking
 class BookingForm(forms.Form):
     DURATION_CHOICES = [
         ("half_day", _("Half day")),
-        ("full_day", _("Full day")),
+        ("daily", _("Full day")),
         ("week", _("Week (7 days)")),
         ("month", _("Month (30 days)")),
     ]
@@ -27,7 +27,7 @@ class BookingForm(forms.Form):
     duration = forms.ChoiceField(
         label=_("Duration"),
         choices=DURATION_CHOICES,
-        initial="full_day",
+        initial="daily",
     )
     tariff_category = forms.ChoiceField(
         label=_("Rate"),

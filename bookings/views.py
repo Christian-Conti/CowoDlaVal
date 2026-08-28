@@ -105,7 +105,7 @@ class BookingCreateView(LoginRequiredMixin, FormView):
                         "end_date": opt["end_date"].isoformat(),
                         "days": opt["days"],
                     }
-                    for opt in split_suggestion["split_options"]
+                    for opt in split_suggestion["options"]
                 ],
             }
             return redirect("booking_confirmation")
@@ -150,7 +150,7 @@ def booking_confirmation(request):
                         user=request.user,
                         space_id=option["desk_id"],
                         booking_date=parse_date(option["start_date"]),
-                        duration="full_day",
+                        duration="daily",
                         tariff_category=suggestion["tariff_category"],
                         notes=suggestion["notes"],
                         language=getattr(request, "LANGUAGE_CODE", "it"),
@@ -241,7 +241,7 @@ def modify_booking_view(request, pk):
                 user=request.user,
                 space_id=form.cleaned_data["space"].id,
                 booking_date=form.cleaned_data["date"],
-                duration=form.cleaned_data.get("duration", "full_day"),
+                duration=form.cleaned_data.get("duration", "daily"),
                 tariff_category=form.cleaned_data["tariff_category"],
                 notes=form.cleaned_data["notes"],
             )

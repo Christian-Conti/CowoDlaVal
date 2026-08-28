@@ -12,24 +12,13 @@ def get_booking_date_range(start_date, duration):
     """
     Return the inclusive start/end date range for a booking duration.
 
-    The booking UI historically used multiple names for a one-day booking.
-    Normalize them here so old links/forms and the current UI remain compatible.
+    Canonical duration values:
+        half_day
+        daily
+        weekly
+        monthly
     """
     duration = str(duration).strip().lower()
-
-    aliases = {
-        "full_day": "daily",
-        "full-day": "daily",
-        "full day": "daily",
-        "day": "daily",
-        "1_day": "daily",
-        "half-day": "half_day",
-        "half day": "half_day",
-        "week": "weekly",
-        "month": "monthly",
-    }
-
-    duration = aliases.get(duration, duration)
 
     if duration in {"half_day", "daily"}:
         return start_date, start_date
@@ -41,9 +30,9 @@ def get_booking_date_range(start_date, duration):
         return start_date, start_date + timedelta(days=29)
 
     raise ValidationError(
-        _("Select a valid duration: %(duration)s"),
-        params={"duration": duration},
+        _("Select a valid duration."),
     )
+
 
 
 

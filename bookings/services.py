@@ -29,7 +29,7 @@ def create_booking(
     user,
     space_id,
     booking_date,
-    duration="full_day",
+    duration="daily",
     tariff_category=Booking.TariffCategory.STANDARD,
     notes="",
     language="it",
@@ -206,7 +206,7 @@ def modify_booking(
     user,
     space_id,
     booking_date,
-    duration="full_day",
+    duration="daily",
     tariff_category,
     notes=""
 ) -> Booking:
