@@ -19,8 +19,8 @@ class BookingWindow:
 
         self.root = tk.Tk()
         self.root.title(_("Cowo d'la val - Bookings"))
-        self.root.geometry("1120x650")
-        self.root.minsize(800, 500)
+        self.root.geometry("1360x650")
+        self.root.minsize(1000, 500)
 
         toolbar = ttk.Frame(self.root, padding=12)
         toolbar.pack(fill="x")
@@ -34,12 +34,13 @@ class BookingWindow:
 
         table_frame = ttk.Frame(self.root, padding=(12, 0))
         table_frame.pack(fill="both", expand=True)
-        columns = ("code", "desk", "user", "booking", "method", "payment", "amount")
+        columns = ("code", "desk", "user", "email", "booking", "method", "payment", "amount")
         self.table = ttk.Treeview(table_frame, columns=columns, show="headings", selectmode="browse")
         headings = {
             "code": (_("Booking code"), 190),
             "desk": (_("Desk"), 120),
             "user": (_("Customer"), 210),
+            "email": (_("Email"), 240),
             "booking": (_("Booking"), 100),
             "method": (_("Payment method"), 130),
             "payment": (_("Payment"), 110),
@@ -47,7 +48,12 @@ class BookingWindow:
         }
         for column, (label, width) in headings.items():
             self.table.heading(column, text=label)
-            self.table.column(column, width=width, minwidth=60, stretch=column in {"code", "user"})
+            self.table.column(
+                column,
+                width=width,
+                minwidth=60,
+                stretch=column in {"code", "user", "email"},
+            )
 
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.table.yview)
         self.table.configure(yscrollcommand=scrollbar.set)
@@ -62,16 +68,16 @@ class BookingWindow:
 
         actions = ttk.Frame(self.root, padding=(12, 0, 12, 12))
         actions.pack(fill="x")
-        ttk.Button(actions, text=_("Confirm"), command=lambda: self.change_status(Booking.Status.CONFIRMED)).pack(
-            side="left"
-        )
+        ttk.Button(
+            actions,
+            text=_("Confirm"),
+            command=lambda: self.change_status(Booking.Status.CONFIRMED),
+        ).pack(side="left")
         ttk.Button(
             actions,
             text=_("Cancel booking"),
             command=lambda: self.change_status(Booking.Status.CANCELLED),
-        ).pack(
-            side="left", padx=6
-        )
+        ).pack(side="left", padx=6)
         ttk.Button(actions, text=_("Mark paid on site"), command=self.mark_paid).pack(side="left")
         ttk.Button(actions, text=_("Save notes"), command=self.save_notes).pack(side="left", padx=6)
         ttk.Button(actions, text=_("Refresh"), command=self.refresh).pack(side="left")
@@ -124,6 +130,7 @@ class BookingWindow:
                     booking.booking_code,
                     str(booking.space),
                     self.command._user_label(booking),
+                    self.command._user_email(booking),
                     booking.get_status_display(),
                     booking.get_payment_method_display(),
                     self.command._payment_label(booking),
@@ -349,7 +356,11 @@ class Command(BaseCommand):
     def _render_date(self, selected: date) -> None:
         spaces = list(Space.objects.filter(is_active=True).order_by("name"))
         bookings = list(self._bookings_for_date(selected))
-        confirmed = {booking.space_id: booking for booking in bookings if booking.status == Booking.Status.CONFIRMED}
+        confirmed = {
+            booking.space_id: booking
+            for booking in bookings
+            if booking.status == Booking.Status.CONFIRMED
+        }
 
         self.stdout.write("")
         self.stdout.write(self._style(_("Date: %(date)s") % {"date": selected.isoformat()}, "1;34"))
@@ -372,6 +383,7 @@ class Command(BaseCommand):
     def _render_booking(self, booking, indent="  "):
         self.stdout.write(f"{indent}{booking.booking_code}")
         self.stdout.write(f"{indent}{self._user_label(booking)}")
+        self.stdout.write(f"{indent}{_('Email')}: {self._user_email(booking)}")
         self.stdout.write(f"{indent}{booking.get_status_display()}")
         self.stdout.write(f"{indent}{booking.get_payment_method_display()}")
         self.stdout.write(f"{indent}€{booking.amount} {booking.currency}")
@@ -389,6 +401,9 @@ class Command(BaseCommand):
     def _user_label(self, booking):
         name = booking.user.get_full_name().strip() or booking.user.get_username()
         return f"{name} ({booking.user.get_username()})"
+
+    def _user_email(self, booking):
+        return booking.user.email.strip() or "-"
 
     def _payment_label(self, booking):
         return str(_("PAYMENT DUE") if booking.payment_due else booking.get_payment_status_display()).upper()
