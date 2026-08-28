@@ -154,21 +154,8 @@ def suggest_split_booking(
     requested_desk_id: int,
 ) -> dict | None:
     """
-    Suggest contiguous free ranges when the requested desk is unavailable.
-
-    The returned structure intentionally exposes both the current "space"
-    terminology and the older "desk" terminology. The web booking flow has
-    used both names over time, so keeping the aliases here gives callers one
-    stable compatibility contract.
-
-    Every split option contains:
-      - space / desk: the Space instance
-      - space_id / desk_id: the Space primary key
-      - start_date / end_date: inclusive available interval
-      - days: inclusive number of calendar days in the interval
-
-    At the top level both "options" and "split_options" reference the same
-    option list.
+    Return selectable alternatives when the requested desk cannot cover the
+    complete period. This function only computes options; it never books them.
     """
     requested_space = Space.objects.filter(
         pk=requested_desk_id,
@@ -178,13 +165,11 @@ def suggest_split_booking(
     if requested_space is None:
         return None
 
-    requested_conflicts = get_overlapping_bookings(
+    if not get_overlapping_bookings(
         start_date=start_date,
         end_date=end_date,
         space_id=requested_desk_id,
-    )
-
-    if not requested_conflicts.exists():
+    ).exists():
         return None
 
     options = []
@@ -196,17 +181,21 @@ def suggest_split_booking(
             space_id=space.pk,
         )
 
-        available_ranges = _get_available_ranges(
+        for available_start, available_end in _get_available_ranges(
             start_date,
             end_date,
             booked_dates,
-        )
-
-        for available_start, available_end in available_ranges:
+        ):
             days = (available_end - available_start).days + 1
+            option_id = (
+                f"{space.pk}:"
+                f"{available_start.isoformat()}:"
+                f"{available_end.isoformat()}"
+            )
 
             options.append(
                 {
+                    "option_id": option_id,
                     "space": space,
                     "space_id": space.pk,
                     "desk": space,
@@ -235,4 +224,5 @@ def suggest_split_booking(
         "options": options,
         "split_options": options,
     }
+
 

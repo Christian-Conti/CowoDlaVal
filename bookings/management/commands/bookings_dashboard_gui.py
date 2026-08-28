@@ -468,7 +468,7 @@ class DashboardWindow:
 
         self.root.title("Cowo d'la val - Prenotazioni")
         self.root.geometry("1280x760")
-        self.root.minsize(620, 520)
+        self.root.minsize(640, 520)
 
         self.style = ttk.Style(self.root)
         try:
@@ -703,20 +703,26 @@ class DashboardWindow:
     def _handle_resize(self) -> None:
         self._resize_job = None
 
-        root_width = max(self.root.winfo_width(), 620)
+        root_width = max(self.root.winfo_width(), 640)
         root_height = max(self.root.winfo_height(), 520)
 
+        # Use the real content width. Window decorations and frame padding make
+        # the usable width smaller than root.winfo_width().
         content_width = self.content.winfo_width()
         if content_width <= 1:
             content_width = max(root_width - 36, 1)
 
-        scale = min(max(min(root_width / 1280, root_height / 760), 0.86), 1.12)
+        scale = min(
+            max(min(root_width / 1280, root_height / 760), 0.88),
+            1.14,
+        )
         font_size = max(9, min(13, round(11 * scale)))
         self._configure_fonts(font_size)
 
-        if content_width >= 1280:
+        # Wrap early, before any control can be clipped.
+        if content_width >= 1540:
             chrome_layout = "wide"
-        elif content_width >= 760:
+        elif content_width >= 900:
             chrome_layout = "medium"
         else:
             chrome_layout = "narrow"
@@ -724,9 +730,9 @@ class DashboardWindow:
         self._layout_header(chrome_layout)
         self._layout_toolbar(chrome_layout)
 
-        if content_width >= 1420:
+        if content_width >= 1480:
             action_layout = "wide"
-        elif content_width >= 760:
+        elif content_width >= 820:
             action_layout = "medium"
         else:
             action_layout = "narrow"
@@ -734,6 +740,7 @@ class DashboardWindow:
 
         if self._auto_fit_columns and self._columns_initialized:
             self.fit_columns(keep_auto=True)
+
 
 
     def _on_tree_button_press(self, event) -> None:
@@ -781,37 +788,16 @@ class DashboardWindow:
 
         if layout == "wide":
             self.header.grid_columnconfigure(0, weight=1)
-
             self.title_label.grid(row=0, column=0, sticky="w")
-            self.summary_label.grid(
-                row=0,
-                column=1,
-                padx=(16, 10),
-                sticky="e",
-            )
-            self.fit_columns_button.grid(
-                row=0,
-                column=2,
-                padx=4,
-                sticky="e",
-            )
-            self.theme_button.grid(
-                row=0,
-                column=3,
-                padx=(4, 0),
-                sticky="e",
-            )
+            self.summary_label.grid(row=0, column=1, padx=(16, 10), sticky="e")
+            self.fit_columns_button.grid(row=0, column=2, padx=4, sticky="e")
+            self.theme_button.grid(row=0, column=3, padx=(4, 0), sticky="e")
             return
 
         if layout == "medium":
+            # Give the title a complete row. Secondary controls move below it.
             self.header.grid_columnconfigure(0, weight=1)
-
-            self.title_label.grid(
-                row=0,
-                column=0,
-                columnspan=4,
-                sticky="w",
-            )
+            self.title_label.grid(row=0, column=0, columnspan=4, sticky="w")
             self.summary_label.grid(
                 row=1,
                 column=0,
@@ -835,15 +821,11 @@ class DashboardWindow:
             )
             return
 
+        # Narrow mode uses three rows so neither title nor controls disappear.
         for column in range(2):
             self.header.grid_columnconfigure(column, weight=1)
 
-        self.title_label.grid(
-            row=0,
-            column=0,
-            columnspan=2,
-            sticky="w",
-        )
+        self.title_label.grid(row=0, column=0, columnspan=2, sticky="w")
         self.summary_label.grid(
             row=1,
             column=0,
@@ -867,6 +849,7 @@ class DashboardWindow:
         )
 
 
+
     def _layout_toolbar(self, layout: str) -> None:
         if self._toolbar_layout == layout:
             return
@@ -885,51 +868,27 @@ class DashboardWindow:
         for column in range(5):
             self.toolbar.grid_columnconfigure(column, weight=0, minsize=0)
 
-        if layout in {"wide", "medium"}:
-            self.previous_button.configure(text="‹ Giorno precedente")
-            self.next_button.configure(text="Giorno successivo ›")
-        else:
+        if layout == "narrow":
             self.previous_button.configure(text="‹ Precedente")
             self.next_button.configure(text="Successivo ›")
+        else:
+            self.previous_button.configure(text="‹ Giorno precedente")
+            self.next_button.configure(text="Giorno successivo ›")
 
         if layout == "wide":
-            weights = (2, 1, 1, 1, 2)
-            for column, weight in enumerate(weights):
+            for column, weight in enumerate((2, 1, 1, 1, 2)):
                 self.toolbar.grid_columnconfigure(column, weight=weight)
 
-            self.previous_button.grid(
-                row=0,
-                column=0,
-                sticky="ew",
-                padx=(0, 4),
-            )
-            self.date_entry.grid(
-                row=0,
-                column=1,
-                sticky="ew",
-                padx=4,
-            )
-            self.apply_date_button.grid(
-                row=0,
-                column=2,
-                sticky="ew",
-                padx=4,
-            )
-            self.today_button.grid(
-                row=0,
-                column=3,
-                sticky="ew",
-                padx=4,
-            )
-            self.next_button.grid(
-                row=0,
-                column=4,
-                sticky="ew",
-                padx=(4, 0),
-            )
+            self.previous_button.grid(row=0, column=0, sticky="ew", padx=(0, 4))
+            self.date_entry.grid(row=0, column=1, sticky="ew", padx=4)
+            self.apply_date_button.grid(row=0, column=2, sticky="ew", padx=4)
+            self.today_button.grid(row=0, column=3, sticky="ew", padx=4)
+            self.next_button.grid(row=0, column=4, sticky="ew", padx=(4, 0))
             return
 
         if layout == "medium":
+            # Two rows at ordinary window sizes, matching the responsive action
+            # area below the table.
             for column in range(3):
                 self.toolbar.grid_columnconfigure(column, weight=1)
 
@@ -954,13 +913,7 @@ class DashboardWindow:
                 padx=(4, 0),
                 pady=(0, 6),
             )
-
-            self.today_button.grid(
-                row=1,
-                column=0,
-                sticky="ew",
-                padx=(0, 4),
-            )
+            self.today_button.grid(row=1, column=0, sticky="ew", padx=(0, 4))
             self.next_button.grid(
                 row=1,
                 column=1,
@@ -970,6 +923,7 @@ class DashboardWindow:
             )
             return
 
+        # Very small windows use short labels and three rows.
         for column in range(2):
             self.toolbar.grid_columnconfigure(column, weight=1)
 
@@ -987,7 +941,6 @@ class DashboardWindow:
             padx=(4, 0),
             pady=(0, 6),
         )
-
         self.previous_button.grid(
             row=1,
             column=0,
@@ -1002,13 +955,8 @@ class DashboardWindow:
             padx=(4, 0),
             pady=(0, 6),
         )
+        self.today_button.grid(row=2, column=0, columnspan=2, sticky="ew")
 
-        self.today_button.grid(
-            row=2,
-            column=0,
-            columnspan=2,
-            sticky="ew",
-        )
 
 
     def _configure_fonts(self, font_size: int) -> None:

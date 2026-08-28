@@ -88,6 +88,41 @@ class BookingCreateView(LoginRequiredMixin, FormView):
 
         # Check if split booking is needed
         split_suggestion = suggest_split_booking(start_date, end_date, space_id)
+        # Split suggestions are alternatives. Do not create every free option.
+        if split_suggestion:
+            selected_split_option = self.request.POST.get("split_option", "").strip()
+            split_options = split_suggestion.get(
+                "split_options",
+                split_suggestion.get("options", []),
+            )
+            
+            if not selected_split_option:
+                context = self.get_context_data(form=form)
+                context["split_suggestion"] = split_suggestion
+                context["split_choice_required"] = True
+                return self.render_to_response(context)
+            
+            selected_options = [
+                option
+                for option in split_options
+                if option.get("option_id") == selected_split_option
+            ]
+            
+            if len(selected_options) != 1:
+                form.add_error(
+                    None,
+                    "The selected booking alternative is no longer available. "
+                    "Please choose again.",
+                )
+                context = self.get_context_data(form=form)
+                context["split_suggestion"] = split_suggestion
+                context["split_choice_required"] = True
+                return self.render_to_response(context)
+            
+            # Keep both historical keys, but expose only the selected option.
+            split_suggestion["split_options"] = selected_options
+            split_suggestion["options"] = selected_options
+            
         if split_suggestion:
             # Store in session for the confirmation view
             self.request.session["booking_suggestion"] = {

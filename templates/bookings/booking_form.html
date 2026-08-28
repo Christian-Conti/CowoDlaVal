@@ -14,7 +14,100 @@
             {{ form.as_p }}
             <p class="policy-notice">{% translate "Only bookings with payment in person can be cancelled autonomously. Online-paid bookings require assistance from the coworking staff." %}</p>
             <button class="button" type="submit">{% if is_update %}{% translate "Save changes" %}{% else %}{% translate "Continue to payment" %}{% endif %}</button>
-        </form>
+        
+{% if split_choice_required and split_suggestion %}
+<section class="cowodlaval-split-choice" aria-labelledby="split-choice-title">
+    <h2 id="split-choice-title">Choose an available alternative</h2>
+    <p>
+        The requested desk cannot cover the complete period. Select one
+        alternative below. Only the selected alternative will be booked.
+    </p>
+
+    <div class="cowodlaval-split-choice__grid">
+        {% for option in split_suggestion.split_options %}
+        <label class="cowodlaval-split-choice__card">
+            <input
+                type="radio"
+                name="split_option"
+                value="{{ option.option_id }}"
+                required
+            >
+            <span class="cowodlaval-split-choice__title">
+                {{ option.space.name }}
+            </span>
+            <span>
+                {{ option.start_date|date:"Y-m-d" }}
+                →
+                {{ option.end_date|date:"Y-m-d" }}
+            </span>
+            <span>
+                {{ option.days }} day{{ option.days|pluralize }}
+            </span>
+        </label>
+        {% endfor %}
+    </div>
+
+    <p class="cowodlaval-split-choice__hint">
+        Choose one option and submit again to confirm it.
+    </p>
+</section>
+
+<style>
+.cowodlaval-split-choice {
+    margin-top: 1.25rem;
+    padding: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 1rem;
+    background: rgba(124, 131, 255, 0.06);
+}
+
+.cowodlaval-split-choice h2 {
+    margin-top: 0;
+}
+
+.cowodlaval-split-choice__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.cowodlaval-split-choice__card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.35rem 0.65rem;
+    align-items: start;
+    padding: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 0.85rem;
+    cursor: pointer;
+}
+
+.cowodlaval-split-choice__card:hover,
+.cowodlaval-split-choice__card:focus-within {
+    border-color: #7c83ff;
+}
+
+.cowodlaval-split-choice__card input {
+    margin-top: 0.25rem;
+}
+
+.cowodlaval-split-choice__card span {
+    grid-column: 2;
+}
+
+.cowodlaval-split-choice__title {
+    font-weight: 700;
+}
+
+.cowodlaval-split-choice__hint {
+    margin-bottom: 0;
+    opacity: 0.8;
+}
+</style>
+{% endif %}
+
+</form>
     </section>
 </section>
 {% endblock %}
