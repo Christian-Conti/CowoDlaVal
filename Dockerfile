@@ -16,7 +16,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-RUN chmod +x /app/entrypoint.sh && chown -R django:django /app
+RUN chmod +x /app/entrypoint.sh /app/scripts/bookings_dashboard_gui.sh && \
+    chown -R django:django /app && \
+    /app/scripts/bookings_dashboard_gui.sh --install
 
 USER django
 
