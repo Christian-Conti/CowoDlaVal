@@ -1023,6 +1023,119 @@ dt {
     }
 }
 
+.policy-notice,
+.payment-due {
+    border-left: 4px solid var(--yellow);
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: color-mix(in srgb, var(--yellow) 12%, var(--surface));
+}
+
+.payment-due {
+    border-left-color: var(--red);
+    color: var(--red);
+    font-weight: 850;
+}
+
+.payment-options {
+    margin: 0 0 22px;
+    padding: 0;
+    border: 0;
+}
+
+.payment-options legend {
+    margin-bottom: 10px;
+    font-weight: 850;
+}
+
+.payment-options ul {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.payment-options label {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface-soft);
+    cursor: pointer;
+}
+
+.detail-title {
+    margin: 0;
+    color: var(--blue);
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    overflow-wrap: anywhere;
+}
+
+.detail-card {
+    padding: clamp(20px, 4vw, 34px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.booking-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 28px;
+    margin: 0 0 28px;
+}
+
+.booking-facts div {
+    min-width: 0;
+}
+
+.booking-facts dt {
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.booking-facts dd {
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.detail-actions,
+.table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-actions form,
+.table-actions form {
+    margin: 0;
+}
+
+.status.unpaid,
+.status.pending,
+.status.failed {
+    color: var(--red);
+    background: color-mix(in srgb, var(--red) 10%, var(--surface));
+}
+
+.status.paid {
+    color: var(--green);
+    background: color-mix(in srgb, var(--green) 10%, var(--surface));
+}
+
+@media (max-width: 640px) {
+    .booking-facts {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

@@ -28,10 +28,8 @@ def env_list(name: str, default: str = "") -> list[str]:
 
 DEBUG = env_bool("DJANGO_DEBUG", False)
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "")
-if not DEBUG and not SECRET_KEY:
-    raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG=False.")
-if DEBUG and not SECRET_KEY:
-    SECRET_KEY = "development-only-secret-key"
+if not SECRET_KEY:
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set.")
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost" if DEBUG else "")
 if not DEBUG and not ALLOWED_HOSTS:
@@ -86,10 +84,8 @@ WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
 DATABASE_URL = os.getenv("DATABASE_URL", "")
-if not DATABASE_URL and not DEBUG:
-    raise ImproperlyConfigured("DATABASE_URL must point to PostgreSQL in production.")
 if not DATABASE_URL:
-    DATABASE_URL = "postgresql://coworking:coworking@127.0.0.1:5432/coworking"
+    raise ImproperlyConfigured("DATABASE_URL must point to PostgreSQL.")
 
 DATABASES = {
     "default": dj_database_url.parse(
@@ -149,8 +145,14 @@ SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0"))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", False)
 SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
 
-CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "cowodlaval@inventati.org")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", CONTACT_EMAIL)
+PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "")
+if not PUBLIC_BASE_URL:
+    raise ImproperlyConfigured("PUBLIC_BASE_URL must be set.")
+
+CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
+if not DEBUG and (not CONTACT_EMAIL or not DEFAULT_FROM_EMAIL):
+    raise ImproperlyConfigured("CONTACT_EMAIL and DEFAULT_FROM_EMAIL must be set in production.")
 EMAIL_HOST = os.getenv("EMAIL_HOST", "")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
@@ -165,6 +167,34 @@ EMAIL_BACKEND = (
     if DEBUG and not EMAIL_HOST
     else "django.core.mail.backends.smtp.EmailBackend"
 )
+
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "")
+PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET", "")
+PAYPAL_WEBHOOK_ID = os.getenv("PAYPAL_WEBHOOK_ID", "")
+PAYPAL_ENVIRONMENT = os.getenv("PAYPAL_ENVIRONMENT", "sandbox").lower()
+if PAYPAL_ENVIRONMENT not in {"sandbox", "live"}:
+    raise ImproperlyConfigured("PAYPAL_ENVIRONMENT must be sandbox or live.")
+PAYPAL_API_BASE = (
+    "https://api-m.sandbox.paypal.com"
+    if PAYPAL_ENVIRONMENT == "sandbox"
+    else "https://api-m.paypal.com"
+)
+
+SATISPAY_KEY_ID = os.getenv("SATISPAY_KEY_ID", "")
+SATISPAY_PRIVATE_KEY_PATH = os.getenv("SATISPAY_PRIVATE_KEY_PATH", "")
+SATISPAY_ENVIRONMENT = os.getenv("SATISPAY_ENVIRONMENT", "sandbox").lower()
+if SATISPAY_ENVIRONMENT not in {"sandbox", "live"}:
+    raise ImproperlyConfigured("SATISPAY_ENVIRONMENT must be sandbox or live.")
+SATISPAY_API_BASE = (
+    "https://staging.authservices.satispay.com"
+    if SATISPAY_ENVIRONMENT == "sandbox"
+    else "https://authservices.satispay.com"
+)
+
+PAYMENT_HTTP_TIMEOUT = int(os.getenv("PAYMENT_HTTP_TIMEOUT", "15"))
 
 LOGGING = {
     "version": 1,

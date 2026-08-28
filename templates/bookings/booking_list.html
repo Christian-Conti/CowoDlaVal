@@ -15,33 +15,42 @@
             <table>
                 <thead>
                     <tr>
+                        <th>{% translate "Booking code" %}</th>
                         <th>{% translate "Desk" %}</th>
                         {% if user.is_staff %}<th>{% translate "User" %}</th>{% endif %}
                         <th>{% translate "Date" %}</th>
                         <th>{% translate "Status" %}</th>
-                        <th>{% translate "Notes" %}</th>
+                        <th>{% translate "Price" %}</th>
+                        <th>{% translate "Payment method" %}</th>
+                        <th>{% translate "Payment status" %}</th>
                         <th>{% translate "Action" %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
                         <tr>
+                            <td><strong>{{ booking.booking_code }}</strong></td>
                             <td>{{ booking.space }}</td>
                             {% if user.is_staff %}<td>{{ booking.user.username }}</td>{% endif %}
                             <td>{{ booking.date|date:"SHORT_DATE_FORMAT" }}</td>
                             <td><span class="status {{ booking.status }}">{{ booking.get_status_display }}</span></td>
-                            <td>{{ booking.notes|default:"—" }}</td>
+                            <td>€{{ booking.amount }}</td>
+                            <td>{{ booking.get_payment_method_display }}</td>
+                            <td><span class="status {{ booking.payment_status }}">{{ booking.get_payment_status_display }}</span></td>
                             <td>
-                                {% if booking.status == "confirmed" %}
+                                <div class="table-actions">
+                                    <a class="button secondary compact" href="{% url 'booking_detail' booking.id %}">{% translate "Manage" %}</a>
+                                {% if booking.can_user_cancel %}
                                     <form method="post" action="{% url 'booking_cancel' booking.id %}">
                                         {% csrf_token %}
                                         <button class="danger-button" type="submit">{% translate "Cancel" %}</button>
                                     </form>
-                                {% else %}—{% endif %}
+                                {% endif %}
+                                </div>
                             </td>
                         </tr>
                     {% empty %}
-                        <tr><td colspan="6">{% translate "No bookings yet." %}</td></tr>
+                        <tr><td colspan="{% if user.is_staff %}10{% else %}9{% endif %}">{% translate "No bookings yet." %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

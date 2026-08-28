@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
-    env_file: .env
+    env_file: ${ENV_FILE:-.env}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -14,12 +14,14 @@ services:
   web:
     build: .
     restart: unless-stopped
-    env_file: .env
+    env_file: ${ENV_FILE:-.env}
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "8000:8000"
+    volumes:
+      - ./secrets:/run/secrets:ro
 
 volumes:
   postgres_data:

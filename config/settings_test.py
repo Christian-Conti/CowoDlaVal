@@ -1,12 +1,15 @@
 import os
+import secrets
 
 os.environ.setdefault("DJANGO_DEBUG", "True")
-os.environ.setdefault("DJANGO_SECRET_KEY", "test-secret-key")
+os.environ.setdefault("DJANGO_SECRET_KEY", secrets.token_urlsafe(32))
+os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+os.environ.setdefault("PUBLIC_BASE_URL", "http://testserver")
+os.environ.setdefault("DEFAULT_FROM_EMAIL", "no-reply@example.org")
 
 from .settings import *  # noqa: F403,F401,E402
 
 DEBUG = True
-SECRET_KEY = "test-secret-key"
 ALLOWED_HOSTS = ["testserver", "localhost"]
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}}
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
