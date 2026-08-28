@@ -9,20 +9,26 @@ HOST_HOME_PATH="${COWODLAVAL_HOST_HOME_PATH:-}"
 HOST_PROJECT_DIR="${COWODLAVAL_HOST_PROJECT_DIR:-}"
 
 APP_NAME="Cowo d'la val - Prenotazioni"
-DESKTOP_FILE_NAME="cowodlaval-bookings.desktop"
 
-APPLICATIONS_DIR="$HOST_HOME/.local/share/applications"
+DESKTOP_FILE_NAME="cowodlaval-bookings.desktop"
+COMMAND_NAME="cowodlaval-bookings"
+
+LOCAL_DIR="$HOST_HOME/.local"
+BIN_DIR="$LOCAL_DIR/bin"
+APPLICATIONS_DIR="$LOCAL_DIR/share/applications"
+
+COMMAND_PATH="$BIN_DIR/$COMMAND_NAME"
 APPLICATION_PATH="$APPLICATIONS_DIR/$DESKTOP_FILE_NAME"
 
 
 if [ -z "$HOST_HOME_PATH" ] || [ -z "$HOST_PROJECT_DIR" ]; then
-    echo "Missing COWODLAVAL_HOST_HOME_PATH or COWODLAVAL_HOST_PROJECT_DIR." >&2
+    echo "Missing host path configuration." >&2
     exit 1
 fi
 
 
 if [ ! -d "$HOST_HOME" ]; then
-    echo "Mounted host home directory not found: $HOST_HOME" >&2
+    echo "Host home directory not mounted: $HOST_HOME" >&2
     exit 1
 fi
 
@@ -47,7 +53,9 @@ find_desktop_dir() {
 
     case "$desktop_value" in
         '$HOME'/*)
-            printf '%s/%s\n' "$HOST_HOME" "${desktop_value#\$HOME/}"
+            printf '%s/%s\n' \
+                "$HOST_HOME" \
+                "${desktop_value#\$HOME/}"
             return
             ;;
 
@@ -72,9 +80,7 @@ find_desktop_dir() {
 
 
 remove_legacy_files() {
-    # Remove launchers used by previous versions.
     rm -f \
-        "$HOST_HOME/.local/bin/cowodlaval-bookings" \
         "$HOST_HOME/.local/bin/cowodlaval-db-controller" \
         "$APPLICATIONS_DIR/cowodlaval-db-controller.desktop" \
         "$APPLICATIONS_DIR/cowodlaval-bookings-gui.desktop"
@@ -93,34 +99,50 @@ remove_legacy_files() {
 }
 
 
-install_launcher() {
-    echo "Installing Cowo d'la val desktop integration..."
+install_integration() {
+    echo "Installing Cowo d'la val host integration..."
 
     remove_legacy_files
 
-    mkdir -p "$APPLICATIONS_DIR"
+    mkdir -p \
+        "$BIN_DIR" \
+        "$APPLICATIONS_DIR"
 
-    chown "$OWNER" \
-        "$HOST_HOME/.local" \
-        "$HOST_HOME/.local/share" \
-        "$APPLICATIONS_DIR" \
-        2>/dev/null || true
+    # --------------------------------------------------------
+    # CLI / GUI host command
+    # --------------------------------------------------------
 
-    cat > "$APPLICATION_PATH" <<EOF
+    rm -f "$COMMAND_PATH"
+
+    ln -s \
+        "$HOST_PROJECT_DIR/scripts/bookings_dashboard.sh" \
+        "$COMMAND_PATH"
+
+    chown -h "$OWNER" "$COMMAND_PATH" 2>/dev/null || true
+
+    # --------------------------------------------------------
+    # Application menu entry
+    # --------------------------------------------------------
+
+    cat > "$APPLICATION_PATH" <<DESKTOP
 [Desktop Entry]
 Version=1.0
 Type=Application
 Name=$APP_NAME
-Comment=Open the Cowo d'la val bookings database controller
-Exec="$HOST_PROJECT_DIR/scripts/bookings_dashboard_gui.sh"
+Comment=Open the Cowo d'la val bookings manager
+Exec=$HOST_HOME_PATH/.local/bin/$COMMAND_NAME --gui
 Icon=utilities-system-monitor
 Terminal=false
 Categories=Office;Utility;
 StartupNotify=true
-EOF
+DESKTOP
 
     chmod 755 "$APPLICATION_PATH"
     chown "$OWNER" "$APPLICATION_PATH"
+
+    # --------------------------------------------------------
+    # Desktop shortcut, if a desktop directory exists
+    # --------------------------------------------------------
 
     desktop_dir="$(find_desktop_dir || true)"
 
@@ -135,23 +157,25 @@ EOF
 
         chown -h "$OWNER" "$desktop_path" 2>/dev/null || true
 
-        echo "Desktop shortcut installed:"
-        echo "  ${desktop_path#"$HOST_HOME"}"
-    else
-        echo "Desktop directory not present; desktop shortcut skipped."
+        echo "Desktop shortcut installed."
     fi
+
+    echo "Host command installed:"
+    echo "  $HOST_HOME_PATH/.local/bin/$COMMAND_NAME"
 
     echo "Application menu entry installed:"
     echo "  $HOST_HOME_PATH/.local/share/applications/$DESKTOP_FILE_NAME"
 }
 
 
-uninstall_launcher() {
-    echo "Removing Cowo d'la val desktop integration..."
+uninstall_integration() {
+    echo "Removing Cowo d'la val host integration..."
 
     desktop_dir="$(find_desktop_dir || true)"
 
-    rm -f "$APPLICATION_PATH"
+    rm -f \
+        "$COMMAND_PATH" \
+        "$APPLICATION_PATH"
 
     if [ -n "$desktop_dir" ] && [ -d "$desktop_dir" ]; then
         rm -f "$desktop_dir/$DESKTOP_FILE_NAME"
@@ -167,17 +191,17 @@ uninstall_launcher() {
 
     remove_legacy_files
 
-    echo "Cowo d'la val desktop integration removed."
+    echo "Cowo d'la val host integration removed."
 }
 
 
 case "$ACTION" in
     install)
-        install_launcher
+        install_integration
         ;;
 
     uninstall)
-        uninstall_launcher
+        uninstall_integration
         ;;
 
     *)
