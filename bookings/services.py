@@ -1,3 +1,4 @@
+from datetime import timedelta
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -8,6 +9,7 @@ from django.utils.translation import gettext as _
 from spaces.models import Space
 
 from .models import Booking, Payment
+from .availability import get_booking_date_range, get_available_desks_for_period, suggest_split_booking
 
 
 DAILY_RATES = {
@@ -22,34 +24,59 @@ def _send_confirmation_after_commit(booking_id: int) -> None:
     transaction.on_commit(lambda: send_booking_confirmation(booking_id))
 
 
+def calculate_booking_amount(tariff_category: str, duration: str, num_days: int = 1) -> Decimal:
+    """
+    Calculate the total booking amount based on tariff and duration.
+    """
+    try:
+        daily_rate = DAILY_RATES[tariff_category]
+    except KeyError as exc:
+        raise ValidationError(_("Select a valid rate.")) from exc
+
+    if duration == "half_day":
+        return daily_rate / 2
+    elif duration == "full_day":
+        return daily_rate
+    else:
+        return daily_rate * num_days
+
+
 @transaction.atomic
 def create_booking(
     *,
     user,
     space_id,
     booking_date,
+    duration="full_day",
     tariff_category=Booking.TariffCategory.STANDARD,
     notes="",
     language="it",
 ) -> Booking:
     space = Space.objects.select_for_update().get(pk=space_id, is_active=True)
+    start_date, end_date = get_booking_date_range(booking_date, duration)
+    num_days = (end_date - start_date).days + 1
 
-    if Booking.objects.filter(
+    # Check if the desk is available for the entire period
+    bookings = Booking.objects.filter(
         space=space,
-        date=booking_date,
+        date__range=[start_date, end_date],
         status=Booking.Status.CONFIRMED,
-    ).exists():
-        raise ValidationError(_("This desk is already booked for the selected date."))
+    )
+    if bookings.exists():
+        raise ValidationError(
+            _("This desk is not available for the entire requested period. Please check availability or try a different desk.")
+        )
 
     try:
-        amount = DAILY_RATES[tariff_category]
-    except KeyError as exc:
-        raise ValidationError(_("Select a valid rate.")) from exc
+        amount = calculate_booking_amount(tariff_category, duration, num_days)
+    except ValidationError:
+        raise
 
     booking = Booking(
         user=user,
         space=space,
-        date=booking_date,
+        date=start_date,
+        end_date=end_date if end_date != start_date else None,
         tariff_category=tariff_category,
         amount=amount,
         currency="EUR",
@@ -191,7 +218,16 @@ def cancel_booking(*, booking: Booking, user) -> Booking:
 
 
 @transaction.atomic
-def modify_booking(*, booking: Booking, user, space_id, booking_date, tariff_category, notes="") -> Booking:
+def modify_booking(
+    *,
+    booking: Booking,
+    user,
+    space_id,
+    booking_date,
+    duration="full_day",
+    tariff_category,
+    notes=""
+) -> Booking:
     booking = Booking.objects.select_for_update().get(pk=booking.pk)
     if booking.user_id != user.id:
         raise ValidationError(_("You do not have permission to manage this booking."))
@@ -201,20 +237,25 @@ def modify_booking(*, booking: Booking, user, space_id, booking_date, tariff_cat
         )
 
     space = Space.objects.select_for_update().get(pk=space_id, is_active=True)
-    if Booking.objects.filter(
+    start_date, end_date = get_booking_date_range(booking_date, duration)
+    num_days = (end_date - start_date).days + 1
+
+    bookings = Booking.objects.filter(
         space=space,
-        date=booking_date,
+        date__range=[start_date, end_date],
         status=Booking.Status.CONFIRMED,
-    ).exclude(pk=booking.pk).exists():
-        raise ValidationError(_("This desk is already booked for the selected date."))
+    ).exclude(pk=booking.pk)
+    if bookings.exists():
+        raise ValidationError(_("This desk is already booked for the selected dates."))
 
     try:
-        amount = DAILY_RATES[tariff_category]
-    except KeyError as exc:
-        raise ValidationError(_("Select a valid rate.")) from exc
+        amount = calculate_booking_amount(tariff_category, duration, num_days)
+    except ValidationError:
+        raise
 
     booking.space = space
-    booking.date = booking_date
+    booking.date = start_date
+    booking.end_date = end_date if end_date != start_date else None
     booking.tariff_category = tariff_category
     booking.amount = amount
     booking.notes = notes
@@ -223,5 +264,5 @@ def modify_booking(*, booking: Booking, user, space_id, booking_date, tariff_cat
         with transaction.atomic():
             booking.save()
     except IntegrityError as exc:
-        raise ValidationError(_("This desk is already booked for the selected date.")) from exc
+        raise ValidationError(_("This desk is already booked for the selected dates.")) from exc
     return booking

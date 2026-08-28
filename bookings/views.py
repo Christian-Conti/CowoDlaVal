@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.utils.translation import gettext as _
@@ -38,6 +38,7 @@ from .services import (
     prepare_online_payment,
     select_onsite_payment,
 )
+from .availability import get_booking_date_range, suggest_split_booking
 
 
 logger = logging.getLogger(__name__)
@@ -77,13 +78,47 @@ class BookingCreateView(LoginRequiredMixin, FormView):
         return initial
 
     def form_valid(self, form):
+        space_id = form.cleaned_data["space"].id
+        booking_date = form.cleaned_data["date"]
+        duration = form.cleaned_data["duration"]
+        tariff_category = form.cleaned_data["tariff_category"]
+        notes = form.cleaned_data["notes"]
+
+        start_date, end_date = get_booking_date_range(booking_date, duration)
+
+        # Check if split booking is needed
+        split_suggestion = suggest_split_booking(start_date, end_date, space_id)
+        if split_suggestion:
+            # Store in session for the confirmation view
+            self.request.session["booking_suggestion"] = {
+                "space_id": space_id,
+                "start_date": start_date.isoformat(),
+                "end_date": end_date.isoformat(),
+                "duration": duration,
+                "tariff_category": tariff_category,
+                "notes": notes,
+                "split_options": [
+                    {
+                        "desk_id": opt["desk"].id,
+                        "desk_name": str(opt["desk"]),
+                        "start_date": opt["start_date"].isoformat(),
+                        "end_date": opt["end_date"].isoformat(),
+                        "days": opt["days"],
+                    }
+                    for opt in split_suggestion["split_options"]
+                ],
+            }
+            return redirect("booking_confirmation")
+
+        # Try to create the booking
         try:
             booking = create_booking(
                 user=self.request.user,
-                space_id=form.cleaned_data["space"].id,
-                booking_date=form.cleaned_data["date"],
-                tariff_category=form.cleaned_data["tariff_category"],
-                notes=form.cleaned_data["notes"],
+                space_id=space_id,
+                booking_date=booking_date,
+                duration=duration,
+                tariff_category=tariff_category,
+                notes=notes,
                 language=getattr(self.request, "LANGUAGE_CODE", "it"),
             )
         except ValidationError as exc:
@@ -93,6 +128,49 @@ class BookingCreateView(LoginRequiredMixin, FormView):
 
         messages.success(self.request, _("Booking created. Choose how you want to pay."))
         return redirect("booking_payment", pk=booking.pk)
+
+
+@login_required
+def booking_confirmation(request):
+    """
+    Show a confirmation page for split bookings or special conditions.
+    """
+    suggestion = request.session.get("booking_suggestion")
+    if not suggestion:
+        return redirect("home")
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "confirm":
+            # User confirmed the split booking
+            try:
+                bookings = []
+                for option in suggestion["split_options"]:
+                    booking = create_booking(
+                        user=request.user,
+                        space_id=option["desk_id"],
+                        booking_date=parse_date(option["start_date"]),
+                        duration="full_day",
+                        tariff_category=suggestion["tariff_category"],
+                        notes=suggestion["notes"],
+                        language=getattr(request, "LANGUAGE_CODE", "it"),
+                    )
+                    bookings.append(booking)
+                del request.session["booking_suggestion"]
+                messages.success(
+                    request,
+                    _("Bookings created successfully. Split across %(count)d desks.")
+                    % {"count": len(bookings)},
+                )
+                if bookings:
+                    return redirect("booking_payment", pk=bookings[0].pk)
+            except ValidationError as exc:
+                messages.error(request, "; ".join(exc.messages))
+        elif action == "cancel":
+            del request.session["booking_suggestion"]
+            return redirect("home")
+
+    return render(request, "bookings/booking_confirmation.html", {"suggestion": suggestion})
 
 
 @login_required
@@ -163,6 +241,7 @@ def modify_booking_view(request, pk):
                 user=request.user,
                 space_id=form.cleaned_data["space"].id,
                 booking_date=form.cleaned_data["date"],
+                duration=form.cleaned_data.get("duration", "full_day"),
                 tariff_category=form.cleaned_data["tariff_category"],
                 notes=form.cleaned_data["notes"],
             )

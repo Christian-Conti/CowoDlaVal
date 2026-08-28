@@ -43,6 +43,7 @@ class Booking(models.Model):
     space = models.ForeignKey(Space, on_delete=models.CASCADE, related_name="bookings")
     booking_code = models.CharField(max_length=32, unique=True, default=generate_booking_code, editable=False)
     date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)  # For multi-day bookings
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.CONFIRMED)
     tariff_category = models.CharField(
         max_length=20,
@@ -81,11 +82,15 @@ class Booking(models.Model):
         ]
 
     def __str__(self) -> str:
+        if self.end_date and self.end_date != self.date:
+            return f"{self.booking_code} - {self.space} - {self.date:%Y-%m-%d} to {self.end_date:%Y-%m-%d}"
         return f"{self.booking_code} - {self.space} - {self.date:%Y-%m-%d}"
 
     def clean(self):
         if self.date and self.date < timezone.localdate():
             raise ValidationError({"date": _("You cannot book a past date.")})
+        if self.end_date and self.end_date < self.date:
+            raise ValidationError({"end_date": _("End date must be after or equal to start date.")})
 
     @property
     def can_user_cancel(self) -> bool:

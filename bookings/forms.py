@@ -9,6 +9,13 @@ from .models import Booking
 
 
 class BookingForm(forms.Form):
+    DURATION_CHOICES = [
+        ("half_day", _("Half day")),
+        ("full_day", _("Full day")),
+        ("week", _("Week (7 days)")),
+        ("month", _("Month (30 days)")),
+    ]
+
     space = forms.ModelChoiceField(
         queryset=Space.objects.filter(is_active=True),
         label=_("Desk"),
@@ -16,6 +23,11 @@ class BookingForm(forms.Form):
     date = forms.DateField(
         label=_("Date"),
         widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    duration = forms.ChoiceField(
+        label=_("Duration"),
+        choices=DURATION_CHOICES,
+        initial="full_day",
     )
     tariff_category = forms.ChoiceField(
         label=_("Rate"),
