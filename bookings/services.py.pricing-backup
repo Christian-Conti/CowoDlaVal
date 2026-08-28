@@ -1,4 +1,3 @@
-from bookings.pricing import calculate_booking_amount
 from datetime import timedelta
 from decimal import Decimal
 
@@ -13,10 +12,33 @@ from .models import Booking, Payment
 from .availability import get_booking_date_range, get_available_desks_for_period, suggest_split_booking
 
 
+DAILY_RATES = {
+    Booking.TariffCategory.STANDARD: Decimal("8.00"),
+    Booking.TariffCategory.DISCOUNTED: Decimal("5.00"),
+}
+
+
 def _send_confirmation_after_commit(booking_id: int) -> None:
     from .emails import send_booking_confirmation
 
     transaction.on_commit(lambda: send_booking_confirmation(booking_id))
+
+
+def calculate_booking_amount(tariff_category: str, duration: str, num_days: int = 1) -> Decimal:
+    """
+    Calculate the total booking amount based on tariff and duration.
+    """
+    try:
+        daily_rate = DAILY_RATES[tariff_category]
+    except KeyError as exc:
+        raise ValidationError(_("Select a valid rate.")) from exc
+
+    if duration == "half_day":
+        return daily_rate / 2
+    elif duration == "full_day":
+        return daily_rate
+    else:
+        return daily_rate * num_days
 
 
 @transaction.atomic
