@@ -15,129 +15,59 @@
             <p class="policy-notice">{% translate "Only bookings with payment in person can be cancelled autonomously. Online-paid bookings require assistance from the coworking staff." %}</p>
             <button class="button" type="submit">{% if is_update %}{% translate "Save changes" %}{% else %}{% translate "Continue to payment" %}{% endif %}</button>
         
-{% if split_choice_required and split_suggestion %}
-<section
-    class="cowodlaval-split-choice"
-    aria-labelledby="split-choice-title"
->
-    {% if split_suggestion.split_options %}
+{% if alternative_choice_required and alternative_suggestion %}
 
-        <h2 id="split-choice-title">
-            {% trans "Choose an available alternative" %}
-        </h2>
 
+
+{% endif %}
+
+
+{% if alternative_choice_required and alternative_suggestion %}
+
+
+{% endif %}
+
+
+{% if alternative_choice_required and alternative_suggestion %}
+
+
+{% endif %}
+
+
+{% if alternative_choice_required and alternative_suggestion %}
+<section class="cowodlaval-alternative-choice" aria-labelledby="alternative-choice-title">
+    {% if alternative_suggestion.alternatives %}
+        <h2 id="alternative-choice-title">{% translate "Choose an available alternative" %}</h2>
         <p>
-            {% trans "The requested desk is not available for the complete requested period. Select one alternative below." %}
-            {% trans "Only the selected alternative will be booked." %}
+            {% translate "The requested desk is not available for the complete requested period. Select one alternative below." %}
+            {% translate "Only the selected alternative will be booked." %}
         </p>
-
-        <div class="cowodlaval-split-choice__grid">
-            {% for option in split_suggestion.split_options %}
-                <label class="cowodlaval-split-choice__card">
-                    <input
-                        type="radio"
-                        name="split_option"
-                        value="{{ option.option_id }}"
-                        required
-                    >
-
-                    <span class="cowodlaval-split-choice__title">
-                        {{ option.space.name }}
-                    </span>
-
-                    <span>
-                        {{ option.start_date|date:"Y-m-d" }}
-                        →
-                        {{ option.end_date|date:"Y-m-d" }}
-                    </span>
-
-                    <span>
-                        {{ option.days }}
-                        {% blocktranslate count counter=option.days %}
-                            day
-                        {% plural %}
-                            days
-                        {% endblocktranslate %}
-                    </span>
+        <div class="cowodlaval-alternative-choice__grid">
+            {% for alternative in alternative_suggestion.alternatives %}
+                <label class="cowodlaval-alternative-choice__card">
+                    <input type="radio" name="alternative" value="{{ alternative.alternative_id }}" required>
+                    <span class="cowodlaval-alternative-choice__title">{{ alternative.space.name }}</span>
+                    <span>{{ alternative.start_date|date:"SHORT_DATE_FORMAT" }} → {{ alternative.end_date|date:"SHORT_DATE_FORMAT" }}</span>
                 </label>
             {% endfor %}
         </div>
-
-        <p class="cowodlaval-split-choice__hint">
-            {% trans "Choose one option and submit again to confirm it." %}
-        </p>
-
+        <button type="submit" class="button">{% translate "Continue with selected alternative" %}</button>
     {% else %}
-
-        <h2 id="split-choice-title">
-            {% trans "No solutions available" %}
-        </h2>
-
-        <div class="cowodlaval-split-choice__empty">
-            <strong>
-                {% trans "No complete-period alternatives are available." %}
-            </strong>
-
-            <p>
-                {% trans "Please choose a different date or duration." %}
-            </p>
+        <h2 id="alternative-choice-title">{% translate "No solutions available" %}</h2>
+        <div class="cowodlaval-alternative-choice__empty">
+            <strong>{% translate "No alternative desk is available for the complete requested period." %}</strong>
+            <p>{% translate "Please choose a different date or duration." %}</p>
         </div>
-
     {% endif %}
 </section>
-
 <style>
-.cowodlaval-split-choice {
-    margin-top: 1.25rem;
-    padding: 1.25rem;
-    border: 1px solid rgba(148, 163, 184, 0.35);
-    border-radius: 1rem;
-    background: rgba(124, 131, 255, 0.06);
-}
-
-.cowodlaval-split-choice h2 {
-    margin-top: 0;
-}
-
-.cowodlaval-split-choice__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 0.8rem;
-    margin-top: 1rem;
-}
-
-.cowodlaval-split-choice__card {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.35rem 0.65rem;
-    align-items: start;
-    padding: 1rem;
-    border: 1px solid rgba(148, 163, 184, 0.45);
-    border-radius: 0.85rem;
-    cursor: pointer;
-}
-
-.cowodlaval-split-choice__card:hover,
-.cowodlaval-split-choice__card:focus-within {
-    border-color: #7c83ff;
-}
-
-.cowodlaval-split-choice__card input {
-    margin-top: 0.25rem;
-}
-
-.cowodlaval-split-choice__card span {
-    grid-column: 2;
-}
-
-.cowodlaval-split-choice__title {
-    font-weight: 700;
-}
-
-.cowodlaval-split-choice__hint {
-    margin-bottom: 0;
-    opacity: 0.8;
-}
+.cowodlaval-alternative-choice { margin-top: 1.25rem; padding: 1.25rem; border: 1px solid rgba(148,163,184,.35); border-radius: 1rem; background: rgba(124,131,255,.06); }
+.cowodlaval-alternative-choice__grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: .8rem; margin: 1rem 0; }
+.cowodlaval-alternative-choice__card { display: grid; grid-template-columns: auto 1fr; gap: .35rem .65rem; align-items: start; padding: 1rem; border: 1px solid rgba(148,163,184,.45); border-radius: .85rem; cursor: pointer; }
+.cowodlaval-alternative-choice__card:hover, .cowodlaval-alternative-choice__card:has(input:checked) { border-color: #7c83ff; }
+.cowodlaval-alternative-choice__card:has(input:checked) { box-shadow: 0 0 0 2px rgba(124,131,255,.25); }
+.cowodlaval-alternative-choice__card span { grid-column: 2; }
+.cowodlaval-alternative-choice__title { font-weight: 700; }
 </style>
 {% endif %}
 

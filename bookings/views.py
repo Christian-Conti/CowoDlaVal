@@ -37,8 +37,10 @@ from .services import (
     modify_booking,
     prepare_online_payment,
     select_onsite_payment,
+    discard_unfinished_booking,
 )
-from .availability import get_booking_date_range, suggest_split_booking
+from .availability import get_booking_date_range, get_booking_alternatives
+from django.views import View
 
 
 logger = logging.getLogger(__name__)
@@ -87,65 +89,45 @@ class BookingCreateView(LoginRequiredMixin, FormView):
         start_date, end_date = get_booking_date_range(booking_date, duration)
 
         # Check if split booking is needed
-        split_suggestion = suggest_split_booking(start_date, end_date, space_id)
-        # Split suggestions are alternatives. Do not create every free option.
-        if split_suggestion:
-            selected_split_option = self.request.POST.get("split_option", "").strip()
-            split_options = split_suggestion.get(
-                "split_options",
-                split_suggestion.get("options", []),
+        alternative_suggestion = get_booking_alternatives(
+            start_date=start_date,
+            end_date=end_date,
+            requested_space_id=space_id,
+        )
+        
+        if alternative_suggestion is not None:
+            alternatives = alternative_suggestion["alternatives"]
+            selected_alternative_id = (
+                self.request.POST.get("alternative", "").strip()
             )
-            
-            if not selected_split_option:
+        
+            if not alternatives or not selected_alternative_id:
                 context = self.get_context_data(form=form)
-                context["split_suggestion"] = split_suggestion
-                context["split_choice_required"] = True
+                context["alternative_suggestion"] = alternative_suggestion
+                context["alternative_choice_required"] = True
                 return self.render_to_response(context)
-            
-            selected_options = [
-                option
-                for option in split_options
-                if option.get("option_id") == selected_split_option
+        
+            selected_alternatives = [
+                alternative
+                for alternative in alternatives
+                if alternative["alternative_id"] == selected_alternative_id
             ]
-            
-            if len(selected_options) != 1:
+            if len(selected_alternatives) != 1:
                 form.add_error(
                     None,
-                    "The selected booking alternative is no longer available. "
-                    "Please choose again.",
+                    _(
+                        "The selected alternative is no longer available. "
+                        "Please choose again."
+                    ),
                 )
                 context = self.get_context_data(form=form)
-                context["split_suggestion"] = split_suggestion
-                context["split_choice_required"] = True
+                context["alternative_suggestion"] = alternative_suggestion
+                context["alternative_choice_required"] = True
                 return self.render_to_response(context)
-            
-            # Keep both historical keys, but expose only the selected option.
-            split_suggestion["split_options"] = selected_options
-            split_suggestion["options"] = selected_options
-            
-        if split_suggestion:
-            # Store in session for the confirmation view
-            self.request.session["booking_suggestion"] = {
-                "space_id": space_id,
-                "start_date": start_date.isoformat(),
-                "end_date": end_date.isoformat(),
-                "duration": duration,
-                "tariff_category": tariff_category,
-                "notes": notes,
-                "split_options": [
-                    {
-                        "desk_id": opt["desk"].id,
-                        "desk_name": str(opt["desk"]),
-                        "start_date": opt["start_date"].isoformat(),
-                        "end_date": opt["end_date"].isoformat(),
-                        "days": opt["days"],
-                    }
-                    for opt in split_suggestion["options"]
-                ],
-            }
-            return redirect("booking_confirmation")
-
-        # Try to create the booking
+        
+            # Only the desk changes. Preserve the original date, duration and tariff.
+            space_id = selected_alternatives[0]["space_id"]
+        
         try:
             booking = create_booking(
                 user=self.request.user,
@@ -166,46 +148,6 @@ class BookingCreateView(LoginRequiredMixin, FormView):
 
 
 @login_required
-def booking_confirmation(request):
-    """
-    Show a confirmation page for split bookings or special conditions.
-    """
-    suggestion = request.session.get("booking_suggestion")
-    if not suggestion:
-        return redirect("home")
-
-    if request.method == "POST":
-        action = request.POST.get("action")
-        if action == "confirm":
-            # User confirmed the split booking
-            try:
-                bookings = []
-                for option in suggestion["split_options"]:
-                    booking = create_booking(
-                        user=request.user,
-                        space_id=option["desk_id"],
-                        booking_date=parse_date(option["start_date"]),
-                        duration="daily",
-                        tariff_category=suggestion["tariff_category"],
-                        notes=suggestion["notes"],
-                        language=getattr(request, "LANGUAGE_CODE", "it"),
-                    )
-                    bookings.append(booking)
-                del request.session["booking_suggestion"]
-                messages.success(
-                    request,
-                    _("Bookings created successfully. Split across %(count)d desks.")
-                    % {"count": len(bookings)},
-                )
-                if bookings:
-                    return redirect("booking_payment", pk=bookings[0].pk)
-            except ValidationError as exc:
-                messages.error(request, "; ".join(exc.messages))
-        elif action == "cancel":
-            del request.session["booking_suggestion"]
-            return redirect("home")
-
-    return render(request, "bookings/booking_confirmation.html", {"suggestion": suggestion})
 
 
 @login_required
@@ -415,3 +357,33 @@ def satispay_callback(request):
         logger.exception("Satispay callback verification failed")
         return HttpResponse(status=503)
     return HttpResponse(status=200)
+
+
+class BookingAbandonView(LoginRequiredMixin, View):
+    # Permanently discard an unfinished checkout before payment starts.
+    def post(self, request, booking_code):
+        booking = Booking.objects.filter(
+            booking_code=booking_code,
+            user=request.user,
+        ).first()
+        if booking is None:
+            messages.error(
+                request,
+                _("You do not have permission to manage this booking."),
+            )
+            return redirect("/")
+
+        try:
+            discard_unfinished_booking(
+                booking=booking,
+                user=request.user,
+            )
+        except ValidationError as exc:
+            messages.error(request, " ".join(exc.messages))
+            return redirect(request.META.get("HTTP_REFERER") or "/")
+
+        messages.success(
+            request,
+            _("This unfinished booking was discarded."),
+        )
+        return redirect("/")

@@ -6,7 +6,11 @@
     <div class="section-heading">
         <p class="eyebrow">{{ booking.booking_code }}</p>
         <h1>{% translate "Choose payment" %}</h1>
-        <p>{{ booking.space }} · {{ booking.date|date:"SHORT_DATE_FORMAT" }} · <strong>€{{ booking.amount }}</strong></p>
+        <p>
+            {{ booking.space }} · {{ booking.date|date:"SHORT_DATE_FORMAT" }}
+            {% if booking.end_date %} → {{ booking.end_date|date:"SHORT_DATE_FORMAT" }}{% endif %}
+            · <strong>€{{ booking.amount }}</strong>
+        </p>
     </div>
     <section class="form-card">
         <p class="policy-notice"><strong>{% translate "Only bookings with payment in person can be cancelled autonomously." %}</strong> {% translate "Bookings paid online cannot be cancelled or modified automatically; contact the coworking staff if you need assistance." %}</p>
@@ -52,7 +56,20 @@
                 </ul>
             </fieldset>
             <button class="button payment-submit" type="submit">{% translate "Continue" %}</button>
-        </form>
+        
+        <button
+            type="submit"
+            class="button danger abandon-booking-button"
+            formaction="{% url 'bookings:abandon' booking.booking_code %}"
+            formmethod="post"
+            formnovalidate
+            data-confirm="{% translate 'Discard this unfinished booking? It will be permanently removed.' %}"
+            onclick="return window.confirm(this.dataset.confirm);"
+        >
+            {% translate "Abandon booking" %}
+        </button>
+
+</form>
         <p class="fine-print">{% translate "Card payments use Stripe Checkout. Cowo d'la val never receives or stores card details." %}</p>
     </section>
 </section>

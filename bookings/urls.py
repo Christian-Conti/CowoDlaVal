@@ -3,7 +3,6 @@ from django.urls import path
 from .views import (
     BookingCreateView,
     BookingListView,
-    booking_confirmation,
     booking_detail,
     booking_payment,
     cancel_booking_view,
@@ -14,12 +13,12 @@ from .views import (
     satispay_return,
     stripe_success,
     stripe_webhook,
+    BookingAbandonView,
 )
 
 urlpatterns = [
     path("", BookingListView.as_view(), name="booking_list"),
     path("new/", BookingCreateView.as_view(), name="booking_create"),
-    path("confirmation/", booking_confirmation, name="booking_confirmation"),
     path("<int:pk>/", booking_detail, name="booking_detail"),
     path("<int:pk>/payment/", booking_payment, name="booking_payment"),
     path("<int:pk>/modify/", modify_booking_view, name="booking_modify"),
@@ -30,4 +29,9 @@ urlpatterns = [
     path("webhooks/stripe/", stripe_webhook, name="stripe_webhook"),
     path("webhooks/paypal/", paypal_webhook, name="paypal_webhook"),
     path("webhooks/satispay/", satispay_callback, name="satispay_callback"),
+    path(
+        "abandon/<str:booking_code>/",
+        BookingAbandonView.as_view(),
+        name="abandon",
+    ),
 ]

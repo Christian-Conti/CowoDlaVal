@@ -894,38 +894,50 @@ msgstr "Aucun poste n'est encore configuré."
 #~ msgid "You cannot book in the past."
 #~ msgstr "Vous ne pouvez pas réserver dans le passé."
 
-
-msgid "Choose an available alternative"
-msgstr "Choisissez une alternative disponible"
-
-
-msgid "The requested desk is not available for the complete requested period. Select one alternative below."
-msgstr "Le poste demandé n'est pas disponible pendant toute la période demandée. Sélectionnez une alternative disponible ci-dessous."
-
-
-msgid "Only the selected alternative will be booked."
-msgstr "Seule l'alternative sélectionnée sera réservée."
-
-
 msgid "Choose one option and submit again to confirm it."
 msgstr "Sélectionnez une option puis envoyez de nouveau le formulaire pour la confirmer."
-
-
-msgid "No solutions available"
-msgstr "Aucune solution disponible"
-
 
 msgid "No complete-period alternatives are available."
 msgstr "Aucun poste alternatif n'est disponible pour l'ensemble de la période demandée."
 
+msgid "day"
+msgstr "jour"
+
+msgid "days"
+msgstr "jours"
+
+msgid "Choose an available alternative"
+msgstr "Choisissez une alternative disponible"
+
+msgid "The requested desk is not available for the complete requested period. Select one alternative below."
+msgstr "Le poste demandé n'est pas disponible pendant toute la période demandée. Sélectionnez une alternative disponible ci-dessous."
+
+msgid "Only the selected alternative will be booked."
+msgstr "Seule l'alternative sélectionnée sera réservée."
+
+msgid "Continue with selected alternative"
+msgstr "Continuer avec l'alternative sélectionnée"
+
+msgid "No solutions available"
+msgstr "Aucune solution disponible"
+
+msgid "No alternative desk is available for the complete requested period."
+msgstr "Aucun poste alternatif n'est disponible pour l'ensemble de la période demandée."
 
 msgid "Please choose a different date or duration."
 msgstr "Veuillez choisir une autre date ou une autre durée."
 
+msgid "The selected alternative is no longer available. Please choose again."
+msgstr "L'alternative sélectionnée n'est plus disponible. Veuillez en choisir une autre."
 
-msgid "day"
-msgstr "jour"
+msgid "Abandon booking"
+msgstr "Abandonner la réservation"
 
+msgid "Discard this unfinished booking? It will be permanently removed."
+msgstr "Abandonner cette réservation inachevée ? Elle sera supprimée définitivement."
 
-msgid "days"
-msgstr "jours"
+msgid "This unfinished booking was discarded."
+msgstr "La réservation inachevée a été supprimée."
+
+msgid "This booking can no longer be discarded because payment processing has already started."
+msgstr "Cette réservation ne peut plus être supprimée car le traitement du paiement a déjà commencé."

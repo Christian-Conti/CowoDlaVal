@@ -13,7 +13,6 @@ from .models import Booking, Payment
 from .availability import (
     get_booking_date_range,
     get_overlapping_bookings,
-    suggest_split_booking,
 )
 
 
@@ -248,3 +247,29 @@ def modify_booking(
     except IntegrityError as exc:
         raise ValidationError(_("This desk is already booked for the selected dates.")) from exc
     return booking
+
+
+@transaction.atomic
+def discard_unfinished_booking(*, booking: Booking, user) -> None:
+    # Hard-delete checkout state only before any payment processing starts.
+    booking = Booking.objects.select_for_update().get(pk=booking.pk)
+
+    if booking.user_id != user.id:
+        raise ValidationError(
+            _("You do not have permission to manage this booking.")
+        )
+
+    payment_started = (
+        booking.payment_status == Booking.PaymentStatus.PAID
+        or booking.payment_method != Booking.PaymentMethod.UNSELECTED
+        or Payment.objects.filter(booking=booking).exists()
+    )
+    if payment_started:
+        raise ValidationError(
+            _(
+                "This booking can no longer be discarded because payment "
+                "processing has already started."
+            )
+        )
+
+    booking.delete()
