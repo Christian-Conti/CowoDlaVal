@@ -362,3 +362,22 @@ Only bookings with **payment in person** can be cancelled or modified autonomous
 ## Data and privacy considerations
 
 The database contains Django account identity/contact data, booking dates/desks/notes, historical prices, and non-sensitive provider transaction references. It does not contain card numbers, CVV, expiry dates, or provider credentials. Define retention, account deletion, access control, incident response, and privacy notices appropriate to the operator's jurisdiction. Avoid placing sensitive personal information in booking notes or logs.
+
+### Responsive desktop dashboard
+
+The graphical booking manager is implemented as the dedicated Django command
+`bookings_dashboard_gui`. The host launcher starts it automatically inside the web
+container, while the original `bookings_dashboard` command remains available for CLI
+and automation use.
+
+The desktop dashboard uses a responsive layout: table columns and typography scale with
+the window, action buttons reflow on smaller windows, and the interface provides light
+and dark themes. It reads CSS custom properties from `static/**/*.css` when available so
+its palette follows the website theme; the theme can also be toggled directly in the
+window. Set `COWO_GUI_THEME=light` or `COWO_GUI_THEME=dark` to force a default.
+
+Direct launch for testing:
+
+```bash
+docker compose exec web python manage.py bookings_dashboard_gui
+```

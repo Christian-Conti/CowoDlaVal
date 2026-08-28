@@ -195,5 +195,5 @@ docker compose exec \
     -e XAUTHORITY=/tmp/.cowodlaval-xauth \
     -e XDG_CACHE_HOME=/tmp/.cache \
     web \
-    sh -lc 'mkdir -p /tmp/.cache/fontconfig && python manage.py bookings_dashboard --gui' \
+    sh -lc 'mkdir -p /tmp/.cache/fontconfig && python manage.py bookings_dashboard_gui' \
     || fail "The bookings dashboard GUI exited with an error. See $LOG_FILE for details."
