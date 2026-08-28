@@ -171,31 +171,24 @@ Open `/admin/` as a superuser. The booking list shows code, date, desk, account/
 
 ## Server booking manager
 
-Launch the manager from the server:
+The terminal dashboard remains available inside the web container:
 
-```sh
-docker compose exec web python manage.py bookings_dashboard
-```
+    docker compose exec web python manage.py bookings_dashboard
 
-Over SSH it opens the interactive terminal interface. In a desktop session it opens a native window automatically; use `--cli` or `--gui` to force one mode. The desktop interface needs Tkinter (`python3-tk` on Debian/Ubuntu) and direct access to the project environment, so it is normally launched outside the Docker container:
+The graphical dashboard is launched on the host through `scripts/bookings_dashboard_gui.sh`. It supports both a local graphical session and SSH X11 forwarding. The web application itself remains inside Docker.
 
-```sh
-python manage.py bookings_dashboard --gui
-```
+### Automatic desktop integration
 
-Both interfaces show booking and payment states and allow staff to confirm or cancel bookings, edit notes, and record payments made on site. Online payment states remain controlled by verified provider callbacks.
+Docker Compose automatically manages the graphical launcher through the `desktop-integration` helper service. `docker compose up` installs/refreshes the application-menu entry and adds the same launcher to the configured XDG desktop directory when that directory already exists. `docker compose down` removes both entries through a `pre_stop` lifecycle hook.
 
-### Desktop icon
+    docker compose up --build -d
+    docker compose down
 
-On the server's graphical desktop, install a menu entry and desktop shortcut once:
+No separate `--install` or `--uninstall` command is required. Docker Compose 2.30.0 or newer is required because the integration uses `post_start` and `pre_stop` lifecycle hooks.
 
-```sh
-./scripts/bookings_dashboard_gui.sh --install
-```
+The helper container has no network access and is the only service that receives a host-home bind mount. It uses that mount exclusively to manage the launcher files. The Django `web` container does not receive access to the host home directory.
 
-The installer creates `~/.local/bin/cowodlaval-bookings`, registers “Cowo d'la val - Prenotazioni” in the application menu, and links the same launcher on the desktop when that directory is available. Double-clicking it opens the GUI directly with no terminal window. Re-run the installer if the repository is moved.
-
-The launcher uses `.venv/bin/python`, `venv/bin/python`, or the system `python3`, in that order. Set `COWO_PYTHON=/absolute/path/to/python` before installation when the deployment uses a different virtual environment. Startup errors are written to `~/.local/state/cowodlaval/bookings-dashboard.log` and shown with Zenity, KDialog, or XMessage when available.
+To open the GUI from an SSH session, connect with X11 forwarding (`ssh -XY <server>`) and launch `scripts/bookings_dashboard_gui.sh`. The host needs `xauth` and `socat`; desktop-launched errors are recorded in `~/.local/state/cowodlaval/bookings-dashboard.log` and shown with Zenity, KDialog, or XMessage when available.
 
 Non-interactive SSH/automation examples:
 

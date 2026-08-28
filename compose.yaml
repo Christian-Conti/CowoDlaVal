@@ -1,0 +1,60 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: ${ENV_FILE:-.env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-coworking} -d ${POSTGRES_DB:-coworking}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  desktop-integration:
+    image: alpine:3.22
+    restart: unless-stopped
+    network_mode: none
+    environment:
+      COWODLAVAL_HOST_HOME: /host-home
+      COWODLAVAL_HOST_HOME_PATH: "${HOME}"
+      COWODLAVAL_HOST_PROJECT_DIR: "${PWD}"
+    volumes:
+      - type: bind
+        source: "${HOME}"
+        target: /host-home
+      - type: bind
+        source: ./scripts/docker_desktop_integration.sh
+        target: /usr/local/bin/cowodlaval-desktop-integration
+        read_only: true
+    command:
+      - /bin/sh
+      - -c
+      - |
+        trap 'exit 0' TERM INT
+        while :; do
+          sleep 3600 &
+          wait $!
+        done
+    post_start:
+      - command: /usr/local/bin/cowodlaval-desktop-integration install
+    pre_stop:
+      - command: /usr/local/bin/cowodlaval-desktop-integration uninstall
+    stop_grace_period: 5s
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: ${ENV_FILE:-.env}
+    depends_on:
+      db:
+        condition: service_healthy
+      desktop-integration:
+        condition: service_started
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./secrets:/run/secrets:ro
+
+volumes:
+  postgres_data:
