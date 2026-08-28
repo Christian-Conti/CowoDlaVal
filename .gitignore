@@ -6,3 +6,4 @@ secrets/
 credentials/
 *.sql
 *.sql.gz
+.docker/
