@@ -201,6 +201,8 @@ def suggest_split_booking(start_date, end_date, requested_desk_id: int) -> dict 
                 {
                     "space": space,
                     "space_id": space.pk,
+                    "desk": space,
+                    "desk_id": space.pk,
                     "start_date": available_start,
                     "end_date": available_end,
                 }
@@ -222,4 +224,5 @@ def suggest_split_booking(start_date, end_date, requested_desk_id: int) -> dict 
         "requested_space": requested_space,
         "requested_desk": requested_space,
         "options": options,
+        "split_options": options,
     }

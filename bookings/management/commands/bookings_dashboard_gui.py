@@ -322,7 +322,7 @@ def _booking_code(booking: Booking) -> str:
     return str(booking.pk)
 
 
-def _customer_name(booking: Booking) -> str:
+def _user_name(booking: Booking) -> str:
     user = getattr(booking, "user", None)
     if user is None:
         return "—"
@@ -400,7 +400,7 @@ class DashboardWindow:
     COLUMNS = (
         "code",
         "space",
-        "customer",
+        "user",
         "email",
         "status",
         "payment_method",
@@ -409,34 +409,34 @@ class DashboardWindow:
     )
 
     HEADINGS = {
-        "code": "Codice prenotazione",
+        "code": "Codice",
         "space": "Postazione",
-        "customer": "Cliente",
+        "user": "User",
         "email": "Email",
-        "status": "Prenotazione",
-        "payment_method": "Metodo di pagamento",
+        "status": "Stato",
+        "payment_method": "Metodo pagamento",
         "payment_status": "Pagamento",
         "amount": "Importo",
     }
 
     COLUMN_RATIOS = {
-        "code": 0.14,
+        "code": 0.15,
         "space": 0.10,
-        "customer": 0.15,
-        "email": 0.19,
+        "user": 0.12,
+        "email": 0.20,
         "status": 0.11,
         "payment_method": 0.13,
         "payment_status": 0.11,
-        "amount": 0.07,
+        "amount": 0.08,
     }
 
     COLUMN_MIN_WIDTHS = {
         "code": 125,
         "space": 95,
-        "customer": 125,
-        "email": 165,
+        "user": 100,
+        "email": 175,
         "status": 105,
-        "payment_method": 125,
+        "payment_method": 135,
         "payment_status": 115,
         "amount": 90,
     }
@@ -453,15 +453,22 @@ class DashboardWindow:
         self.selected_booking_id: int | None = None
         self._resize_job = None
         self._button_layout = None
+        self._toolbar_layout = None
+        self._header_layout = None
         self._last_font_size = None
+        self._auto_fit_columns = True
+        self._column_drag_active = False
+        self._columns_initialized = False
 
         self.date_var = tk.StringVar(value=self.selected_date.isoformat())
         self.summary_var = tk.StringVar(value="")
-        self.theme_button_var = tk.StringVar(value="Tema chiaro" if self.theme_name == "dark" else "Tema scuro")
+        self.theme_button_var = tk.StringVar(
+            value="Tema chiaro" if self.theme_name == "dark" else "Tema scuro"
+        )
 
         self.root.title("Cowo d'la val - Prenotazioni")
-        self.root.geometry("1360x780")
-        self.root.minsize(900, 580)
+        self.root.geometry("1280x760")
+        self.root.minsize(760, 560)
 
         self.style = ttk.Style(self.root)
         try:
@@ -473,7 +480,7 @@ class DashboardWindow:
         self._apply_theme()
         self._bind_events()
         self.refresh()
-        self.root.after_idle(self._handle_resize)
+        self.root.after_idle(self._initial_layout)
 
     def _palette_for_theme(self, theme_name: str) -> dict[str, str]:
         if theme_name == "light":
@@ -484,23 +491,27 @@ class DashboardWindow:
         self.root.grid_rowconfigure(1, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
-        self.header = self.ttk.Frame(self.root, style="App.TFrame", padding=(24, 18, 24, 12))
+        self.header = self.ttk.Frame(self.root, style="App.TFrame", padding=(18, 14, 18, 10))
         self.header.grid(row=0, column=0, sticky="ew")
-        self.header.grid_columnconfigure(0, weight=1)
 
         self.title_label = self.ttk.Label(
             self.header,
             text="Cowo d'la val · Prenotazioni",
             style="Title.TLabel",
         )
-        self.title_label.grid(row=0, column=0, sticky="w")
 
         self.summary_label = self.ttk.Label(
             self.header,
             textvariable=self.summary_var,
             style="Summary.TLabel",
         )
-        self.summary_label.grid(row=0, column=1, padx=(18, 12), sticky="e")
+
+        self.fit_columns_button = self.ttk.Button(
+            self.header,
+            text="Adatta colonne",
+            style="Ghost.TButton",
+            command=self.fit_columns,
+        )
 
         self.theme_button = self.ttk.Button(
             self.header,
@@ -508,16 +519,14 @@ class DashboardWindow:
             style="Ghost.TButton",
             command=self.toggle_theme,
         )
-        self.theme_button.grid(row=0, column=2, sticky="e")
 
-        self.content = self.ttk.Frame(self.root, style="App.TFrame", padding=(24, 0, 24, 18))
+        self.content = self.ttk.Frame(self.root, style="App.TFrame", padding=(18, 0, 18, 14))
         self.content.grid(row=1, column=0, sticky="nsew")
         self.content.grid_columnconfigure(0, weight=1)
         self.content.grid_rowconfigure(1, weight=1)
 
         self.toolbar = self.ttk.Frame(self.content, style="Toolbar.TFrame", padding=12)
         self.toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 12))
-        self.toolbar.grid_columnconfigure(5, weight=1)
 
         self.previous_button = self.ttk.Button(
             self.toolbar,
@@ -525,7 +534,6 @@ class DashboardWindow:
             style="Secondary.TButton",
             command=lambda: self.change_date(-1),
         )
-        self.previous_button.grid(row=0, column=0, padx=(0, 8))
 
         self.date_entry = self.ttk.Entry(
             self.toolbar,
@@ -534,7 +542,6 @@ class DashboardWindow:
             width=14,
             justify="center",
         )
-        self.date_entry.grid(row=0, column=1, padx=4)
 
         self.apply_date_button = self.ttk.Button(
             self.toolbar,
@@ -542,7 +549,6 @@ class DashboardWindow:
             style="Primary.TButton",
             command=self.apply_date,
         )
-        self.apply_date_button.grid(row=0, column=2, padx=4)
 
         self.today_button = self.ttk.Button(
             self.toolbar,
@@ -550,7 +556,6 @@ class DashboardWindow:
             style="Secondary.TButton",
             command=self.go_today,
         )
-        self.today_button.grid(row=0, column=3, padx=4)
 
         self.next_button = self.ttk.Button(
             self.toolbar,
@@ -558,7 +563,6 @@ class DashboardWindow:
             style="Secondary.TButton",
             command=lambda: self.change_date(1),
         )
-        self.next_button.grid(row=0, column=4, padx=(8, 0))
 
         self.table_card = self.ttk.Frame(self.content, style="Card.TFrame", padding=1)
         self.table_card.grid(row=1, column=0, sticky="nsew")
@@ -581,7 +585,7 @@ class DashboardWindow:
                 column,
                 anchor=anchor,
                 minwidth=self.COLUMN_MIN_WIDTHS[column],
-                stretch=True,
+                stretch=False,
             )
 
         self.vertical_scrollbar = self.ttk.Scrollbar(
@@ -671,7 +675,6 @@ class DashboardWindow:
             command=self.root.destroy,
         )
 
-        self._layout_action_buttons(compact=False)
 
     def _bind_events(self) -> None:
         self.root.bind("<Configure>", self._queue_resize)
@@ -682,6 +685,12 @@ class DashboardWindow:
         self.date_entry.bind("<Return>", lambda _event: self.apply_date())
         self.tree.bind("<<TreeviewSelect>>", self.on_select)
         self.tree.bind("<Double-1>", lambda _event: self.notes_text.focus_set())
+        self.tree.bind("<ButtonPress-1>", self._on_tree_button_press, add="+")
+        self.tree.bind("<ButtonRelease-1>", self._on_tree_button_release, add="+")
+
+    def _initial_layout(self) -> None:
+        self._handle_resize()
+        self.fit_columns()
 
     def _queue_resize(self, event=None) -> None:
         if event is not None and event.widget is not self.root:
@@ -689,39 +698,135 @@ class DashboardWindow:
 
         if self._resize_job is not None:
             self.root.after_cancel(self._resize_job)
-        self._resize_job = self.root.after(70, self._handle_resize)
+        self._resize_job = self.root.after(80, self._handle_resize)
 
     def _handle_resize(self) -> None:
         self._resize_job = None
-        width = max(self.root.winfo_width(), 900)
-        height = max(self.root.winfo_height(), 580)
+        width = max(self.root.winfo_width(), 760)
+        height = max(self.root.winfo_height(), 560)
 
-        scale = min(max(min(width / 1360, height / 780), 0.88), 1.28)
-        font_size = max(10, min(15, round(11 * scale)))
+        scale = min(max(min(width / 1280, height / 760), 0.90), 1.14)
+        font_size = max(10, min(13, round(11 * scale)))
         self._configure_fonts(font_size)
 
-        tree_width = max(self.tree.winfo_width(), width - 70)
+        self._layout_header(compact=width < 1050)
+        self._layout_toolbar(compact=width < 1050)
+
+        if width >= 1480:
+            action_layout = "wide"
+        elif width >= 900:
+            action_layout = "medium"
+        else:
+            action_layout = "narrow"
+        self._layout_action_buttons(action_layout)
+
+        if self._auto_fit_columns and self._columns_initialized:
+            self.fit_columns(keep_auto=True)
+
+    def _on_tree_button_press(self, event) -> None:
+        self._column_drag_active = self.tree.identify_region(event.x, event.y) == "separator"
+
+    def _on_tree_button_release(self, _event) -> None:
+        if self._column_drag_active:
+            # A manual separator drag disables automatic re-fitting so the user's
+            # chosen widths are preserved on subsequent window resizes.
+            self._auto_fit_columns = False
+        self._column_drag_active = False
+
+    def fit_columns(self, keep_auto: bool = False) -> None:
+        self.root.update_idletasks()
+        tree_width = max(self.tree.winfo_width() - 4, 1)
         minimum_total = sum(self.COLUMN_MIN_WIDTHS.values())
-        available = max(tree_width - 4, minimum_total)
+        extra = max(0, tree_width - minimum_total)
+        ratio_total = sum(self.COLUMN_RATIOS.values()) or 1.0
 
         for column in self.COLUMNS:
-            target = int(available * self.COLUMN_RATIOS[column])
-            self.tree.column(
-                column,
-                width=max(self.COLUMN_MIN_WIDTHS[column], target),
-            )
+            width = self.COLUMN_MIN_WIDTHS[column]
+            if extra:
+                width += int(extra * self.COLUMN_RATIOS[column] / ratio_total)
+            self.tree.column(column, width=width, stretch=False)
 
-        self._layout_action_buttons(compact=width < 1120)
+        self._columns_initialized = True
+        if not keep_auto:
+            self._auto_fit_columns = True
+
+    def _layout_header(self, compact: bool) -> None:
+        layout = "compact" if compact else "wide"
+        if self._header_layout == layout:
+            return
+        self._header_layout = layout
+
+        for widget in (
+            self.title_label,
+            self.summary_label,
+            self.fit_columns_button,
+            self.theme_button,
+        ):
+            widget.grid_forget()
+
+        for column in range(4):
+            self.header.grid_columnconfigure(column, weight=0)
+
+        if compact:
+            self.header.grid_columnconfigure(0, weight=1)
+            self.title_label.grid(row=0, column=0, columnspan=4, sticky="w")
+            self.summary_label.grid(row=1, column=0, sticky="w", pady=(8, 0))
+            self.fit_columns_button.grid(row=1, column=2, padx=(8, 4), pady=(8, 0))
+            self.theme_button.grid(row=1, column=3, padx=(4, 0), pady=(8, 0))
+            return
+
+        self.header.grid_columnconfigure(0, weight=1)
+        self.title_label.grid(row=0, column=0, sticky="w")
+        self.summary_label.grid(row=0, column=1, padx=(16, 10), sticky="e")
+        self.fit_columns_button.grid(row=0, column=2, padx=4, sticky="e")
+        self.theme_button.grid(row=0, column=3, padx=(4, 0), sticky="e")
+
+    def _layout_toolbar(self, compact: bool) -> None:
+        layout = "compact" if compact else "wide"
+        if self._toolbar_layout == layout:
+            return
+        self._toolbar_layout = layout
+
+        widgets = (
+            self.previous_button,
+            self.date_entry,
+            self.apply_date_button,
+            self.today_button,
+            self.next_button,
+        )
+        for widget in widgets:
+            widget.grid_forget()
+
+        for column in range(5):
+            self.toolbar.grid_columnconfigure(column, weight=0)
+
+        if compact:
+            for column in range(3):
+                self.toolbar.grid_columnconfigure(column, weight=1)
+
+            self.previous_button.grid(row=0, column=0, sticky="ew", padx=(0, 4), pady=(0, 6))
+            self.date_entry.grid(row=0, column=1, sticky="ew", padx=4, pady=(0, 6))
+            self.apply_date_button.grid(row=0, column=2, sticky="ew", padx=(4, 0), pady=(0, 6))
+            self.today_button.grid(row=1, column=0, sticky="ew", padx=(0, 4))
+            self.next_button.grid(row=1, column=1, columnspan=2, sticky="ew", padx=(4, 0))
+            return
+
+        self.toolbar.grid_columnconfigure(4, weight=1)
+        self.previous_button.grid(row=0, column=0, padx=(0, 8))
+        self.date_entry.grid(row=0, column=1, padx=4)
+        self.apply_date_button.grid(row=0, column=2, padx=4)
+        self.today_button.grid(row=0, column=3, padx=4)
+        self.next_button.grid(row=0, column=4, padx=(8, 0), sticky="e")
 
     def _configure_fonts(self, font_size: int) -> None:
         if self._last_font_size == font_size:
             return
         self._last_font_size = font_size
 
-        title_size = max(font_size + 5, 16)
+        title_size = max(font_size + 4, 15)
         heading_size = max(font_size, 10)
-        row_height = max(30, int(font_size * 2.65))
-        button_padding_y = max(7, int(font_size * 0.7))
+        row_height = max(28, int(font_size * 2.45))
+        button_padding_y = max(6, int(font_size * 0.58))
 
         self.style.configure("Title.TLabel", font=("TkDefaultFont", title_size, "bold"))
         self.style.configure("Summary.TLabel", font=("TkDefaultFont", font_size, "bold"))
@@ -744,18 +849,17 @@ class DashboardWindow:
         self.style.configure("App.TEntry", font=("TkDefaultFont", font_size))
         self.notes_text.configure(font=("TkDefaultFont", font_size))
 
-    def _layout_action_buttons(self, compact: bool) -> None:
-        layout_name = "compact" if compact else "wide"
-        if self._button_layout == layout_name:
+    def _layout_action_buttons(self, layout: str) -> None:
+        if self._button_layout == layout:
             return
-        self._button_layout = layout_name
+        self._button_layout = layout
 
         buttons = (
             self.confirm_button,
-            self.cancel_button,
             self.paid_button,
             self.save_notes_button,
             self.refresh_button,
+            self.cancel_button,
             self.close_button,
         )
         for button in buttons:
@@ -764,26 +868,59 @@ class DashboardWindow:
         for column in range(6):
             self.actions.grid_columnconfigure(column, weight=0)
 
-        if compact:
-            self.actions.grid_columnconfigure(0, weight=1)
-            self.actions.grid_columnconfigure(1, weight=1)
-            self.actions.grid_columnconfigure(2, weight=1)
-
-            self.confirm_button.grid(row=0, column=0, sticky="ew", padx=(0, 4), pady=(0, 6))
-            self.paid_button.grid(row=0, column=1, sticky="ew", padx=4, pady=(0, 6))
-            self.save_notes_button.grid(row=0, column=2, sticky="ew", padx=(4, 0), pady=(0, 6))
-            self.cancel_button.grid(row=1, column=0, sticky="ew", padx=(0, 4))
-            self.refresh_button.grid(row=1, column=1, sticky="ew", padx=4)
-            self.close_button.grid(row=1, column=2, sticky="ew", padx=(4, 0))
+        if layout == "wide":
+            for column in range(6):
+                self.actions.grid_columnconfigure(column, weight=1)
+            for column, button in enumerate(buttons):
+                button.grid(
+                    row=0,
+                    column=column,
+                    sticky="ew",
+                    padx=(0 if column == 0 else 4, 0 if column == 5 else 4),
+                )
             return
 
-        self.actions.grid_columnconfigure(5, weight=1)
-        self.confirm_button.grid(row=0, column=0, padx=(0, 6))
-        self.paid_button.grid(row=0, column=1, padx=6)
-        self.save_notes_button.grid(row=0, column=2, padx=6)
-        self.refresh_button.grid(row=0, column=3, padx=6)
-        self.cancel_button.grid(row=0, column=4, padx=6)
-        self.close_button.grid(row=0, column=6, padx=(18, 0), sticky="e")
+        if layout == "medium":
+            for column in range(3):
+                self.actions.grid_columnconfigure(column, weight=1)
+
+            placements = (
+                (self.confirm_button, 0, 0),
+                (self.paid_button, 0, 1),
+                (self.save_notes_button, 0, 2),
+                (self.refresh_button, 1, 0),
+                (self.cancel_button, 1, 1),
+                (self.close_button, 1, 2),
+            )
+            for button, row, column in placements:
+                button.grid(
+                    row=row,
+                    column=column,
+                    sticky="ew",
+                    padx=(0 if column == 0 else 4, 0 if column == 2 else 4),
+                    pady=(0 if row == 0 else 4, 6 if row == 0 else 0),
+                )
+            return
+
+        for column in range(2):
+            self.actions.grid_columnconfigure(column, weight=1)
+
+        placements = (
+            (self.confirm_button, 0, 0),
+            (self.paid_button, 0, 1),
+            (self.save_notes_button, 1, 0),
+            (self.refresh_button, 1, 1),
+            (self.cancel_button, 2, 0),
+            (self.close_button, 2, 1),
+        )
+        for button, row, column in placements:
+            button.grid(
+                row=row,
+                column=column,
+                sticky="ew",
+                padx=(0 if column == 0 else 4, 0 if column == 1 else 4),
+                pady=(0 if row == 0 else 4, 6 if row < 2 else 0),
+            )
 
     def _apply_theme(self) -> None:
         palette = self.palette
@@ -949,7 +1086,7 @@ class DashboardWindow:
             values = (
                 _booking_code(booking),
                 _space_name(booking),
-                _customer_name(booking),
+                _user_name(booking),
                 _customer_email(booking),
                 _display_value(booking, "status"),
                 _display_value(booking, "payment_method"),
