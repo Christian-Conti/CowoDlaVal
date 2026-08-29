@@ -1281,3 +1281,1072 @@ def build_standard_toolbar(
         )
 
     return toolbar
+
+# >>> cowodlaval-final-layout-v4 >>>
+
+# ============================================================
+# FINAL SHARED DESKTOP LAYOUT
+# ============================================================
+
+def _is_descendant(widget, parent):
+    if parent is None:
+        return False
+
+    current = widget
+
+    while current is not None:
+        if current is parent:
+            return True
+
+        current = getattr(
+            current,
+            "master",
+            None,
+        )
+
+    return False
+
+
+def _widget_y(root, widget):
+    try:
+        return (
+            widget.winfo_rooty()
+            - root.winfo_rooty()
+        )
+    except tk.TclError:
+        return 0
+
+
+def _window_kind(root):
+    title = str(
+        root.title()
+    ).lower()
+
+    if "event" in title:
+        return "events"
+
+    return "bookings"
+
+
+def _window_title(root):
+    if _window_kind(root) == "events":
+        return "Cowo d'la val · Eventi"
+
+    return "Cowo d'la val · Prenotazioni"
+
+
+# ============================================================
+# STANDARD NAMES
+# ============================================================
+
+ACTION_SPECS = {
+    "bookings": [
+        {
+            "label": "Conferma",
+            "aliases": {
+                "conferma",
+                "confirm",
+            },
+            "style": "Success.TButton",
+            "prefer": "bottom",
+        },
+        {
+            "label": "Segna pagato",
+            "aliases": {
+                "segna come pagato",
+                "segna come pagato in loco",
+                "segna pagato",
+                "mark paid",
+                "mark as paid",
+                "mark as paid onsite",
+            },
+            "style": "Success.TButton",
+            "prefer": "bottom",
+        },
+        {
+            "label": "Salva note",
+            "aliases": {
+                "salva note",
+                "save notes",
+                "save note",
+            },
+            "style": "Success.TButton",
+            "prefer": "bottom",
+        },
+        {
+            "label": "Aggiorna",
+            "aliases": {
+                "aggiorna",
+                "refresh",
+                "update",
+            },
+            "style": "Neutral.TButton",
+            "prefer": "bottom",
+        },
+        {
+            "label": "Cancella prenotazione",
+            "aliases": {
+                "cancella prenotazione",
+                "cancel booking",
+                "annulla prenotazione",
+            },
+            "style": "Danger.TButton",
+            "prefer": "bottom",
+        },
+    ],
+
+    "events": [
+        {
+            "label": "Nuovo evento",
+            "aliases": {
+                "nuovo",
+                "new",
+                "nuovo evento",
+                "new event",
+            },
+            "style": "Primary.TButton",
+            "prefer": "top",
+        },
+        {
+            "label": "Aggiorna",
+            "aliases": {
+                "aggiorna",
+                "refresh",
+                "update",
+            },
+            "style": "Neutral.TButton",
+            "prefer": "top",
+        },
+        {
+            "label": "Salva evento",
+            "aliases": {
+                "salva",
+                "save",
+                "salva evento",
+                "save event",
+            },
+            "style": "Success.TButton",
+            "prefer": "bottom",
+        },
+        {
+            "label": "Aggiungi immagini",
+            "aliases": {
+                "aggiungi immagini",
+                "add images",
+                "add image",
+            },
+            "style": "Primary.TButton",
+            "prefer": "bottom",
+        },
+        {
+            "label": "Rimuovi immagine",
+            "aliases": {
+                "rimuovi immagine",
+                "rimuovi immagini",
+                "remove image",
+                "remove images",
+            },
+            "style": "Danger.TButton",
+            "prefer": "bottom",
+        },
+        {
+            "label": "Elimina evento",
+            "aliases": {
+                "elimina evento",
+                "delete event",
+            },
+            "style": "Danger.TButton",
+            "prefer": "bottom",
+        },
+    ],
+}
+
+
+UTILITY_ALIASES = {
+    "adatta colonne",
+    "fit columns",
+    "tema",
+    "tema chiaro",
+    "tema scuro",
+    "theme",
+    "light theme",
+    "dark theme",
+    "chiudi",
+    "close",
+}
+
+
+def _widget_text(widget):
+    try:
+        return _norm(
+            widget.cget("text")
+        )
+    except tk.TclError:
+        return ""
+
+
+# ============================================================
+# FIND ORIGINAL ACTION BUTTONS
+# ============================================================
+
+def _find_action_source(
+    root,
+    aliases,
+    prefer,
+):
+    header = getattr(
+        root,
+        "_cowodlaval_toolbar",
+        None,
+    )
+
+    bottom = getattr(
+        root,
+        "_cowodlaval_bottom_bar",
+        None,
+    )
+
+    candidates = []
+
+    for widget in _walk(root):
+
+        if not isinstance(
+            widget,
+            (
+                ttk.Button,
+                tk.Button,
+            ),
+        ):
+            continue
+
+        if _is_descendant(
+            widget,
+            header,
+        ):
+            continue
+
+        if _is_descendant(
+            widget,
+            bottom,
+        ):
+            continue
+
+        text = _widget_text(
+            widget
+        )
+
+        if text not in aliases:
+            continue
+
+        candidates.append(
+            (
+                _widget_y(
+                    root,
+                    widget,
+                ),
+                widget,
+            )
+        )
+
+    if not candidates:
+        return None
+
+    candidates.sort(
+        key=lambda value: value[0]
+    )
+
+    if prefer == "top":
+        return candidates[0][1]
+
+    return candidates[-1][1]
+
+
+def _collect_action_sources(root):
+    kind = _window_kind(
+        root
+    )
+
+    result = []
+
+    for spec in ACTION_SPECS[kind]:
+
+        source = _find_action_source(
+            root,
+            spec["aliases"],
+            spec["prefer"],
+        )
+
+        if source is None:
+            continue
+
+        result.append(
+            (
+                spec,
+                source,
+            )
+        )
+
+    return result
+
+
+# ============================================================
+# HEADER
+#
+# SAME EXACT STRUCTURE FOR EVENTS AND BOOKINGS
+# ============================================================
+
+def _booking_summary(root):
+    for widget in _walk(root):
+
+        if not isinstance(
+            widget,
+            (
+                ttk.Label,
+                tk.Label,
+            ),
+        ):
+            continue
+
+        if _is_descendant(
+            widget,
+            getattr(
+                root,
+                "_cowodlaval_toolbar",
+                None,
+            ),
+        ):
+            continue
+
+        text = str(
+            widget.cget("text")
+        ).strip()
+
+        lower = text.lower()
+
+        if (
+            "prenotazioni" in lower
+            and "postazioni" in lower
+        ):
+            return text
+
+    count = len(
+        _treeviews(root)[0].get_children()
+    ) if _treeviews(root) else 0
+
+    return (
+        f"{count} "
+        f"{'prenotazione' if count == 1 else 'prenotazioni'}"
+    )
+
+
+def _events_summary(root):
+    count = 0
+
+    trees = _treeviews(
+        root
+    )
+
+    if trees:
+        count = len(
+            trees[0].get_children()
+        )
+
+    return (
+        f"{count} "
+        f"{'evento' if count == 1 else 'eventi'}"
+    )
+
+
+def _header_summary(root):
+    if _window_kind(root) == "events":
+        return _events_summary(
+            root
+        )
+
+    return _booking_summary(
+        root
+    )
+
+
+def _hide_original_headers(root):
+    header = getattr(
+        root,
+        "_cowodlaval_toolbar",
+        None,
+    )
+
+    for widget in _walk(root):
+
+        if _is_descendant(
+            widget,
+            header,
+        ):
+            continue
+
+        # ----------------------------------------------------
+        # Old duplicated titles
+        # ----------------------------------------------------
+
+        if isinstance(
+            widget,
+            (
+                ttk.Label,
+                tk.Label,
+            ),
+        ):
+            text = _widget_text(
+                widget
+            )
+
+            if text.startswith(
+                "cowo d'la val"
+            ):
+                _hide(
+                    widget
+                )
+
+            continue
+
+        # ----------------------------------------------------
+        # Old utility buttons
+        # ----------------------------------------------------
+
+        if not isinstance(
+            widget,
+            (
+                ttk.Button,
+                tk.Button,
+            ),
+        ):
+            continue
+
+        text = _widget_text(
+            widget
+        )
+
+        if text in UTILITY_ALIASES:
+            _hide(
+                widget
+            )
+
+
+def _make_toolbar(root):
+    if getattr(
+        root,
+        "_cowodlaval_toolbar",
+        None,
+    ) is not None:
+        return
+
+    root.title(
+        _window_title(
+            root
+        )
+    )
+
+    try:
+        root.minsize(
+            760,
+            560,
+        )
+    except tk.TclError:
+        pass
+
+    header = ttk.Frame(
+        root,
+        style="TFrame",
+    )
+
+    root._cowodlaval_toolbar = header
+
+    # --------------------------------------------------------
+    # TITLE AREA
+    # --------------------------------------------------------
+
+    title_box = ttk.Frame(
+        header,
+        style="TFrame",
+    )
+
+    title_box.grid(
+        row=0,
+        column=0,
+        sticky="w",
+        padx=(10, 8),
+        pady=(5, 4),
+    )
+
+    title = ttk.Label(
+        title_box,
+        text=_window_title(
+            root
+        ),
+        style="Title.TLabel",
+    )
+
+    title.pack(
+        anchor="w",
+    )
+
+    subtitle = ttk.Label(
+        title_box,
+        text=_header_summary(
+            root
+        ),
+        style="Muted.TLabel",
+    )
+
+    subtitle.pack(
+        anchor="w",
+        pady=(1, 0),
+    )
+
+    root._cowodlaval_header_subtitle = (
+        subtitle
+    )
+
+    # --------------------------------------------------------
+    # UNIVERSAL CONTROLS
+    # EXACT SAME POSITION IN BOTH APPS
+    # --------------------------------------------------------
+
+    controls = ttk.Frame(
+        header,
+        style="TFrame",
+    )
+
+    controls.grid(
+        row=0,
+        column=1,
+        sticky="e",
+        padx=(8, 8),
+        pady=6,
+    )
+
+    fit_button = ttk.Button(
+        controls,
+        text="Adatta colonne",
+        command=lambda: fit_columns(
+            root
+        ),
+        style="Neutral.TButton",
+    )
+
+    theme_button = ttk.Button(
+        controls,
+        text="Tema",
+        command=lambda: toggle_theme(
+            root
+        ),
+        style="Neutral.TButton",
+    )
+
+    close_button = ttk.Button(
+        controls,
+        text="Chiudi",
+        command=root.destroy,
+        style="Neutral.TButton",
+    )
+
+    fit_button.grid(
+        row=0,
+        column=0,
+        sticky="ew",
+        padx=2,
+    )
+
+    theme_button.grid(
+        row=0,
+        column=1,
+        sticky="ew",
+        padx=2,
+    )
+
+    close_button.grid(
+        row=0,
+        column=2,
+        sticky="ew",
+        padx=2,
+    )
+
+    header.grid_columnconfigure(
+        0,
+        weight=1,
+    )
+
+    header.grid_columnconfigure(
+        1,
+        weight=0,
+    )
+
+    root._cowodlaval_header_buttons = [
+        fit_button,
+        theme_button,
+        close_button,
+    ]
+
+    _hide_original_headers(
+        root
+    )
+
+
+def _layout_toolbar(root):
+    header = getattr(
+        root,
+        "_cowodlaval_toolbar",
+        None,
+    )
+
+    if header is None:
+        return
+
+    # Same 72px header in BOTH applications.
+    header.place(
+        x=0,
+        y=0,
+        relwidth=1.0,
+        height=72,
+    )
+
+    header.lift()
+
+    subtitle = getattr(
+        root,
+        "_cowodlaval_header_subtitle",
+        None,
+    )
+
+    if subtitle is not None:
+        try:
+            subtitle.configure(
+                text=_header_summary(
+                    root
+                )
+            )
+        except tk.TclError:
+            pass
+
+
+# ============================================================
+# STANDARD BOTTOM ACTION BAR
+# ============================================================
+
+def _destroy_bottom_bar(root):
+    bottom = getattr(
+        root,
+        "_cowodlaval_bottom_bar",
+        None,
+    )
+
+    if bottom is not None:
+        try:
+            bottom.destroy()
+        except tk.TclError:
+            pass
+
+    root._cowodlaval_bottom_bar = None
+    root._cowodlaval_bottom_pairs = []
+    root._cowodlaval_bottom_signature = None
+
+
+def _make_bottom_bar(root):
+    sources = _collect_action_sources(
+        root
+    )
+
+    signature = tuple(
+        (
+            spec["label"],
+            str(source),
+        )
+        for spec, source in sources
+    )
+
+    if (
+        getattr(
+            root,
+            "_cowodlaval_bottom_signature",
+            None,
+        )
+        == signature
+        and getattr(
+            root,
+            "_cowodlaval_bottom_bar",
+            None,
+        )
+        is not None
+    ):
+        return
+
+    old = getattr(
+        root,
+        "_cowodlaval_bottom_bar",
+        None,
+    )
+
+    if old is not None:
+        try:
+            old.destroy()
+        except tk.TclError:
+            pass
+
+    if not sources:
+        return
+
+    bar = ttk.Frame(
+        root,
+        style="TFrame",
+    )
+
+    root._cowodlaval_bottom_bar = bar
+    root._cowodlaval_bottom_signature = signature
+
+    separator = ttk.Separator(
+        bar,
+        orient="horizontal",
+    )
+
+    separator.grid(
+        row=0,
+        column=0,
+        columnspan=12,
+        sticky="ew",
+        pady=(0, 4),
+    )
+
+    pairs = []
+
+    for spec, source in sources:
+
+        # Hide the original control.
+        _hide(
+            source
+        )
+
+        button = ttk.Button(
+            bar,
+            text=spec["label"],
+            command=lambda w=source: w.invoke(),
+            style=spec["style"],
+        )
+
+        pairs.append(
+            (
+                button,
+                source,
+                spec,
+            )
+        )
+
+    root._cowodlaval_bottom_pairs = (
+        pairs
+    )
+
+    _layout_bottom_bar(
+        root
+    )
+
+
+def _layout_bottom_bar(root):
+    bar = getattr(
+        root,
+        "_cowodlaval_bottom_bar",
+        None,
+    )
+
+    if bar is None:
+        return
+
+    pairs = getattr(
+        root,
+        "_cowodlaval_bottom_pairs",
+        [],
+    )
+
+    if not pairs:
+        return
+
+    width = max(
+        root.winfo_width(),
+        1,
+    )
+
+    buttons = [
+        pair[0]
+        for pair in pairs
+    ]
+
+    for button in buttons:
+        button.grid_forget()
+
+    for column in range(12):
+        bar.grid_columnconfigure(
+            column,
+            weight=0,
+        )
+
+    # --------------------------------------------------------
+    # Same responsive layout in both GUIs
+    # --------------------------------------------------------
+
+    if width >= 1100:
+        columns = len(
+            buttons
+        )
+
+    elif width >= 650:
+        columns = min(
+            3,
+            len(buttons),
+        )
+
+    else:
+        columns = min(
+            2,
+            len(buttons),
+        )
+
+    for column in range(columns):
+        bar.grid_columnconfigure(
+            column,
+            weight=1,
+            uniform="bottom-actions",
+        )
+
+    for index, button in enumerate(
+        buttons
+    ):
+        button.grid(
+            row=1 + (
+                index // columns
+            ),
+            column=index % columns,
+            sticky="ew",
+            padx=3,
+            pady=2,
+        )
+
+    rows = (
+        len(buttons)
+        + columns
+        - 1
+    ) // columns
+
+    height = (
+        42
+        if rows == 1
+        else 72
+        if rows == 2
+        else 102
+    )
+
+    bar.place(
+        x=0,
+        rely=1.0,
+        y=-height,
+        relwidth=1.0,
+        height=height,
+    )
+
+    bar.lift()
+
+
+# ============================================================
+# MIRROR ORIGINAL BUTTON STATE
+# ============================================================
+
+def _sync_bottom_states(root):
+    pairs = getattr(
+        root,
+        "_cowodlaval_bottom_pairs",
+        [],
+    )
+
+    for button, source, spec in pairs:
+
+        try:
+            if isinstance(
+                source,
+                ttk.Button,
+            ):
+                disabled = (
+                    source.instate(
+                        ["disabled"]
+                    )
+                )
+
+            else:
+                disabled = (
+                    str(
+                        source.cget(
+                            "state"
+                        )
+                    )
+                    == "disabled"
+                )
+
+            if disabled:
+                button.state(
+                    ["disabled"]
+                )
+            else:
+                button.state(
+                    ["!disabled"]
+                )
+
+            # Reapply semantic style explicitly.
+            button.configure(
+                style=spec["style"]
+            )
+
+        except tk.TclError:
+            pass
+
+
+# ============================================================
+# REMOVE ALL OLD DUPLICATED CONTROLS
+# ============================================================
+
+def _cleanup_old_controls(root):
+    header = getattr(
+        root,
+        "_cowodlaval_toolbar",
+        None,
+    )
+
+    bottom = getattr(
+        root,
+        "_cowodlaval_bottom_bar",
+        None,
+    )
+
+    kind = _window_kind(
+        root
+    )
+
+    all_action_aliases = set()
+
+    for spec in ACTION_SPECS[kind]:
+        all_action_aliases.update(
+            spec["aliases"]
+        )
+
+    for widget in _walk(root):
+
+        if _is_descendant(
+            widget,
+            header,
+        ):
+            continue
+
+        if _is_descendant(
+            widget,
+            bottom,
+        ):
+            continue
+
+        # Old title
+        if isinstance(
+            widget,
+            (
+                ttk.Label,
+                tk.Label,
+            ),
+        ):
+            text = _widget_text(
+                widget
+            )
+
+            if text.startswith(
+                "cowo d'la val"
+            ):
+                _hide(
+                    widget
+                )
+
+            continue
+
+        if not isinstance(
+            widget,
+            (
+                ttk.Button,
+                tk.Button,
+            ),
+        ):
+            continue
+
+        text = _widget_text(
+            widget
+        )
+
+        # Universal duplicates
+        if text in UTILITY_ALIASES:
+            _hide(
+                widget
+            )
+            continue
+
+        # Operational buttons have already been copied into
+        # the standard bottom bar.
+        if (
+            getattr(
+                root,
+                "_cowodlaval_bottom_bar",
+                None,
+            )
+            is not None
+            and text in all_action_aliases
+        ):
+            _hide(
+                widget
+            )
+
+
+# ============================================================
+# FINAL REFRESH
+# ============================================================
+
+def _refresh(root):
+    try:
+        configure_styles(
+            root
+        )
+
+        _style_widgets(
+            root
+        )
+
+        if getattr(
+            root,
+            "_cowodlaval_toolbar",
+            None,
+        ) is None:
+            _make_toolbar(
+                root
+            )
+
+        _make_bottom_bar(
+            root
+        )
+
+        _cleanup_old_controls(
+            root
+        )
+
+        _layout_toolbar(
+            root
+        )
+
+        _layout_bottom_bar(
+            root
+        )
+
+        _sync_bottom_states(
+            root
+        )
+
+    except tk.TclError:
+        pass
+
+
+# <<< cowodlaval-final-layout-v4 <<<
