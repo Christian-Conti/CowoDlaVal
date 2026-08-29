@@ -21,6 +21,7 @@
             <span class="brand-sub">D'LA VAL</span>
         </a>
         <div class="nav-links">
+            <a href="{% url 'events:list' %}">{% event_t "Events" %}</a>
             <a href="{% url 'home' %}#booking">{% translate "Book" %}</a>
             <a href="{% url 'home' %}#details">{% translate "Details" %}</a>
             <a href="{% url 'contact' %}">{% translate "Contact" %}</a>
@@ -43,6 +44,7 @@
                 <span>{% translate "Menu" %}</span>
             </summary>
             <div class="mobile-menu-panel">
+                <a href="{% url 'events:list' %}">{% event_t "Events" %}</a>
                 <a href="{% url 'home' %}#booking">{% translate "Book" %}</a>
                 <a href="{% url 'home' %}#details">{% translate "Details" %}</a>
                 <a href="{% url 'contact' %}">{% translate "Contact" %}</a>
@@ -72,7 +74,6 @@
             </select>
         </form>
     
-<a class="nav-link" href="{% url 'events:list' %}">{% event_t "Events" %}</a>
 </nav>
 </header>
 

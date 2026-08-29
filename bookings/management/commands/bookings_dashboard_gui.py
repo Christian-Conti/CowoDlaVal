@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from config.gui_theme import apply_cowodlaval_theme
 import io
 import os
 import re
@@ -1420,6 +1421,7 @@ class Command(BaseCommand):
 
         try:
             root = tk.Tk()
+            apply_cowodlaval_theme(root)
         except tk.TclError as exc:
             raise CommandError(
                 "Unable to open the graphical display. Check DISPLAY/X11 forwarding."
