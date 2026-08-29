@@ -1,3 +1,4 @@
+from config.gui_theme import apply_cowodlaval_theme
 import os
 import sys
 from datetime import date, timedelta
@@ -19,6 +20,7 @@ class BookingWindow:
         self.bookings = {}
 
         self.root = tk.Tk()
+        apply_cowodlaval_theme(self.root)
         self.root.title(_("Cowo d'la val - Bookings"))
         self.root.geometry("1400x700")
         self.root.minsize(1000, 560)

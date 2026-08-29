@@ -189,8 +189,29 @@ def cancel_booking(*, booking: Booking, user) -> Booking:
     if booking.status != Booking.Status.CONFIRMED:
         raise ValidationError(_("This booking is no longer active."))
     if not user.is_staff and not booking.can_user_cancel:
+        if booking.payment_method != Booking.PaymentMethod.ONSITE:
+            raise ValidationError(
+                _(
+                    "Only bookings with payment in person can be cancelled "
+                    "autonomously. Contact the coworking staff."
+                )
+            )
+
+        if booking.cancellation_penalty_applies:
+            raise ValidationError(
+                _(
+                    "This booking starts in less than 12 hours. "
+                    "Autonomous cancellation is no longer available and "
+                    "a 50% cancellation charge applies. "
+                    "Contact the coworking staff."
+                )
+            )
+
         raise ValidationError(
-            _("Only bookings with payment in person can be cancelled online. Contact the coworking staff.")
+            _(
+                "This booking cannot be cancelled autonomously. "
+                "Contact the coworking staff."
+            )
         )
 
     booking.status = Booking.Status.CANCELLED

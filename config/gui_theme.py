@@ -1,67 +1,67 @@
 import tkinter as tk
-from tkinter import font as tkfont
 from tkinter import ttk
 
 
 COLORS = {
-    "window": "#151722",
+    "window": "#161823",
+
     "surface": "#1E2230",
-    "surface_alt": "#252B40",
-    "border": "#414862",
+    "surface_alt": "#272C3E",
+    "surface_hover": "#30364A",
 
-    "text": "#F1F1F7",
-    "muted": "#B9B9C9",
+    "border": "#414861",
 
-    "primary": "#7C83FF",
-    "primary_active": "#9197FF",
+    "text": "#F3F3F8",
+    "muted": "#B8BAC8",
 
-    "success": "#56B88A",
-    "success_active": "#69C89A",
+    "primary": "#747CFF",
+    "primary_hover": "#8A91FF",
 
-    "danger": "#EE8294",
-    "danger_active": "#F29BA9",
+    "success": "#55B88A",
+    "success_hover": "#69C99C",
 
-    "neutral": "#29314D",
-    "neutral_active": "#35405F",
+    "danger": "#E9788B",
+    "danger_hover": "#F08C9D",
 
-    "selection": "#4E568A",
+    "neutral": "#303752",
+    "neutral_hover": "#3B4565",
+
+    "selection": "#50598A",
 }
 
 
-ORIGINAL_BUTTON = ttk.Button
-
-
-def semantic_style(text):
-    text = text.strip().lower()
-
-    danger = (
+SEMANTIC_WORDS = {
+    "Danger.TButton": (
         "cancella",
+        "cancel booking",
         "delete",
         "elimina",
         "remove",
         "rimuovi",
-        "annulla prenotazione",
-    )
+        "abbandona",
+        "abandon",
+    ),
 
-    success = (
+    "Success.TButton": (
         "conferma",
         "confirm",
         "salva",
         "save",
         "pagato",
         "paid",
-    )
+    ),
 
-    primary = (
+    "Primary.TButton": (
         "applica",
         "apply",
         "nuovo",
         "new",
         "aggiungi",
-        "add",
-    )
+        "add image",
+        "add event",
+    ),
 
-    neutral = (
+    "Neutral.TButton": (
         "aggiorna",
         "refresh",
         "update",
@@ -77,24 +77,70 @@ def semantic_style(text):
         "theme",
         "adatta",
         "fit",
-    )
+    ),
+}
 
-    if any(word in text for word in danger):
-        return "Danger.TButton"
 
-    if any(word in text for word in success):
-        return "Success.TButton"
+def _button_style(text):
+    value = str(text or "").strip().lower()
 
-    if any(word in text for word in primary):
-        return "Primary.TButton"
-
-    if any(word in text for word in neutral):
-        return "Neutral.TButton"
+    for style_name, words in SEMANTIC_WORDS.items():
+        if any(word in value for word in words):
+            return style_name
 
     return "Neutral.TButton"
 
 
-def configure_styles(root, base_size=11):
+def _button_style_config(
+    style,
+    name,
+    background,
+    hover,
+    font,
+    padding,
+):
+    style.configure(
+        name,
+        background=background,
+        foreground=COLORS["text"],
+        bordercolor=background,
+        lightcolor=background,
+        darkcolor=background,
+        relief="flat",
+        padding=padding,
+        font=font,
+    )
+
+    style.map(
+        name,
+        background=[
+            ("pressed", hover),
+            ("active", hover),
+            ("disabled", COLORS["surface_alt"]),
+        ],
+        foreground=[
+            ("disabled", COLORS["muted"]),
+        ],
+    )
+
+
+def _font_size(width):
+    if width < 700:
+        return 9
+
+    if width < 950:
+        return 10
+
+    if width < 1350:
+        return 11
+
+    return 12
+
+
+def configure_styles(root):
+    width = max(root.winfo_width(), 800)
+    size = _font_size(width)
+
     style = ttk.Style(root)
 
     try:
@@ -108,32 +154,45 @@ def configure_styles(root, base_size=11):
 
     normal_font = (
         "TkDefaultFont",
-        base_size,
+        size,
     )
 
-    button_font = (
+    bold_font = (
         "TkDefaultFont",
-        base_size,
+        size,
         "bold",
     )
 
-    heading_font = (
+    title_font = (
         "TkDefaultFont",
-        base_size,
+        size + 3,
         "bold",
     )
+
+    button_padding = (
+        max(9, size),
+        max(6, size - 2),
+    )
+
+    # --------------------------------------------------------
+    # Generic widgets
+    # --------------------------------------------------------
 
     style.configure(
         ".",
         background=COLORS["window"],
         foreground=COLORS["text"],
-        fieldbackground=COLORS["surface"],
         font=normal_font,
     )
 
     style.configure(
         "TFrame",
         background=COLORS["window"],
+    )
+
+    style.configure(
+        "Card.TFrame",
+        background=COLORS["surface"],
     )
 
     style.configure(
@@ -144,14 +203,80 @@ def configure_styles(root, base_size=11):
     )
 
     style.configure(
+        "Title.TLabel",
+        background=COLORS["window"],
+        foreground=COLORS["text"],
+        font=title_font,
+    )
+
+    style.configure(
+        "Muted.TLabel",
+        background=COLORS["window"],
+        foreground=COLORS["muted"],
+        font=normal_font,
+    )
+
+    # --------------------------------------------------------
+    # Entries / Combobox
+    # --------------------------------------------------------
+
+    style.configure(
         "TEntry",
         fieldbackground=COLORS["surface"],
         foreground=COLORS["text"],
         insertcolor=COLORS["text"],
         bordercolor=COLORS["border"],
-        padding=6,
+        lightcolor=COLORS["border"],
+        darkcolor=COLORS["border"],
+        padding=(8, 6),
         font=normal_font,
     )
+
+    style.configure(
+        "TCombobox",
+        fieldbackground=COLORS["surface"],
+        background=COLORS["surface"],
+        foreground=COLORS["text"],
+        arrowcolor=COLORS["text"],
+        bordercolor=COLORS["border"],
+        padding=(8, 6),
+        font=normal_font,
+    )
+
+    style.map(
+        "TCombobox",
+        fieldbackground=[
+            ("readonly", COLORS["surface"]),
+        ],
+        foreground=[
+            ("readonly", COLORS["text"]),
+        ],
+        selectbackground=[
+            ("readonly", COLORS["selection"]),
+        ],
+    )
+
+    # --------------------------------------------------------
+    # Check / Radio
+    # --------------------------------------------------------
+
+    style.configure(
+        "TCheckbutton",
+        background=COLORS["window"],
+        foreground=COLORS["text"],
+        font=normal_font,
+    )
+
+    style.configure(
+        "TRadiobutton",
+        background=COLORS["window"],
+        foreground=COLORS["text"],
+        font=normal_font,
+    )
+
+    # --------------------------------------------------------
+    # Notebook
+    # --------------------------------------------------------
 
     style.configure(
         "TNotebook",
@@ -163,16 +288,22 @@ def configure_styles(root, base_size=11):
         "TNotebook.Tab",
         background=COLORS["neutral"],
         foreground=COLORS["text"],
-        padding=(12, 6),
-        font=normal_font,
+        padding=(14, 7),
+        font=bold_font,
+        borderwidth=0,
     )
 
     style.map(
         "TNotebook.Tab",
         background=[
             ("selected", COLORS["primary"]),
+            ("active", COLORS["neutral_hover"]),
         ],
     )
+
+    # --------------------------------------------------------
+    # Treeview
+    # --------------------------------------------------------
 
     style.configure(
         "Treeview",
@@ -180,7 +311,9 @@ def configure_styles(root, base_size=11):
         fieldbackground=COLORS["surface"],
         foreground=COLORS["text"],
         bordercolor=COLORS["border"],
-        rowheight=max(26, int(base_size * 2.25)),
+        lightcolor=COLORS["border"],
+        darkcolor=COLORS["border"],
+        rowheight=max(25, int(size * 2.45)),
         font=normal_font,
     )
 
@@ -190,8 +323,8 @@ def configure_styles(root, base_size=11):
         foreground=COLORS["text"],
         bordercolor=COLORS["border"],
         relief="flat",
-        padding=(7, 5),
-        font=heading_font,
+        padding=(8, 6),
+        font=bold_font,
     )
 
     style.map(
@@ -204,221 +337,513 @@ def configure_styles(root, base_size=11):
         ],
     )
 
-    configure_button(
+    style.map(
+        "Treeview.Heading",
+        background=[
+            ("active", COLORS["surface_hover"]),
+        ],
+    )
+
+    # --------------------------------------------------------
+    # Scrollbars
+    # --------------------------------------------------------
+
+    style.configure(
+        "Vertical.TScrollbar",
+        background=COLORS["neutral"],
+        troughcolor=COLORS["surface"],
+        arrowcolor=COLORS["text"],
+        bordercolor=COLORS["surface"],
+    )
+
+    style.configure(
+        "Horizontal.TScrollbar",
+        background=COLORS["neutral"],
+        troughcolor=COLORS["surface"],
+        arrowcolor=COLORS["text"],
+        bordercolor=COLORS["surface"],
+    )
+
+    # --------------------------------------------------------
+    # Buttons
+    # --------------------------------------------------------
+
+    _button_style_config(
+        style,
+        "TButton",
+        COLORS["neutral"],
+        COLORS["neutral_hover"],
+        bold_font,
+        button_padding,
+    )
+
+    _button_style_config(
         style,
         "Neutral.TButton",
         COLORS["neutral"],
-        COLORS["neutral_active"],
-        button_font,
+        COLORS["neutral_hover"],
+        bold_font,
+        button_padding,
     )
 
-    configure_button(
+    _button_style_config(
         style,
         "Primary.TButton",
         COLORS["primary"],
-        COLORS["primary_active"],
-        button_font,
+        COLORS["primary_hover"],
+        bold_font,
+        button_padding,
     )
 
-    configure_button(
+    _button_style_config(
         style,
         "Success.TButton",
         COLORS["success"],
-        COLORS["success_active"],
-        button_font,
+        COLORS["success_hover"],
+        bold_font,
+        button_padding,
     )
 
-    configure_button(
+    _button_style_config(
         style,
         "Danger.TButton",
         COLORS["danger"],
-        COLORS["danger_active"],
-        button_font,
+        COLORS["danger_hover"],
+        bold_font,
+        button_padding,
     )
 
-    # Keep generic/custom legacy button styles visually coherent.
-    for name in (
-        "TButton",
+    # Legacy styles used by existing dashboards.
+    _button_style_config(
+        style,
         "Accent.TButton",
+        COLORS["primary"],
+        COLORS["primary_hover"],
+        bold_font,
+        button_padding,
+    )
+
+    _button_style_config(
+        style,
         "Secondary.TButton",
-    ):
-        configure_button(
-            style,
-            name,
-            COLORS["neutral"],
-            COLORS["neutral_active"],
-            button_font,
-        )
-
-
-def configure_button(
-    style,
-    name,
-    background,
-    active_background,
-    font,
-):
-    style.configure(
-        name,
-        background=background,
-        foreground=COLORS["text"],
-        bordercolor=background,
-        lightcolor=background,
-        darkcolor=background,
-        padding=(13, 8),
-        relief="flat",
-        font=font,
-    )
-
-    style.map(
-        name,
-        background=[
-            ("active", active_background),
-            ("pressed", active_background),
-            ("disabled", COLORS["surface_alt"]),
-        ],
-        foreground=[
-            ("disabled", COLORS["muted"]),
-        ],
+        COLORS["neutral"],
+        COLORS["neutral_hover"],
+        bold_font,
+        button_padding,
     )
 
 
-def walk_widgets(widget):
+def _walk(widget):
     yield widget
 
-    for child in widget.winfo_children():
-        yield from walk_widgets(child)
+    try:
+        children = widget.winfo_children()
+    except tk.TclError:
+        return
+
+    for child in children:
+        yield from _walk(child)
 
 
-def style_buttons(root):
-    for widget in walk_widgets(root):
-        if isinstance(widget, ORIGINAL_BUTTON):
+def _style_existing_widgets(root):
+    for widget in _walk(root):
+
+        # ----------------------------------------------------
+        # ttk.Button semantic colours
+        # ----------------------------------------------------
+
+        if isinstance(widget, ttk.Button):
             try:
-                text = str(widget.cget("text"))
                 widget.configure(
-                    style=semantic_style(text)
+                    style=_button_style(
+                        widget.cget("text")
+                    )
+                )
+            except tk.TclError:
+                pass
+
+        # ----------------------------------------------------
+        # Old tk.Button widgets
+        # ----------------------------------------------------
+
+        elif isinstance(widget, tk.Button):
+            text = str(
+                widget.cget("text")
+            )
+
+            semantic = _button_style(text)
+
+            palette = {
+                "Primary.TButton": (
+                    COLORS["primary"],
+                    COLORS["primary_hover"],
+                ),
+                "Success.TButton": (
+                    COLORS["success"],
+                    COLORS["success_hover"],
+                ),
+                "Danger.TButton": (
+                    COLORS["danger"],
+                    COLORS["danger_hover"],
+                ),
+                "Neutral.TButton": (
+                    COLORS["neutral"],
+                    COLORS["neutral_hover"],
+                ),
+            }
+
+            bg, active = palette.get(
+                semantic,
+                (
+                    COLORS["neutral"],
+                    COLORS["neutral_hover"],
+                ),
+            )
+
+            try:
+                widget.configure(
+                    background=bg,
+                    activebackground=active,
+                    foreground=COLORS["text"],
+                    activeforeground=COLORS["text"],
+                    relief="flat",
+                    borderwidth=0,
+                    highlightthickness=0,
+                    padx=12,
+                    pady=7,
+                )
+            except tk.TclError:
+                pass
+
+        # ----------------------------------------------------
+        # Text areas
+        # ----------------------------------------------------
+
+        elif isinstance(widget, tk.Text):
+            try:
+                widget.configure(
+                    background=COLORS["surface"],
+                    foreground=COLORS["text"],
+                    insertbackground=COLORS["text"],
+                    selectbackground=COLORS["selection"],
+                    selectforeground=COLORS["text"],
+                    relief="flat",
+                    borderwidth=1,
+                    highlightbackground=COLORS["border"],
+                    highlightcolor=COLORS["primary"],
+                )
+            except tk.TclError:
+                pass
+
+        # ----------------------------------------------------
+        # Listbox
+        # ----------------------------------------------------
+
+        elif isinstance(widget, tk.Listbox):
+            try:
+                widget.configure(
+                    background=COLORS["surface"],
+                    foreground=COLORS["text"],
+                    selectbackground=COLORS["selection"],
+                    selectforeground=COLORS["text"],
+                    relief="flat",
+                    borderwidth=1,
+                    highlightbackground=COLORS["border"],
+                    highlightcolor=COLORS["primary"],
                 )
             except tk.TclError:
                 pass
 
 
-def responsive_button_bars(root):
+def _responsive_button_frames(root):
     """
-    Reflow frames containing only buttons.
+    Reflow only frames whose visible children are ALL buttons.
 
-    This intentionally ignores mixed frames containing labels, entries,
-    etc., so date/navigation forms are never rearranged unexpectedly.
+    This avoids touching forms containing labels/entries while allowing
+    action bars to become 1, 2 or 3 rows depending on window width.
     """
-    width = max(root.winfo_width(), 1)
 
-    if width >= 1200:
-        columns = 6
-    elif width >= 900:
-        columns = 4
-    elif width >= 650:
-        columns = 3
+    width = max(
+        root.winfo_width(),
+        1,
+    )
+
+    if width >= 1450:
+        max_columns = 6
+    elif width >= 1100:
+        max_columns = 4
+    elif width >= 800:
+        max_columns = 3
     else:
-        columns = 2
+        max_columns = 2
 
-    for parent in walk_widgets(root):
-        children = [
-            child
-            for child in parent.winfo_children()
-            if child.winfo_manager()
-        ]
+    for parent in _walk(root):
+        try:
+            children = [
+                child
+                for child in parent.winfo_children()
+                if child.winfo_manager()
+            ]
+        except tk.TclError:
+            continue
 
         if len(children) < 2:
             continue
 
         if not all(
-            isinstance(child, ORIGINAL_BUTTON)
+            isinstance(
+                child,
+                (
+                    ttk.Button,
+                    tk.Button,
+                ),
+            )
             for child in children
         ):
             continue
 
+        # Only reflow grid-based button bars.
         if not all(
             child.winfo_manager() == "grid"
             for child in children
         ):
             continue
 
-        actual_columns = min(
-            columns,
+        columns = min(
+            max_columns,
             len(children),
         )
 
-        for column in range(len(children)):
-            try:
+        try:
+            for index in range(
+                len(children)
+            ):
                 parent.grid_columnconfigure(
-                    column,
+                    index,
                     weight=0,
                 )
-            except tk.TclError:
-                pass
 
-        for column in range(actual_columns):
-            parent.grid_columnconfigure(
-                column,
-                weight=1,
-                uniform="actions",
-            )
+            for index in range(columns):
+                parent.grid_columnconfigure(
+                    index,
+                    weight=1,
+                    uniform="cowodlaval-actions",
+                )
 
-        for index, button in enumerate(children):
-            button.grid_configure(
-                row=index // actual_columns,
-                column=index % actual_columns,
-                sticky="ew",
-                padx=4,
-                pady=4,
-            )
+            for index, button in enumerate(
+                children
+            ):
+                button.grid_configure(
+                    row=index // columns,
+                    column=index % columns,
+                    sticky="ew",
+                    padx=4,
+                    pady=4,
+                )
+
+        except tk.TclError:
+            pass
 
 
-def responsive_update(root):
-    width = max(root.winfo_width(), 1)
-
-    if width < 700:
-        size = 9
-    elif width < 1000:
-        size = 10
-    elif width < 1400:
-        size = 11
-    else:
-        size = 12
-
-    configure_styles(
-        root,
-        base_size=size,
-    )
-
-    style_buttons(root)
-    responsive_button_bars(root)
+def _refresh(root):
+    try:
+        configure_styles(root)
+        _style_existing_widgets(root)
+        _responsive_button_frames(root)
+    except tk.TclError:
+        pass
 
 
 def apply_cowodlaval_theme(root):
-    configure_styles(root)
+    """
+    Install the shared CowoDlaVal theme on one Tk root.
 
-    pending = {"job": None}
+    Safe to call immediately after Tk(): widgets created afterwards are
+    styled on the first idle cycle and on subsequent window resizes.
+    """
 
-    def schedule_update(_event=None):
-        if pending["job"] is not None:
+    root.configure(
+        background=COLORS["window"],
+    )
+
+    state = {
+        "job": None,
+    }
+
+    def schedule_refresh(_event=None):
+        if state["job"] is not None:
             try:
                 root.after_cancel(
-                    pending["job"]
+                    state["job"]
                 )
             except tk.TclError:
                 pass
 
-        pending["job"] = root.after(
-            80,
-            lambda: responsive_update(root),
-        )
+        try:
+            state["job"] = root.after(
+                80,
+                lambda: _refresh(root),
+            )
+        except tk.TclError:
+            pass
 
     root.bind(
         "<Configure>",
-        schedule_update,
+        schedule_refresh,
         add="+",
     )
 
     root.after_idle(
-        lambda: responsive_update(root)
+        lambda: _refresh(root)
     )
+
+
+def build_standard_toolbar(
+    parent,
+    *,
+    fit_command=None,
+    theme_command=None,
+    close_command=None,
+):
+    """
+    Standard top-right toolbar shared by Bookings and Events.
+
+    Layout:
+        [Fit columns]    ...    [Theme] [Close]
+
+    On small windows it reflows while preserving the same order.
+    """
+
+    toolbar = ttk.Frame(parent)
+
+    buttons = []
+
+    if fit_command is not None:
+        fit = ttk.Button(
+            toolbar,
+            text="Adatta colonne",
+            command=fit_command,
+            style="Neutral.TButton",
+        )
+        buttons.append(fit)
+
+    if theme_command is not None:
+        theme = ttk.Button(
+            toolbar,
+            text="Tema",
+            command=theme_command,
+            style="Neutral.TButton",
+        )
+        buttons.append(theme)
+
+    if close_command is not None:
+        close = ttk.Button(
+            toolbar,
+            text="Chiudi",
+            command=close_command,
+            style="Neutral.TButton",
+        )
+        buttons.append(close)
+
+    toolbar._cowodlaval_toolbar_buttons = buttons
+
+    def layout(width=None):
+        if width is None:
+            try:
+                width = parent.winfo_width()
+            except tk.TclError:
+                width = 1200
+
+        for button in buttons:
+            button.grid_forget()
+
+        for column in range(6):
+            toolbar.grid_columnconfigure(
+                column,
+                weight=0,
+            )
+
+        if width >= 900:
+            # Keep Fit on the left and Theme/Close aligned to right.
+            toolbar.grid_columnconfigure(
+                1,
+                weight=1,
+            )
+
+            index = 0
+
+            if fit_command is not None:
+                buttons[index].grid(
+                    row=0,
+                    column=0,
+                    sticky="w",
+                    padx=(0, 5),
+                    pady=3,
+                )
+                index += 1
+
+            if theme_command is not None:
+                buttons[index].grid(
+                    row=0,
+                    column=2,
+                    sticky="e",
+                    padx=5,
+                    pady=3,
+                )
+                index += 1
+
+            if close_command is not None:
+                buttons[index].grid(
+                    row=0,
+                    column=3,
+                    sticky="e",
+                    padx=(5, 0),
+                    pady=3,
+                )
+
+        else:
+            # Small windows: two rows, same semantic order.
+            toolbar.grid_columnconfigure(
+                0,
+                weight=1,
+            )
+            toolbar.grid_columnconfigure(
+                1,
+                weight=1,
+            )
+
+            index = 0
+
+            if fit_command is not None:
+                buttons[index].grid(
+                    row=0,
+                    column=0,
+                    columnspan=2,
+                    sticky="ew",
+                    padx=3,
+                    pady=3,
+                )
+                index += 1
+
+            if theme_command is not None:
+                buttons[index].grid(
+                    row=1,
+                    column=0,
+                    sticky="ew",
+                    padx=3,
+                    pady=3,
+                )
+                index += 1
+
+            if close_command is not None:
+                buttons[index].grid(
+                    row=1,
+                    column=1,
+                    sticky="ew",
+                    padx=3,
+                    pady=3,
+                )
+
+    toolbar._cowodlaval_layout = layout
+
+    return toolbar
