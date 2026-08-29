@@ -23,3 +23,6 @@ USER django
 EXPOSE 8000
 
 ENTRYPOINT ["/app/entrypoint.sh"]
+
+# cowodlaval-stats-launcher-permissions
+RUN chmod +x /app/scripts/stats_dashboard_gui.sh

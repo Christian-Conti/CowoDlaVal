@@ -1,5 +1,189 @@
 #!/bin/sh
 
+# >>> cowodlaval-stats-desktop >>>
+
+_COWO_STATS_ACTION="${1:-install}"
+
+_COWO_STATS_HOME="${COWODLAVAL_HOST_HOME:-/host-home}"
+_COWO_STATS_HOME_PATH="${COWODLAVAL_HOST_HOME_PATH:-$HOME}"
+_COWO_STATS_PROJECT="${COWODLAVAL_HOST_PROJECT_DIR:-$PWD}"
+
+if [ ! -d "$_COWO_STATS_HOME" ]; then
+    _COWO_STATS_HOME="$HOME"
+    _COWO_STATS_HOME_PATH="$HOME"
+fi
+
+
+_cowo_stats_install() {
+
+    echo "Installing Cowo d'la val Statistics integration..."
+
+    mkdir -p \
+        "$_COWO_STATS_HOME/.local/bin" \
+        "$_COWO_STATS_HOME/.local/share/applications"
+
+
+    # --------------------------------------------------------
+    # CLI / GUI launcher
+    # --------------------------------------------------------
+
+    cat > "$_COWO_STATS_HOME/.local/bin/cowodlaval-stats" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$_COWO_STATS_PROJECT"
+
+MODE="\${1:---gui}"
+
+case "\$MODE" in
+
+    --gui)
+        shift || true
+
+        exec \
+            "$_COWO_STATS_PROJECT/scripts/stats_dashboard_gui.sh" \
+            "\$@"
+        ;;
+
+    --cli)
+        shift || true
+
+        exec docker compose exec web \
+            python manage.py stats_cli \
+            "\$@"
+        ;;
+
+    --help|-h)
+        echo
+        echo "Cowo d'la val · Statistiche"
+        echo
+        echo "Usage:"
+        echo "  cowodlaval-stats"
+        echo "  cowodlaval-stats --gui"
+        echo "  cowodlaval-stats --cli"
+        echo "  cowodlaval-stats --cli --days 30"
+        echo "  cowodlaval-stats --cli --days 90 --trend"
+        echo "  cowodlaval-stats --cli --all"
+        echo
+        ;;
+
+    *)
+        echo "Unknown option: \$MODE" >&2
+        exit 2
+        ;;
+
+esac
+EOF
+
+    chmod +x \
+        "$_COWO_STATS_HOME/.local/bin/cowodlaval-stats"
+
+
+    # --------------------------------------------------------
+    # Application menu
+    # --------------------------------------------------------
+
+    cat > \
+        "$_COWO_STATS_HOME/.local/share/applications/cowodlaval-stats.desktop" \
+        <<EOF
+[Desktop Entry]
+Type=Application
+Version=1.0
+
+Name=Cowo d'la val · Statistiche
+GenericName=Booking statistics
+Comment=Statistiche e andamento delle prenotazioni
+
+Exec=$_COWO_STATS_HOME_PATH/.local/bin/cowodlaval-stats --gui
+
+Icon=utilities-system-monitor
+
+Terminal=false
+StartupNotify=true
+
+Categories=System;Monitor;Utility;
+
+Keywords=coworking;booking;prenotazioni;statistiche;statistics;monitor;
+EOF
+
+    chmod +x \
+        "$_COWO_STATS_HOME/.local/share/applications/cowodlaval-stats.desktop"
+
+
+    # --------------------------------------------------------
+    # Desktop shortcut, if desktop directory exists
+    # --------------------------------------------------------
+
+    for desktop_dir in Desktop Scrivania
+    do
+        if [ -d "$_COWO_STATS_HOME/$desktop_dir" ]; then
+
+            ln -sfn \
+                "$_COWO_STATS_HOME_PATH/.local/share/applications/cowodlaval-stats.desktop" \
+                "$_COWO_STATS_HOME/$desktop_dir/Cowo d'la val - Statistiche.desktop"
+
+        fi
+    done
+
+
+    # --------------------------------------------------------
+    # Correct ownership when running from Docker
+    # --------------------------------------------------------
+
+    if command -v stat >/dev/null 2>&1 \
+       && command -v chown >/dev/null 2>&1
+    then
+
+        _COWO_STATS_OWNER="$(
+            stat -c '%u:%g' \
+                "$_COWO_STATS_HOME" \
+                2>/dev/null \
+                || true
+        )"
+
+        if [ -n "$_COWO_STATS_OWNER" ]; then
+
+            chown \
+                "$_COWO_STATS_OWNER" \
+                "$_COWO_STATS_HOME/.local/bin/cowodlaval-stats" \
+                "$_COWO_STATS_HOME/.local/share/applications/cowodlaval-stats.desktop" \
+                2>/dev/null \
+                || true
+        fi
+    fi
+
+    echo "Statistics launcher installed:"
+    echo "  $_COWO_STATS_HOME_PATH/.local/bin/cowodlaval-stats"
+}
+
+
+_cowo_stats_remove() {
+
+    echo "Removing Cowo d'la val Statistics integration..."
+
+    rm -f \
+        "$_COWO_STATS_HOME/.local/bin/cowodlaval-stats" \
+        "$_COWO_STATS_HOME/.local/share/applications/cowodlaval-stats.desktop" \
+        "$_COWO_STATS_HOME/Desktop/Cowo d'la val - Statistiche.desktop" \
+        "$_COWO_STATS_HOME/Scrivania/Cowo d'la val - Statistiche.desktop"
+}
+
+
+case "$_COWO_STATS_ACTION" in
+
+    install|up|start)
+        _cowo_stats_install
+        ;;
+
+    remove|uninstall|down|stop)
+        _cowo_stats_remove
+        ;;
+
+esac
+
+# <<< cowodlaval-stats-desktop <<<
+
+
 set -eu
 
 ACTION="${1:-}"
@@ -386,3 +570,4 @@ case "$ACTION" in
         exit 2
         ;;
 esac
+
