@@ -34,19 +34,134 @@
             {% if booking.can_user_modify %}
                 <a class="button secondary action-button action-button--secondary" href="{% url 'booking_modify' booking.id %}">{% translate "Modify booking" %}</a>
             {% endif %}
-            {% if booking.can_user_cancel %}
-                <form method="post" action="{% url 'booking_cancel' booking.id %}">
-                    {% csrf_token %}
-                    <button class="danger-button action-button action-button--danger" type="submit">{% translate "Cancel booking" %}</button>
-                </form>
+            {# >>> cowodlaval-cancellation-policy >>> #}
+
+{% if booking.cancellation_penalty_applies %}
+
+    {% get_current_language as LANGUAGE_CODE %}
+    {% with lang=LANGUAGE_CODE|slice:":2" %}
+
+        <div class="policy-notice cancellation-warning">
+
+            {% if lang == "it" %}
+
+                <strong>
+                    La cancellazione autonoma non è più disponibile.
+                </strong>
+
+                <p>
+                    Mancano meno di 12 ore all'inizio della prenotazione.
+                    Non puoi più cancellarla autonomamente.
+                </p>
+
+                <p>
+                    In caso di cancellazione è previsto un rimborso spese
+                    pari al <strong>50% dell'importo della prenotazione</strong>
+                    (€{{ booking.cancellation_penalty_amount|floatformat:2 }}).
+                    Contatta lo staff del coworking per gestire la cancellazione.
+                </p>
+
+            {% elif lang == "fr" %}
+
+                <strong>
+                    L'annulation autonome n'est plus disponible.
+                </strong>
+
+                <p>
+                    La réservation commence dans moins de 12 heures.
+                    Vous ne pouvez plus l'annuler vous-même.
+                </p>
+
+                <p>
+                    En cas d'annulation, des frais correspondant à
+                    <strong>50 % du montant de la réservation</strong>
+                    (€{{ booking.cancellation_penalty_amount|floatformat:2 }})
+                    s'appliquent.
+                    Veuillez contacter l'équipe du coworking.
+                </p>
+
+            {% elif lang == "de" %}
+
+                <strong>
+                    Die selbstständige Stornierung ist nicht mehr möglich.
+                </strong>
+
+                <p>
+                    Die Buchung beginnt in weniger als 12 Stunden.
+                    Sie können sie nicht mehr selbstständig stornieren.
+                </p>
+
+                <p>
+                    Bei einer Stornierung wird eine Gebühr in Höhe von
+                    <strong>50 % des Buchungsbetrags</strong>
+                    (€{{ booking.cancellation_penalty_amount|floatformat:2 }})
+                    fällig.
+                    Bitte wenden Sie sich an das Coworking-Team.
+                </p>
+
+            {% else %}
+
+                <strong>
+                    Autonomous cancellation is no longer available.
+                </strong>
+
+                <p>
+                    The booking starts in less than 12 hours.
+                    You can no longer cancel it yourself.
+                </p>
+
+                <p>
+                    A charge equal to
+                    <strong>50% of the booking amount</strong>
+                    (€{{ booking.cancellation_penalty_amount|floatformat:2 }})
+                    applies.
+                    Please contact the coworking staff.
+                </p>
+
             {% endif %}
+
         </div>
 
-        {% if booking.can_user_cancel %}
-            <p class="policy-notice">{% translate "Only bookings with payment in person can be cancelled autonomously. For cancellations less than 12 hours before the booking, a 50% expense reimbursement is requested." %}</p>
-        {% elif booking.payment_method != "onsite" %}
-            <p class="policy-notice">{% translate "Online-paid bookings cannot be cancelled or modified automatically. Contact the coworking staff if you need a change or refund." %}</p>
-        {% endif %}
+    {% endwith %}
+
+{% elif booking.can_user_cancel %}
+
+    {% get_current_language as LANGUAGE_CODE %}
+    {% with lang=LANGUAGE_CODE|slice:":2" %}
+
+        <div class="policy-notice cancellation-allowed">
+
+            {% if lang == "it" %}
+                Puoi cancellare autonomamente questa prenotazione fino
+                a 12 ore prima dell'orario di apertura della postazione.
+
+            {% elif lang == "fr" %}
+                Vous pouvez annuler cette réservation vous-même jusqu'à
+                12 heures avant l'heure d'ouverture du poste.
+
+            {% elif lang == "de" %}
+                Sie können diese Buchung bis 12 Stunden vor der
+                Öffnungszeit des Arbeitsplatzes selbstständig stornieren.
+
+            {% else %}
+                You can cancel this booking autonomously until
+                12 hours before the desk opening time.
+
+            {% endif %}
+
+        </div>
+
+    {% endwith %}
+
+{% elif booking.payment_method != "onsite" %}
+
+    <div class="policy-notice">
+        {% translate "Online-paid bookings cannot be cancelled or modified automatically. Contact the coworking staff if you need a change or refund." %}
+    </div>
+
+{% endif %}
+
+{# <<< cowodlaval-cancellation-policy <<< #}
     </section>
 </section>
 {% endblock %}

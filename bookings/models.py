@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import secrets
 import uuid
 
@@ -92,9 +93,6 @@ class Booking(models.Model):
         if self.end_date and self.end_date < self.date:
             raise ValidationError({"end_date": _("End date must be after or equal to start date.")})
 
-    @property
-    def can_user_cancel(self) -> bool:
-        return self.status == self.Status.CONFIRMED and self.payment_method == self.PaymentMethod.ONSITE
 
     @property
     def can_user_modify(self) -> bool:
@@ -110,6 +108,60 @@ class Booking(models.Model):
         if payment is None:
             return ""
         return payment.transaction_id or payment.external_id or payment.checkout_id
+
+
+    @property
+    def cancellation_deadline(self):
+        """
+        Return the deadline for autonomous cancellation.
+
+        Onsite bookings can be cancelled autonomously until
+        12 hours before the desk opening time.
+        """
+        booking_start = datetime.combine(
+            self.date,
+            self.space.opening_time,
+        )
+
+        booking_start = timezone.make_aware(
+            booking_start,
+            timezone.get_current_timezone(),
+        )
+
+        return booking_start - timedelta(hours=12)
+
+    @property
+    def can_user_cancel(self):
+        """
+        Return whether the customer can autonomously cancel the booking.
+        """
+        if self.status != self.Status.CONFIRMED:
+            return False
+
+        if self.payment_method != self.PaymentMethod.ONSITE:
+            return False
+
+        return timezone.now() < self.cancellation_deadline
+
+    @property
+    def cancellation_penalty_applies(self):
+        """
+        Return whether the autonomous cancellation window has closed.
+        """
+        if self.status != self.Status.CONFIRMED:
+            return False
+
+        if self.payment_method != self.PaymentMethod.ONSITE:
+            return False
+
+        return timezone.now() >= self.cancellation_deadline
+
+    @property
+    def cancellation_penalty_amount(self):
+        """
+        Return the 50 percent late-cancellation charge.
+        """
+        return self.amount / 2
 
 
 class Payment(models.Model):

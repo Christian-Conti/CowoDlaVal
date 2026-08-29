@@ -7,3 +7,5 @@ credentials/
 *.sql
 *.sql.gz
 .docker/
+
+event_uploads/

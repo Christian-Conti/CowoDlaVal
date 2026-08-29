@@ -71,6 +71,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - ./event_uploads:/event_uploads:ro
       - ./secrets:/run/secrets:ro
 
 volumes:

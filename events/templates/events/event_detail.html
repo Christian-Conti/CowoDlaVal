@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load event_i18n %}
+
+{% block title %}{{ event.display_title }} · {% event_t "Events" %}{% endblock %}
+
+{% block content %}
+<style>
+.event-detail{width:min(1050px,calc(100% - 2rem));margin:2rem auto 4rem}.event-detail-head{margin-bottom:1.5rem}.event-detail-meta{font-weight:700;opacity:.78;margin:.5rem 0 1rem}.event-detail-lead{font-size:1.12rem;line-height:1.65}.event-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.5rem 0 2rem}.event-gallery img{width:100%;height:300px;object-fit:cover;border-radius:1rem;border:1px solid color-mix(in srgb,currentColor 14%,transparent)}.event-description{white-space:pre-line;line-height:1.7}.event-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:2rem}.event-action{display:inline-flex;align-items:center;justify-content:center;min-height:2.7rem;padding:.55rem 1rem;border-radius:.8rem;text-decoration:none;font-weight:700;border:1px solid currentColor}.event-action-primary{background:#747cff;color:white;border-color:#747cff}
+</style>
+<article class="event-detail">
+  <header class="event-detail-head">
+    <a href="{% url 'events:list' %}">← {% event_t "Events" %}</a>
+    <h1>{{ event.display_title }}</h1>
+    <div class="event-detail-meta">{{ event.date|date:"DATE_FORMAT" }}{% if event.time %} · {{ event.time|time:"TIME_FORMAT" }}{% endif %}{% if event.location %} · {{ event.location }}{% endif %}</div>
+    {% if event.display_short_description %}<p class="event-detail-lead">{{ event.display_short_description }}</p>{% endif %}
+  </header>
+  {% if event.images.all %}<div class="event-gallery">{% for image in event.images.all %}<img src="{% url 'events:image' image.pk %}" alt="{{ event.display_title }}" loading="lazy">{% endfor %}</div>{% endif %}
+  {% if event.display_description %}<div class="event-description">{{ event.display_description }}</div>{% endif %}
+  {% if user.is_superuser %}<div class="event-actions"><a class="event-action event-action-primary" href="{% url 'events:edit' event.pk %}">{% event_t "Edit event" %}</a><a class="event-action" href="{% url 'events:delete' event.pk %}">{% event_t "Delete event" %}</a></div>{% endif %}
+</article>
+{% endblock %}

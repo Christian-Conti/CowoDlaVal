@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load event_i18n %}
+
+{% block title %}{% event_t "Delete event" %}{% endblock %}
+
+{% block content %}
+<section style="width:min(760px,calc(100% - 2rem));margin:3rem auto;">
+  <h1>{% event_t "Delete event" %}</h1>
+  <p>{% event_t "Are you sure you want to delete this event?" %} <strong>{{ object.display_title }}</strong></p>
+  <form method="post" style="display:flex;gap:.75rem;flex-wrap:wrap;">{% csrf_token %}<button type="submit">{% event_t "Delete event" %}</button><a href="{{ object.get_absolute_url }}">{% event_t "Cancel" %}</a></form>
+</section>
+{% endblock %}

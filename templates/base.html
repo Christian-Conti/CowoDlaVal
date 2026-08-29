@@ -1,4 +1,5 @@
 {% load static i18n %}
+{% load event_i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 <!doctype html>
 <html lang="{{ LANGUAGE_CODE }}">
@@ -20,6 +21,7 @@
             <span class="brand-sub">D'LA VAL</span>
         </a>
         <div class="nav-links">
+            <a href="{% url 'events:list' %}">{% event_t "Events" %}</a>
             <a href="{% url 'home' %}#booking">{% translate "Book" %}</a>
             <a href="{% url 'home' %}#details">{% translate "Details" %}</a>
             <a href="{% url 'contact' %}">{% translate "Contact" %}</a>
@@ -42,6 +44,7 @@
                 <span>{% translate "Menu" %}</span>
             </summary>
             <div class="mobile-menu-panel">
+                <a href="{% url 'events:list' %}">{% event_t "Events" %}</a>
                 <a href="{% url 'home' %}#booking">{% translate "Book" %}</a>
                 <a href="{% url 'home' %}#details">{% translate "Details" %}</a>
                 <a href="{% url 'contact' %}">{% translate "Contact" %}</a>
@@ -70,7 +73,8 @@
                 <option value="fr" {% if LANGUAGE_CODE == "fr" %}selected{% endif %}>FR</option>
             </select>
         </form>
-    </nav>
+    
+</nav>
 </header>
 
 <main>

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load event_i18n %}
+
+{% block title %}{% if object %}{% event_t "Edit event" %}{% else %}{% event_t "Add event" %}{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+.event-form-page{width:min(980px,calc(100% - 2rem));margin:2rem auto 4rem}.event-form{display:grid;gap:1rem}.event-form p{margin:0;display:grid;gap:.4rem}.event-form input:not([type=checkbox]),.event-form textarea,.event-form select{width:100%;box-sizing:border-box;padding:.7rem .8rem;border:1px solid color-mix(in srgb,currentColor 22%,transparent);border-radius:.7rem;color:inherit;background:Canvas}.event-form textarea{resize:vertical}.event-form .helptext{opacity:.7;font-size:.9rem}.event-form .errorlist{color:#d84a64;margin:0}.event-form-actions,.event-existing-images{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem}.event-form-button{min-height:2.7rem;padding:.55rem 1rem;border-radius:.8rem;font:inherit;font-weight:700;border:1px solid currentColor;cursor:pointer;text-decoration:none;color:inherit;background:transparent}.event-form-button-primary{background:#747cff;color:white;border-color:#747cff}.existing-image-card{width:180px}.existing-image-card img{width:100%;height:120px;object-fit:cover;border-radius:.7rem;margin-bottom:.4rem}
+</style>
+<section class="event-form-page">
+  <h1>{% if object %}{% event_t "Edit event" %}{% else %}{% event_t "Add event" %}{% endif %}</h1>
+  <form class="event-form" method="post" enctype="multipart/form-data">{% csrf_token %}{{ form.as_p }}<div class="event-form-actions"><button class="event-form-button event-form-button-primary" type="submit">{% event_t "Save" %}</button><a class="event-form-button" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'events:list' %}{% endif %}">{% event_t "Cancel" %}</a></div></form>
+  {% if object and object.images.exists %}<h2>{% event_t "Current images" %}</h2><div class="event-existing-images">{% for image in object.images.all %}<div class="existing-image-card"><img src="{% url 'events:image' image.pk %}" alt="{{ object.display_title }}"><form method="post" action="{% url 'events:image_delete' image.pk %}">{% csrf_token %}<button class="event-form-button" type="submit">{% event_t "Remove image" %}</button></form></div>{% endfor %}</div>{% endif %}
+</section>
+{% endblock %}

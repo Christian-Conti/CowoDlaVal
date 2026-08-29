@@ -381,3 +381,31 @@ Direct launch for testing:
 ```bash
 docker compose exec web python manage.py bookings_dashboard_gui
 ```
+
+
+<!-- COWODLAVAL_EVENTS_APP -->
+## Events
+
+The public events page is available at `/events/`. Only public events whose
+scheduled date is today or later appear in the list; an event remains visible
+through its event day and disappears from the public list the following day.
+Each event supports Italian, English, German and French content and multiple
+images.
+
+Only Django superusers can create, edit and delete events from the web.
+
+CLI management:
+
+    docker compose exec web python manage.py events_dashboard
+    docker compose exec web python manage.py events_dashboard --add
+    docker compose exec web python manage.py events_dashboard --publish EVENT_ID
+    docker compose exec web python manage.py events_dashboard --unpublish EVENT_ID
+    docker compose exec web python manage.py events_dashboard --add-image EVENT_ID /path/image.jpg
+
+Graphical management from the server monitor or SSH X11 session:
+
+    ./scripts/events_dashboard_gui.sh
+
+The desktop-integration lifecycle hook installs both the booking manager and
+event manager launchers on `docker compose up` and removes both on
+`docker compose down`.
