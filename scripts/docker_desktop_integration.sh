@@ -3,70 +3,41 @@
 set -eu
 
 ACTION="${1:-}"
-
 HOST_HOME="${COWODLAVAL_HOST_HOME:-/host-home}"
 HOST_HOME_PATH="${COWODLAVAL_HOST_HOME_PATH:-}"
 HOST_PROJECT_DIR="${COWODLAVAL_HOST_PROJECT_DIR:-}"
-HOST_BIN="${COWODLAVAL_HOST_BIN:-/host-usr-local-bin}"
-
-APP_NAME="Cowo d'la val - Prenotazioni"
-DESKTOP_FILE_NAME="cowodlaval-bookings.desktop"
-COMMAND_NAME="cowodlaval-bookings"
-
-APPLICATIONS_DIR="$HOST_HOME/.local/share/applications"
-
-COMMAND_PATH="$HOST_BIN/$COMMAND_NAME"
-APPLICATION_PATH="$APPLICATIONS_DIR/$DESKTOP_FILE_NAME"
-
 
 if [ -z "$HOST_HOME_PATH" ] || [ -z "$HOST_PROJECT_DIR" ]; then
-    echo "Missing host path configuration." >&2
+    echo "Missing COWODLAVAL_HOST_HOME_PATH or COWODLAVAL_HOST_PROJECT_DIR." >&2
     exit 1
 fi
-
 
 if [ ! -d "$HOST_HOME" ]; then
-    echo "Host home directory not mounted: $HOST_HOME" >&2
+    echo "Mounted host home directory not found: $HOST_HOME" >&2
     exit 1
 fi
-
-
-if [ ! -d "$HOST_BIN" ]; then
-    echo "Host /usr/local/bin directory not mounted: $HOST_BIN" >&2
-    exit 1
-fi
-
 
 OWNER="$(stat -c '%u:%g' "$HOST_HOME")"
-
+APPLICATIONS_DIR="$HOST_HOME/.local/share/applications"
+BIN_DIR="$HOST_HOME/.local/bin"
 
 find_desktop_dir() {
     config_file="$HOST_HOME/.config/user-dirs.dirs"
     desktop_value=""
 
     if [ -f "$config_file" ]; then
-        desktop_value="$(
-            grep '^XDG_DESKTOP_DIR=' "$config_file" 2>/dev/null \
-                | head -n 1 \
-                | cut -d= -f2-
-        )"
-
+        desktop_value="$(grep '^XDG_DESKTOP_DIR=' "$config_file" 2>/dev/null | head -n 1 | cut -d= -f2-)"
         desktop_value="${desktop_value#\"}"
         desktop_value="${desktop_value%\"}"
     fi
 
     case "$desktop_value" in
         '$HOME'/*)
-            printf '%s/%s\n' \
-                "$HOST_HOME" \
-                "${desktop_value#\$HOME/}"
+            printf '%s/%s\n' "$HOST_HOME" "${desktop_value#\$HOME/}"
             return
             ;;
-
         "$HOST_HOME_PATH"/*)
-            printf '%s/%s\n' \
-                "$HOST_HOME" \
-                "${desktop_value#"$HOST_HOME_PATH"/}"
+            printf '%s/%s\n' "$HOST_HOME" "${desktop_value#"$HOST_HOME_PATH"/}"
             return
             ;;
     esac
@@ -78,140 +49,113 @@ find_desktop_dir() {
 
     if [ -d "$HOST_HOME/Scrivania" ]; then
         printf '%s\n' "$HOST_HOME/Scrivania"
-        return
     fi
 }
 
+install_one() {
+    launcher_name="$1"
+    desktop_name="$2"
+    app_name="$3"
+    comment="$4"
+    script_name="$5"
+    icon="$6"
 
-remove_legacy_files() {
-    # Remove old launcher previously installed under ~/.local/bin.
-    rm -f \
-        "$HOST_HOME/.local/bin/cowodlaval-bookings" \
-        "$HOST_HOME/.local/bin/cowodlaval-db-controller"
+    launcher_path="$BIN_DIR/$launcher_name"
+    application_path="$APPLICATIONS_DIR/$desktop_name"
 
-    rm -f \
-        "$APPLICATIONS_DIR/cowodlaval-db-controller.desktop" \
-        "$APPLICATIONS_DIR/cowodlaval-bookings-gui.desktop"
+    cat > "$launcher_path" <<EOF_LAUNCHER
+#!/usr/bin/env bash
+exec "$HOST_PROJECT_DIR/scripts/$script_name" "\$@"
+EOF_LAUNCHER
 
-    for directory in \
-        "$HOST_HOME/Desktop" \
-        "$HOST_HOME/Scrivania" \
-        "$(find_desktop_dir || true)"
-    do
+    chmod 755 "$launcher_path"
+    chown "$OWNER" "$launcher_path"
+
+    cat > "$application_path" <<EOF_DESKTOP
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=$app_name
+Comment=$comment
+Exec="$HOST_HOME_PATH/.local/bin/$launcher_name"
+Icon=$icon
+Terminal=false
+Categories=Office;Utility;
+StartupNotify=true
+EOF_DESKTOP
+
+    chmod 755 "$application_path"
+    chown "$OWNER" "$application_path"
+
+    desktop_dir="$(find_desktop_dir || true)"
+    if [ -n "$desktop_dir" ] && [ -d "$desktop_dir" ]; then
+        desktop_path="$desktop_dir/$desktop_name"
+        rm -f "$desktop_path"
+        ln -s "$HOST_HOME_PATH/.local/share/applications/$desktop_name" "$desktop_path"
+        chown -h "$OWNER" "$desktop_path" 2>/dev/null || true
+    fi
+}
+
+remove_one() {
+    launcher_name="$1"
+    desktop_name="$2"
+
+    rm -f "$BIN_DIR/$launcher_name" "$APPLICATIONS_DIR/$desktop_name"
+
+    for directory in "$HOST_HOME/Desktop" "$HOST_HOME/Scrivania" "$(find_desktop_dir || true)"; do
         if [ -n "$directory" ] && [ -d "$directory" ]; then
-            rm -f \
-                "$directory/cowodlaval-db-controller.desktop" \
-                "$directory/cowodlaval-bookings-gui.desktop"
+            rm -f "$directory/$desktop_name"
         fi
     done
 }
 
-
-install_integration() {
-    echo "Installing Cowo d'la val host integration..."
-
-    remove_legacy_files
-
-    mkdir -p "$APPLICATIONS_DIR"
-
-    # ========================================================
-    # CLI / GUI launcher
-    # ========================================================
-
-    rm -f "$COMMAND_PATH"
-
-    ln -s \
-        "$HOST_PROJECT_DIR/scripts/bookings_dashboard.sh" \
-        "$COMMAND_PATH"
-
-    chmod +x "$HOST_HOME/CowoDlaVal/scripts/bookings_dashboard.sh" \
-        2>/dev/null || true
-
-    echo "Launcher installed:"
-    echo "  /usr/local/bin/$COMMAND_NAME"
-
-
-    # ========================================================
-    # Main application menu
-    # ========================================================
-
-    cat > "$APPLICATION_PATH" <<DESKTOP
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=$APP_NAME
-Comment=Open the Cowo d'la val bookings manager
-Exec=/usr/local/bin/$COMMAND_NAME --gui
-Icon=utilities-system-monitor
-Terminal=false
-Categories=Office;Utility;
-StartupNotify=true
-DESKTOP
-
-    chmod 755 "$APPLICATION_PATH"
-    chown "$OWNER" "$APPLICATION_PATH"
-
-    echo "Application menu entry installed."
-
-
-    # ========================================================
-    # Desktop shortcut
-    # ========================================================
-
-    desktop_dir="$(find_desktop_dir || true)"
-
-    if [ -n "$desktop_dir" ] && [ -d "$desktop_dir" ]; then
-        desktop_path="$desktop_dir/$DESKTOP_FILE_NAME"
-
-        rm -f "$desktop_path"
-
-        ln -s \
-            "$HOST_HOME_PATH/.local/share/applications/$DESKTOP_FILE_NAME" \
-            "$desktop_path"
-
-        chown -h "$OWNER" "$desktop_path" 2>/dev/null || true
-
-        echo "Desktop shortcut installed."
-    fi
-}
-
-
-uninstall_integration() {
-    echo "Removing Cowo d'la val host integration..."
-
-    desktop_dir="$(find_desktop_dir || true)"
+install_launchers() {
+    mkdir -p "$APPLICATIONS_DIR" "$BIN_DIR"
+    chown "$OWNER" "$HOST_HOME/.local" "$HOST_HOME/.local/share" "$APPLICATIONS_DIR" "$BIN_DIR" 2>/dev/null || true
 
     rm -f \
-        "$COMMAND_PATH" \
-        "$APPLICATION_PATH"
+        "$BIN_DIR/cowodlaval-db-controller" \
+        "$APPLICATIONS_DIR/cowodlaval-db-controller.desktop" \
+        "$APPLICATIONS_DIR/cowodlaval-bookings-gui.desktop"
 
-    if [ -n "$desktop_dir" ] && [ -d "$desktop_dir" ]; then
-        rm -f "$desktop_dir/$DESKTOP_FILE_NAME"
-    fi
+    install_one \
+        "cowodlaval-bookings" \
+        "cowodlaval-bookings.desktop" \
+        "Cowo d'la val - Prenotazioni" \
+        "Gestisci le prenotazioni Cowo d'la val" \
+        "bookings_dashboard_gui.sh" \
+        "utilities-system-monitor"
 
-    if [ -d "$HOST_HOME/Desktop" ]; then
-        rm -f "$HOST_HOME/Desktop/$DESKTOP_FILE_NAME"
-    fi
+    install_one \
+        "cowodlaval-events" \
+        "cowodlaval-events.desktop" \
+        "Cowo d'la val - Eventi" \
+        "Gestisci gli eventi Cowo d'la val" \
+        "events_dashboard_gui.sh" \
+        "x-office-calendar"
 
-    if [ -d "$HOST_HOME/Scrivania" ]; then
-        rm -f "$HOST_HOME/Scrivania/$DESKTOP_FILE_NAME"
-    fi
-
-    remove_legacy_files
-
-    echo "Cowo d'la val host integration removed."
+    echo "Cowo d'la val booking and event launchers installed."
 }
 
+uninstall_launchers() {
+    remove_one "cowodlaval-bookings" "cowodlaval-bookings.desktop"
+    remove_one "cowodlaval-events" "cowodlaval-events.desktop"
+
+    rm -f \
+        "$BIN_DIR/cowodlaval-db-controller" \
+        "$APPLICATIONS_DIR/cowodlaval-db-controller.desktop" \
+        "$APPLICATIONS_DIR/cowodlaval-bookings-gui.desktop"
+
+    echo "Cowo d'la val desktop integration removed."
+}
 
 case "$ACTION" in
     install)
-        install_integration
+        install_launchers
         ;;
-
     uninstall)
-        uninstall_integration
+        uninstall_launchers
         ;;
-
     *)
         echo "Usage: $0 {install|uninstall}" >&2
         exit 1
