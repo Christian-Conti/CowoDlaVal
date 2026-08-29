@@ -1,4 +1,4 @@
-from config.gui_theme import apply_cowodlaval_theme
+from config.gui_theme import install_unified_gui
 from datetime import datetime
 import mimetypes
 from pathlib import Path
@@ -168,7 +168,7 @@ class EventManagerGUI:
         self.filedialog = filedialog
         self.messagebox = messagebox
         self.root = tk.Tk()
-        apply_cowodlaval_theme(self.root)
+        install_unified_gui(self.root)
         self.root.title("Cowo d'la val - Eventi")
         self.root.geometry("1280x850")
         self.root.minsize(900, 620)
