@@ -5,7 +5,7 @@ the user's full name on the public availability page.
 
 ## Included hardening
 
-- Dedicated production Compose stack with Caddy automatic HTTPS.
+- Shared Compose base with a small production override and Caddy automatic HTTPS.
 - Gunicorn is not published directly in production.
 - PostgreSQL and Redis are reachable only on an internal Docker network.
 - Redis-backed rate limiting for login, signup, password reset, contact form,

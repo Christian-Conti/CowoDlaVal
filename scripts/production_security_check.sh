@@ -10,17 +10,20 @@ set -euo pipefail
 
 docker compose \
     --env-file .env.production \
+    -f compose.yaml \
     -f compose.prod.yaml \
     config >/dev/null
 
 docker compose \
     --env-file .env.production \
+    -f compose.yaml \
     -f compose.prod.yaml \
     run --rm web \
     python manage.py check --deploy
 
 docker compose \
     --env-file .env.production \
+    -f compose.yaml \
     -f compose.prod.yaml \
     run --rm web \
     python manage.py test
