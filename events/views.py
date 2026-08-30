@@ -5,6 +5,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_POST
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -104,9 +105,15 @@ def event_image(request, pk):
             raise Http404
 
     response = HttpResponse(bytes(image.data), content_type=image.content_type)
-    safe_name = image.original_name.replace('"', "")
-    response["Content-Disposition"] = f'inline; filename="{safe_name}"'
-    response["Cache-Control"] = "public, max-age=3600"
+    response["Content-Disposition"] = content_disposition_header(
+        False,
+        image.original_name,
+    )
+    if image.event.is_public:
+        response["Cache-Control"] = "public, max-age=3600"
+    else:
+        response["Cache-Control"] = "private, no-store"
+        response["Pragma"] = "no-cache"
     return response
 
 

@@ -38,9 +38,7 @@ def home(request):
             space.booked_by_name = ""
             continue
 
-        full_name = booking.user.get_full_name().strip()
-        space.booked_by_name = full_name or booking.user.get_username()
-
+        space.booked_by_name = booking.user.get_username()
     return render(
         request,
         "home.html",

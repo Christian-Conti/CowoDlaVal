@@ -39,8 +39,9 @@ class EmailAuthenticationForm(AuthenticationForm):
                 UserModel.DoesNotExist,
                 UserModel.MultipleObjectsReturned,
             ):
+                # Run one password hash to reduce account-enumeration timing differences.
+                UserModel().set_password(password)
                 raise self.get_invalid_login_error()
-
             if not user.check_password(password):
                 raise self.get_invalid_login_error()
 

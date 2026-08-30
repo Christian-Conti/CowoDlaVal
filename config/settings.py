@@ -1,4 +1,5 @@
 from pathlib import Path
+from urllib.parse import urlsplit
 import os
 
 import dj_database_url
@@ -27,15 +28,38 @@ def env_list(name: str, default: str = "") -> list[str]:
 
 
 DEBUG = env_bool("DJANGO_DEBUG", False)
+
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "")
 if not SECRET_KEY:
     raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set.")
 
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost" if DEBUG else "")
+ALLOWED_HOSTS = env_list(
+    "DJANGO_ALLOWED_HOSTS",
+    "127.0.0.1,localhost" if DEBUG else "",
+)
 if not DEBUG and not ALLOWED_HOSTS:
     raise ImproperlyConfigured("DJANGO_ALLOWED_HOSTS must be set in production.")
 
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
+
+CACHE_URL = os.getenv("CACHE_URL", "")
+if CACHE_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": CACHE_URL,
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "cowodlaval-security",
+        }
+    }
+
+RATE_LIMITS_ENABLED = env_bool("DJANGO_RATE_LIMITS_ENABLED", not DEBUG)
+BEHIND_PROXY = env_bool("DJANGO_BEHIND_PROXY", False)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -52,10 +76,12 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "config.security_middleware.SecurityHeadersMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "config.security_middleware.RateLimitMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -124,6 +150,7 @@ STORAGES = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 LOGIN_URL = "login"
@@ -132,28 +159,68 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+
 X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-
-if env_bool("DJANGO_BEHIND_PROXY", False):
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
+SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool(
+    "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS",
+    False,
+)
+SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
+
+if BEHIND_PROXY:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
-SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0"))
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", False)
-SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
+SESSION_COOKIE_AGE = int(os.getenv("DJANGO_SESSION_COOKIE_AGE", "43200"))
+SESSION_SAVE_EVERY_REQUEST = True
+PASSWORD_RESET_TIMEOUT = int(os.getenv("DJANGO_PASSWORD_RESET_TIMEOUT", "3600"))
+
+if not DEBUG:
+    SESSION_COOKIE_NAME = "__Host-cowodlaval_session"
+    CSRF_COOKIE_NAME = "__Host-cowodlaval_csrf"
+    SESSION_COOKIE_PATH = "/"
+    CSRF_COOKIE_PATH = "/"
 
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "")
 if not PUBLIC_BASE_URL:
     raise ImproperlyConfigured("PUBLIC_BASE_URL must be set.")
 
+public_url = urlsplit(PUBLIC_BASE_URL)
+if (
+    not public_url.scheme
+    or not public_url.netloc
+    or public_url.username
+    or public_url.password
+    or public_url.query
+    or public_url.fragment
+    or public_url.path not in {"", "/"}
+):
+    raise ImproperlyConfigured("PUBLIC_BASE_URL must be a plain site origin.")
+
+PUBLIC_ORIGIN = f"{public_url.scheme}://{public_url.netloc}"
+
+if not DEBUG and public_url.scheme != "https":
+    raise ImproperlyConfigured("PUBLIC_BASE_URL must use HTTPS in production.")
+
+if not DEBUG and PUBLIC_ORIGIN not in CSRF_TRUSTED_ORIGINS:
+    raise ImproperlyConfigured(
+        "DJANGO_CSRF_TRUSTED_ORIGINS must include PUBLIC_BASE_URL origin."
+    )
+
 CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
 if not DEBUG and (not CONTACT_EMAIL or not DEFAULT_FROM_EMAIL):
-    raise ImproperlyConfigured("CONTACT_EMAIL and DEFAULT_FROM_EMAIL must be set in production.")
+    raise ImproperlyConfigured(
+        "CONTACT_EMAIL and DEFAULT_FROM_EMAIL must be set in production."
+    )
+
 EMAIL_HOST = os.getenv("EMAIL_HOST", "")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
@@ -161,8 +228,12 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))
+
 if EMAIL_USE_TLS and EMAIL_USE_SSL:
-    raise ImproperlyConfigured("EMAIL_USE_TLS and EMAIL_USE_SSL cannot both be enabled.")
+    raise ImproperlyConfigured(
+        "EMAIL_USE_TLS and EMAIL_USE_SSL cannot both be enabled."
+    )
+
 EMAIL_BACKEND = (
     "django.core.mail.backends.console.EmailBackend"
     if DEBUG and not EMAIL_HOST
@@ -178,6 +249,7 @@ PAYPAL_WEBHOOK_ID = os.getenv("PAYPAL_WEBHOOK_ID", "")
 PAYPAL_ENVIRONMENT = os.getenv("PAYPAL_ENVIRONMENT", "sandbox").lower()
 if PAYPAL_ENVIRONMENT not in {"sandbox", "live"}:
     raise ImproperlyConfigured("PAYPAL_ENVIRONMENT must be sandbox or live.")
+
 PAYPAL_API_BASE = (
     "https://api-m.sandbox.paypal.com"
     if PAYPAL_ENVIRONMENT == "sandbox"
@@ -189,6 +261,7 @@ SATISPAY_PRIVATE_KEY_PATH = os.getenv("SATISPAY_PRIVATE_KEY_PATH", "")
 SATISPAY_ENVIRONMENT = os.getenv("SATISPAY_ENVIRONMENT", "sandbox").lower()
 if SATISPAY_ENVIRONMENT not in {"sandbox", "live"}:
     raise ImproperlyConfigured("SATISPAY_ENVIRONMENT must be sandbox or live.")
+
 SATISPAY_API_BASE = (
     "https://staging.authservices.satispay.com"
     if SATISPAY_ENVIRONMENT == "sandbox"

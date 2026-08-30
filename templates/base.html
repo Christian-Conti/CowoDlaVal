@@ -66,7 +66,7 @@
             {% csrf_token %}
             <input name="next" type="hidden" value="{{ request.get_full_path }}">
             <label class="sr-only" for="language-select">{% translate "Language" %}</label>
-            <select id="language-select" name="language" onchange="this.form.submit()">
+            <select id="language-select" name="language">
                 <option value="it" {% if LANGUAGE_CODE == "it" %}selected{% endif %}>IT</option>
                 <option value="en" {% if LANGUAGE_CODE == "en" %}selected{% endif %}>EN</option>
                 <option value="de" {% if LANGUAGE_CODE == "de" %}selected{% endif %}>DE</option>

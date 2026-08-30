@@ -1,0 +1,52 @@
+services:
+  desktop-integration:
+    image: alpine:3.22
+    restart: unless-stopped
+    network_mode: none
+    environment:
+      COWODLAVAL_HOST_HOME: /host-home
+      COWODLAVAL_HOST_HOME_PATH: "${HOME}"
+      COWODLAVAL_HOST_PROJECT_DIR: "${PWD}"
+    volumes:
+      - type: bind
+        source: ${HOME}
+        target: /host-home
+      - type: bind
+        source: /usr/local/bin
+        target: /host-usr-local-bin
+      - type: bind
+        source: ./scripts/docker_desktop_integration.sh
+        target: /usr/local/bin/cowodlaval-desktop-integration
+        read_only: true
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -eu
+
+        cleanup() {
+          echo "Removing CowoDlaVal host integration..."
+          /usr/local/bin/cowodlaval-desktop-integration uninstall || true
+        }
+
+        trap 'cleanup; exit 0' TERM INT HUP
+
+        echo "Installing CowoDlaVal host integration..."
+        /usr/local/bin/cowodlaval-desktop-integration install
+
+        while true; do
+          sleep 30 &
+          wait $! || true
+          /usr/local/bin/cowodlaval-desktop-integration install \
+            >/dev/null 2>&1 || true
+        done
+    stop_grace_period: 5s
+
+  web:
+    build:
+      target: development
+    depends_on:
+      desktop-integration:
+        condition: service_started
+    ports:
+      - "${WEB_BIND_ADDRESS:-127.0.0.1}:8000:8000"
