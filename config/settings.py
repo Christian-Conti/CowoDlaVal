@@ -203,3 +203,79 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": "INFO"},
 }
+
+# BEGIN COWODLAVAL SECURITY HARDENING
+# Added by the production security patch. Keep this block at the end of settings.py.
+from urllib.parse import urlsplit as _cowodlaval_urlsplit
+
+CACHE_URL = os.getenv("CACHE_URL", "")
+if CACHE_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": CACHE_URL,
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "cowodlaval-security",
+        }
+    }
+
+RATE_LIMITS_ENABLED = env_bool("DJANGO_RATE_LIMITS_ENABLED", not DEBUG)
+BEHIND_PROXY = env_bool("DJANGO_BEHIND_PROXY", False)
+if BEHIND_PROXY:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+_security_headers_middleware = "config.security_middleware.SecurityHeadersMiddleware"
+_rate_limit_middleware = "config.security_middleware.RateLimitMiddleware"
+
+if _security_headers_middleware not in MIDDLEWARE:
+    try:
+        _security_index = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1
+    except ValueError:
+        _security_index = 0
+    MIDDLEWARE.insert(_security_index, _security_headers_middleware)
+
+if _rate_limit_middleware not in MIDDLEWARE:
+    try:
+        _rate_index = MIDDLEWARE.index("django.middleware.csrf.CsrfViewMiddleware")
+    except ValueError:
+        _rate_index = len(MIDDLEWARE)
+    MIDDLEWARE.insert(_rate_index, _rate_limit_middleware)
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+PASSWORD_RESET_TIMEOUT = int(os.getenv("DJANGO_PASSWORD_RESET_TIMEOUT", "3600"))
+SESSION_COOKIE_AGE = int(os.getenv("DJANGO_SESSION_COOKIE_AGE", "43200"))
+SESSION_SAVE_EVERY_REQUEST = True
+
+if not DEBUG:
+    SESSION_COOKIE_NAME = "__Host-cowodlaval_session"
+    CSRF_COOKIE_NAME = "__Host-cowodlaval_csrf"
+    SESSION_COOKIE_PATH = "/"
+    CSRF_COOKIE_PATH = "/"
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+_public_url = _cowodlaval_urlsplit(PUBLIC_BASE_URL)
+if (
+    not _public_url.scheme
+    or not _public_url.netloc
+    or _public_url.username
+    or _public_url.password
+    or _public_url.query
+    or _public_url.fragment
+    or _public_url.path not in {"", "/"}
+):
+    raise ImproperlyConfigured("PUBLIC_BASE_URL must be a plain site origin.")
+
+PUBLIC_ORIGIN = f"{_public_url.scheme}://{_public_url.netloc}"
+if not DEBUG and _public_url.scheme != "https":
+    raise ImproperlyConfigured("PUBLIC_BASE_URL must use HTTPS in production.")
+if not DEBUG and PUBLIC_ORIGIN not in CSRF_TRUSTED_ORIGINS:
+    raise ImproperlyConfigured(
+        "DJANGO_CSRF_TRUSTED_ORIGINS must include PUBLIC_BASE_URL origin."
+    )
+# END COWODLAVAL SECURITY HARDENING

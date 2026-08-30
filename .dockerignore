@@ -9,3 +9,4 @@ __pycache__
 *.sql.gz
 credentials
 secrets
+.env.production

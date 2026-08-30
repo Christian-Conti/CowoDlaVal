@@ -9,3 +9,4 @@ credentials/
 .docker/
 
 event_uploads/
+.env.production

@@ -8,3 +8,11 @@
     applySystemTheme();
     mediaQuery.addEventListener?.("change", applySystemTheme);
 })();
+
+// COWODLAVAL language selector CSP handler
+(() => {
+    const languageSelect = document.getElementById("language-select");
+    languageSelect?.addEventListener("change", () => {
+        languageSelect.form?.requestSubmit();
+    });
+})();

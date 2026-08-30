@@ -15,6 +15,7 @@ services:
     image: alpine:3.22
     restart: unless-stopped
 
+    network_mode: none
     environment:
       COWODLAVAL_HOST_HOME: /host-home
       COWODLAVAL_HOST_HOME_PATH: "${HOME}"
@@ -62,6 +63,10 @@ services:
   web:
     build: .
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     env_file: ${ENV_FILE:-.env}
     depends_on:
       db:
@@ -69,7 +74,7 @@ services:
       desktop-integration:
         condition: service_started
     ports:
-      - "8000:8000"
+      - "${WEB_BIND_ADDRESS:-127.0.0.1}:8000:8000"
     volumes:
       - ./event_uploads:/event_uploads:ro
       - ./secrets:/run/secrets:ro
