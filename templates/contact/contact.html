@@ -19,30 +19,30 @@
             <button class="button" type="submit">{% translate "Send request" %}</button>
         </form>
     </section>
-    {% if location_address %}
-        <section class="contact-location" aria-labelledby="location-heading">
-            <div class="location-heading">
-                <p class="eyebrow">{% translate "Location" %}</p>
-                <h2 id="location-heading">{% translate "Where to find us" %}</h2>
-                <p>{% translate "Find Cowo d'la val on the map and plan your journey." %}</p>
-            </div>
-            <div class="location-card">
-                <iframe
-                    class="location-map"
-                    src="{{ map_embed_url }}"
-                    title="{% translate "Map showing the location of Cowo d'la val" %}"
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                ></iframe>
-                <div class="location-details">
-                    <span>{% translate "Address" %}</span>
-                    <address>{{ location_address }}</address>
-                    <a class="button compact" href="{{ map_directions_url }}" target="_blank" rel="noopener noreferrer">
-                        {% translate "Open directions" %}
-                    </a>
-                </div>
-            </div>
-        </section>
-    {% endif %}
 </section>
+{% if location_address %}
+    <section class="shell contact-location" aria-labelledby="location-heading">
+        <div class="location-heading">
+            <p class="eyebrow">{% translate "Location" %}</p>
+            <h2 id="location-heading">{% translate "Where to find us" %}</h2>
+            <p>{% translate "Find Cowo d'la val on the map and plan your journey." %}</p>
+        </div>
+        <div class="location-card">
+            <iframe
+                class="location-map"
+                src="{{ map_embed_url }}"
+                title="{% translate "Map showing the location of Cowo d'la val" %}"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+            <div class="location-details">
+                <span>{% translate "Address" %}</span>
+                <address>{{ location_address }}</address>
+                <a class="button compact" href="{{ map_directions_url }}" target="_blank" rel="noopener noreferrer">
+                    {% translate "Open directions" %}
+                </a>
+            </div>
+        </div>
+    </section>
+{% endif %}
 {% endblock %}

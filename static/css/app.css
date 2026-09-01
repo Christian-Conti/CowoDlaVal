@@ -925,8 +925,7 @@ table th {
 }
 
 .contact-location {
-    grid-column: 1 / -1;
-    padding-top: 18px;
+    padding-bottom: 78px;
 }
 
 .location-heading {
@@ -1117,6 +1116,10 @@ dt {
     .section,
     .page-section {
         padding-block: 54px;
+    }
+
+    .contact-location {
+        padding-bottom: 54px;
     }
 
     .hero-copy h1 {
