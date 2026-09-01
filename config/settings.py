@@ -215,6 +215,7 @@ if not DEBUG and PUBLIC_ORIGIN not in CSRF_TRUSTED_ORIGINS:
     )
 
 CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "")
+LOCATION_ADDRESS = os.getenv("LOCATION_ADDRESS", "").strip()
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
 if not DEBUG and (not CONTACT_EMAIL or not DEFAULT_FROM_EMAIL):
     raise ImproperlyConfigured(

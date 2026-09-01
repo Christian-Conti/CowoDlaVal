@@ -1,5 +1,6 @@
 import logging
 import smtplib
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
@@ -95,8 +96,29 @@ def contact(request):
             _("We could not send your message. Please try again later or contact us by email."),
         )
 
+    location_address = settings.LOCATION_ADDRESS
+    location_context = {}
+    if location_address:
+        location_context = {
+            "location_address": location_address,
+            "map_embed_url": "https://www.google.com/maps?"
+            + urlencode(
+                {
+                    "q": location_address,
+                    "output": "embed",
+                    "hl": request.LANGUAGE_CODE,
+                }
+            ),
+            "map_directions_url": "https://www.google.com/maps/dir/?"
+            + urlencode({"api": "1", "destination": location_address}),
+        }
+
     return render(
         request,
         "contact/contact.html",
-        {"form": form, "contact_email": settings.CONTACT_EMAIL},
+        {
+            "form": form,
+            "contact_email": settings.CONTACT_EMAIL,
+            **location_context,
+        },
     )

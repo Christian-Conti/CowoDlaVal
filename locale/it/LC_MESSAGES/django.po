@@ -594,6 +594,24 @@ msgstr ""
 msgid "Send request"
 msgstr "Invia richiesta"
 
+msgid "Location"
+msgstr "Posizione"
+
+msgid "Where to find us"
+msgstr "Dove trovarci"
+
+msgid "Find Cowo d'la val on the map and plan your journey."
+msgstr "Trova Cowo d'la val sulla mappa e pianifica il tuo viaggio."
+
+msgid "Map showing the location of Cowo d'la val"
+msgstr "Mappa che mostra la posizione di Cowo d'la val"
+
+msgid "Address"
+msgstr "Indirizzo"
+
+msgid "Open directions"
+msgstr "Apri le indicazioni"
+
 msgid "Cowo d'la val - Coworking Space"
 msgstr "Cowo d'la val - Spazio Coworking"
 

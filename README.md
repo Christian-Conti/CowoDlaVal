@@ -91,6 +91,7 @@ Core variables:
 | `PUBLIC_BASE_URL` | External origin used in email and provider return/callback URLs. |
 | `DATABASE_URL` | PostgreSQL connection URL. |
 | `CONTACT_EMAIL` | Destination for the contact form. |
+| `LOCATION_ADDRESS` | Public address used by the contact-page map and directions link. |
 | `DEFAULT_FROM_EMAIL` | Sender for application email. |
 | `DJANGO_SECURE_SSL_REDIRECT` | Redirect HTTP to HTTPS in production. |
 

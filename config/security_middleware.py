@@ -157,13 +157,16 @@ class SecurityHeadersMiddleware:
             if request.path.startswith("/admin/"):
                 # Django Admin can require inline script in some views.
                 script_source = "'self' 'unsafe-inline'"
+            frame_source = (
+                "https://www.google.com" if request.path == "/contact/" else "'none'"
+            )
 
             directives = [
                 "default-src 'self'",
                 "base-uri 'self'",
                 "object-src 'none'",
                 "frame-ancestors 'none'",
-                "frame-src 'none'",
+                f"frame-src {frame_source}",
                 "img-src 'self' data:",
                 "font-src 'self' data:",
                 "style-src 'self' 'unsafe-inline'",

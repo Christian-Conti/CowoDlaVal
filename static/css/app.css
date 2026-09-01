@@ -924,6 +924,67 @@ table th {
     word-break: break-word;
 }
 
+.contact-location {
+    grid-column: 1 / -1;
+    padding-top: 18px;
+}
+
+.location-heading {
+    margin-bottom: 24px;
+}
+
+.location-heading h2 {
+    margin: 0;
+    color: var(--blue);
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    line-height: 1;
+    text-transform: uppercase;
+    font-weight: 900;
+}
+
+.location-heading > p:last-child {
+    margin: 14px 0 0;
+    color: var(--muted);
+}
+
+.location-card {
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.location-map {
+    width: 100%;
+    min-height: 420px;
+    border: 0;
+}
+
+.location-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 14px;
+    padding: 30px;
+}
+
+.location-details span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.location-details address {
+    font-style: normal;
+    font-weight: 750;
+}
+
 .site-footer {
     border-top: 1px solid var(--line);
     background: var(--surface);
@@ -1031,6 +1092,14 @@ dt {
 
     .contact-copy {
         position: static;
+    }
+
+    .location-card {
+        grid-template-columns: 1fr;
+    }
+
+    .location-details {
+        align-items: stretch;
     }
 }
 
